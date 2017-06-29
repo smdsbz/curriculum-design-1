@@ -62,7 +62,7 @@ _(院系负责人、科研团队不同名)_
 
 -------------------------------------------------------------
 
-## Data Structure
+## API
 
 #### Department Info
 
@@ -75,6 +75,15 @@ mobile      |   联系电话            |   char[15]     |   "13312345678"
 next        |   下一个院系节点         |   Depart *    |   NULL
 child_team_head |   团队链表中该院的第一个节点  |   Team *    |   NULL
 child_team_tail |   团队链表中该院的最后一个节点  |   Team *  |   NULL
+
+```C
+Depart *appendDepart(Depart *tail, Depart new_one);
+int modifyDepart(Depart *target, Depart new_one);
+int removeDepart(Depart *target);
+Depart *getDepartByManager(const char *);
+Depart *getDepartByName(const char *);
+Depart initDepart(void);
+```
 
 
 #### Team Info
@@ -131,3 +140,5 @@ Team_HEAD --------> ... <--> Team_from_another_Department <--> Team_1 <--> Team_
                              |                       |
 Project_HEAD -----> ... <--> Proj_1 <--> Proj_2 <--> ...
 ```
+
+-------------------------------------------------------------

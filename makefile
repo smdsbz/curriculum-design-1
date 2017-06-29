@@ -1,5 +1,5 @@
 main:
-	gcc ./utils/data_structure.c
+	gcc ./utils/*
 
 clean:
 	rm a.exe
