@@ -31,7 +31,7 @@ Project_HEAD -----> ... <--> Proj_1 <--> Proj_2 <--> ...
 
 
 
-#define BUILDING        // 正在开发，包含main函数，单元测试
+// #define BUILDING        // 正在开发，包含main函数，单元测试
 
 #if defined(BUILDING)
 #include <stdio.h>
