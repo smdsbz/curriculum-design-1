@@ -77,12 +77,13 @@ child_team_head |   团队链表中该院的第一个节点  |   Team *    |   N
 child_team_tail |   团队链表中该院的最后一个节点  |   Team *  |   NULL
 
 ```C
+Depart initDepart(void);
 Depart *appendDepart(Depart *tail, Depart new_one);
 int modifyDepart(Depart *target, Depart new_one);
 int removeDepart(Depart *target);
-Depart *getDepartByManager(const char *);
-Depart *getDepartByName(const char *);
-Depart initDepart(void);
+DepartWrapper *getDepartByManager(Depart *start, const char *manager, DepartWrapper *rtn);
+DepartWrapper *getDepartByName(Depart *start, const char *, DepartWrapper *rtn);
+void cleanupDepartWrapper(DepartWrapper *start, DepartWrapper *end);
 ```
 
 
@@ -142,3 +143,14 @@ Project_HEAD -----> ... <--> Proj_1 <--> Proj_2 <--> ...
 ```
 
 -------------------------------------------------------------
+
+
+
+#### 不定长搜索结果序列实现方式
+```C
+typedef struct _DepartWrapper {
+    /* 用来储存搜索结果 */
+    struct _Depart          *depart;    // 指向符合条件的节点
+    struct _DepartWrapper   *next;      // 指向下一个结果wrapper
+} DepartWrapper;
+```

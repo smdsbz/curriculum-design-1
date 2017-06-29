@@ -45,7 +45,7 @@ Project_HEAD -----> ... <--> Proj_1 <--> Proj_2 <--> ...
 // 但是现在我懒得写hash，所以我拒绝，单向链表你慢慢找吧:triumph:
 
 
-typedef struct _Department {
+typedef struct _Depart {
 
     // self.data
     char    name[20];       // 院系名称
@@ -63,6 +63,13 @@ typedef struct _Department {
     struct _Team    *child_team_tail;       // ''''''''''''中的最后一个
 
 } Depart;
+
+typedef struct _DepartWrapper {
+    /* 用来储存搜索结果 */
+    struct _Depart          *depart;    // 指向符合条件的节点
+    struct _DepartWrapper   *next;      // 指向下一个结果wrapper
+} DepartWrapper;
+
 
 
 
@@ -89,6 +96,12 @@ typedef struct _Team {
 
 } Team;
 
+typedef struct _TeamWrapper {
+    struct _Team        *team;
+    struct _TeamWrapper *next;
+} TeamWrapper;
+
+
 
 
 typedef struct _Project {
@@ -109,6 +122,11 @@ typedef struct _Project {
     #endif
     struct _Project *next;      // 下一个同级节点
 } Project;
+
+typedef struct _ProjectWrapper {
+    struct _Project         *project;
+    struct _ProjectWrapper  *next;
+} ProjectWrapper;
 
 
 

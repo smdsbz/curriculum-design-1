@@ -1,5 +1,5 @@
 main:
-	gcc ./utils/*
+	gcc ./utils/*.h ./utils/*.c main.c
 
 clean:
 	rm a.exe
