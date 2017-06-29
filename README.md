@@ -68,9 +68,13 @@ _(院系负责人、科研团队不同名)_
 
 name        |   description        |   type         |   sample
 ------------|----------------------|--------------- |--------------------
-name      |   院系名称            |   char[20]     |   "Computer"
+name        |   院系名称            |   char[20]     |   "Computer"
 manager     |   负责人             |   char[12]     |   "张三"
 mobile      |   联系电话            |   char[15]     |   "13312345678"
+---         |   ---                |    ---         |    ---
+next        |   下一个院系节点         |   Depart *    |   NULL
+child_team_head |   团队链表中该院的第一个节点  |   Team *    |   NULL
+child_team_tail |   团队链表中该院的最后一个节点  |   Team *  |   NULL
 
 
 #### Team Info
@@ -82,6 +86,11 @@ manager     |   负责人             |   char[12]    |   "李四"
 teacher_num |   教师人数            |   int         |   5
 student_num |   研究生人数           |   int         |   20
 faculty     |   所属院系            |   char[20]    |   "Computer"
+---         |   ---                 |   ---         |   ---
+parent_depart   |   该团队所属院系的节点  |   Depart *    |   NULL
+next        |   下一个团队节点         |   Team *      |   NULL
+child_project_head  |   项目链表中该团队的第一个节点  |   Project *   |   NULL
+child_project_tail  |   项目链表中该团队的最后一个节点 |   Project *   |   NULL
 
 
 #### Project Info
@@ -91,9 +100,12 @@ name        |   description         |   type        |   sample
 id          |   项目编号            |   char[15]    |   "0121210044"
 type        |   项目类别            |   char        |   [1-5] (*[1])
 start_date  |   起始时间            |   char[8]     |   "2015/03"
-funding     |   项目经费            |   float       |   23.5 (x 1000 CNY)
+funding     |   项目经费            |   float           |   23.5 (x 1000 CNY)
 manager     |   项目负责人           |   char[12]    |   "王五"
 team        |   所属团队            |   char[30]    |   "网络安全"
+---         |   ---                 |   ---         |   ---
+parent_team |   该项目负责团队的节点  |   Team *      |   NULL
+next        |   下一个项目节点         | Project *     |   NULL
 
 ##### \*[1] project.type
 

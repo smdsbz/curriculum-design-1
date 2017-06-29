@@ -59,10 +59,10 @@ typedef struct _Department {
     struct _Depart  *next;  // 下一个院系节点
 
     // navigation - child node range
-    struct _Team    *child_team_start;      // 该院系所有团队中的第一个
-    struct _Team    *child_team_end;        // ''''''''''''中的最后一个
+    struct _Team    *child_team_head;       // 该院系所有团队中的第一个
+    struct _Team    *child_team_tail;       // ''''''''''''中的最后一个
 
-} Department;
+} Depart;
 
 
 
@@ -84,8 +84,8 @@ typedef struct _Team {
     struct _Team    *next;      // 下一个同级节点
 
     // navigation - child node range
-    struct _Project *child_project_start;   // 该团队所有项目中的第一个
-    struct _Project *child_project_end;     // ''''''''''''最后一个
+    struct _Project *child_project_head;    // 该团队所有项目中的第一个
+    struct _Project *child_project_tail;    // ''''''''''''中的最后一个
 
 } Team;
 
@@ -102,12 +102,12 @@ typedef struct _Project {
     char    team[30];       // 所属团队
 
     // navigation
-    struct _Team    *parent_team;
+    struct _Team    *parent_team;   // 负责团队的节点
 
     #if defined(DUAL_WAY_CHAIN)
-    struct _Project *prev;
+    struct _Project *prev;      // 上一个同级节点
     #endif
-    struct _Project *next;
+    struct _Project *next;      // 下一个同级节点
 } Project;
 
 
