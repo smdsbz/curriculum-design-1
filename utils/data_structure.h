@@ -30,7 +30,9 @@ Project_HEAD -----> ... <--> Proj_1 <--> Proj_2 <--> ...
 
 
 
-
+#ifdef BUILDING
+#undef BUILDING
+#endif
 // #define BUILDING        // 正在开发，包含main函数，单元测试
 
 #if defined(BUILDING)
@@ -51,8 +53,11 @@ typedef struct _Depart {
     char    name[20];       // 院系名称
     char    manager[12];    // 负责人
     char    mobile[15];     // 负责人电话
+    // added
+    int     team_num;       // 该院系团队总数
 
     // navigation
+    // NOTE: 写入文件时没有指针
     #if defined(DUAL_WAY_CHAIN)
     struct _Depart  *prev;  // 上一个院系节点
     #endif
