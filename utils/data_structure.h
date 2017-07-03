@@ -47,6 +47,13 @@ Project_HEAD -----> ... <--> Proj_1 <--> Proj_2 <--> ...
 // 但是现在我懒得写hash，所以我拒绝，单向链表你慢慢找吧:triumph:
 
 
+
+
+#include <string.h>     // will be used in .c files
+
+
+/*********** Definitions ************/
+
 typedef struct _Depart {
 
     // self.data

@@ -90,17 +90,17 @@ int modifyDepart(Depart *target, Depart new_one);
  *  RETN:   success code
  */
 
-int removeDepart(Depart *target);
+int removeDepart(Depart **phead, Depart *target);
 /*  删除院系节点（也可以用作free方法？？）
- *  ARGS:   目标地址 | NULL
+ *  ARGS:   指向院系链表头节点地址的指针，目标地址 | NULL
  *  RETN:   success code
  */
 
 DepartWrapper *getDepartByManager(Depart *, const char *, DepartWrapper *);
 /*  通过负责人姓名查找院系
  *  ARGS:   院系链表，院系负责人 char[12]，搜索结果挂载点
- *  RETN:   搜索结果挂载点 | NULL （没有结果时也返回挂载点地址）
- *  NOTE:   院系负责人不同名，返回的是一个院系的数据，或者也可以像下面的这个函数一样，返回结果链
+ *  RETN:   搜索结果挂载点 | NULL
+ *  NOTE:   没有结果时也返回挂载点地址，只有在申请内存出错时返回NULL
  *  NOTE:   只能在院系链有数据的情况下调用该函数！
  */
 

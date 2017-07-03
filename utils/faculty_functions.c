@@ -16,11 +16,6 @@
 #endif
 
 
-#include <string.h>
-
-
-// Depart *Depart_HEAD = NULL;
-
 
 
 
@@ -38,9 +33,9 @@ int modifyDepart(Depart *target, Depart new_one);
  *  RETN:   success code
  */
 
-int removeDepart(Depart *target);
+int removeDepart(Depart **phead, Depart *target);
 /*  删除院系节点（也可以用作free方法？？）
- *  ARGS:   目标地址 | NULL
+ *  ARGS:   指向院系链表头节点地址的指针，目标地址 | NULL
  *  RETN:   success code
  */
 
@@ -154,7 +149,7 @@ void main(void) {
 /*************** Function Realizations ***************/
 
 Depart initDepart(void) {
-    /* TODO: 增加图形界面后记得修改数据来源 */
+    // TODO: 增加图形界面后记得修改数据来源
     // NOTE: 载入内存
     Depart Computer;
     printf("depart.name = "); scanf("%s", Computer.name);
@@ -218,7 +213,7 @@ int modifyDepart(Depart *target, Depart new_one) {
 
 
 
-int removeDepart(Depart *target) {
+int removeDepart(Depart **phead, Depart *target) {
 
     /* 错误处理：同上 */
     if (target == NULL) {
@@ -228,8 +223,19 @@ int removeDepart(Depart *target) {
         return 0;
     }
 
+    /* problem code
     free(target);
-    target = NULL;
+    target = NULL;  // target will be deleted out of the function, no need to redirect
+    */
+
+    if (*phead == target) {     // 要删除的节点是头节点
+        *phead = target->next;  // 头节点重新赋值
+        phead->next = target->next->next;   // 链表重新链接
+    } else {    // 要删除的节点不是头节点
+        Depart *phead_safe = *phead;
+        // HACK: 删除后没有重新连接链表!!!!
+        
+    }
 
     return 1;
 }
