@@ -234,8 +234,12 @@ int removeDepart(Depart **phead, Depart *target) {
     } else {    // 要删除的节点不是头节点
         Depart *phead_safe = *phead;
         // HACK: 删除后没有重新连接链表!!!!
-        
+        for (; phead_safe->next != target; phead_safe = phead_safe->next) ;
+        phead_safe->next = phead_safe->next->next;
     }
+
+    // after all the routing things are done
+    free(target);
 
     return 1;
 }
