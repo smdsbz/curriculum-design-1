@@ -126,12 +126,16 @@ void main(void) {
     cleanupDepartWrapper(RST_LIST);
         // NOTE: RST_LIST在清理之后也free掉了，需要重新申请搜索结果挂载点
 
+    // search demo
     RST_LIST = (DepartWrapper *)malloc(sizeof(DepartWrapper));
     printf("search by name: "); scanf("%s", buf);
     getDepartByName(HEAD, buf, RST_LIST);
     printDepartWrapperToConsole(RST_LIST);
     cleanupDepartWrapper(RST_LIST);
 
+    // remove demo
+    removeDepart(&HEAD, HEAD->next);
+    printDepartToConsole(HEAD);
 
     // simple cleanup
     // HACK: cleanupDepart() to simplify this process
@@ -230,7 +234,7 @@ int removeDepart(Depart **phead, Depart *target) {
 
     if (*phead == target) {     // 要删除的节点是头节点
         *phead = target->next;  // 头节点重新赋值
-        phead->next = target->next->next;   // 链表重新链接
+        (*phead)->next = target->next->next;   // 链表重新链接
     } else {    // 要删除的节点不是头节点
         Depart *phead_safe = *phead;
         // HACK: 删除后没有重新连接链表!!!!
@@ -252,7 +256,7 @@ void cleanupDepartWrapper(DepartWrapper *start) {
     while (1) {
         end = start->next;   // 保存下一个节点位置
         #if defined(BUILDING)
-        printf("freed 0x%p\n", start);
+        printf("[LOG] cleanupDepartWrapper(): freed 0x%p\n", start);
         #endif
         free(start);
         start = end;
