@@ -78,13 +78,15 @@ child_team_head |   团队链表中该院的第一个节点  |   Team *    |   N
 child_team_tail |   团队链表中该院的最后一个节点  |   Team *  |   NULL
 
 ```C
-Depart *appendDepart(Depart *tail, Depart new_one);
+    /**** POST | DELETE | PUT ****/
+
+Depart *appendDepart(Depart *head, Depart *tail, DepartData new_one);
 /*  录入院系
- *  ARGS:   链表尾，已有数据的作为buffer的Depart节点
+ *  ARGS:   链表头，链表尾，已有数据的作为buffer的DepartData实例
  *  RETN:   新增节点的地址
  */
 
-int modifyDepart(Depart *target, Depart new_one);
+int modifyDepart(Depart *target, DepartData new_one);
 /*  修改院系信息
  *  ARGS:   目标地址，已经修改数据的buffer
  *  RETN:   success code
@@ -96,11 +98,13 @@ int removeDepart(Depart **phead, Depart *target);
  *  RETN:   success code
  */
 
+    /**** SELECT ****/
+
 DepartWrapper *getDepartByManager(Depart *, const char *, DepartWrapper *);
 /*  通过负责人姓名查找院系
  *  ARGS:   院系链表，院系负责人 char[12]，搜索结果挂载点
- *  RETN:   搜索结果挂载点 | NULL
- *  NOTE:   没有结果时也返回挂载点地址，只有在申请内存出错时返回NULL
+ *  RETN:   搜索结果挂载点 | NULL （没有结果时也返回挂载点地址）
+ *  NOTE:   院系负责人不同名，返回的是一个院系的数据，或者也可以像下面的这个函数一样，返回结果链
  *  NOTE:   只能在院系链有数据的情况下调用该函数！
  */
 
@@ -111,12 +115,14 @@ DepartWrapper *getDepartByName(Depart *, const char *, DepartWrapper *);
  *  NOTE:   由于查找结果可能不只有一个，该操作会创建一个用于储存查询结果的新链表，返回链表的头节点地址
  */
 
-Depart initDepart(void);
+DepartData initDepartData(void);
 /*  创建一个院系数据的原型
  *  ARGS:   void
  *  RETN:   根据在该函数执行过程中输入的数据所创建出来的原型
  *  NOTE:   will trigger input action
  */
+
+    /**** CLEANUPs ****/
 
 void cleanupDepartWrapper(DepartWrapper *start);
 /*  清空搜索结果序列
@@ -124,6 +130,12 @@ void cleanupDepartWrapper(DepartWrapper *start);
  *  RETN:   void
  *  NOTE:   每次搜完了记得调一次啊。。。
  *  NOTE:   调用后传进来的那个节点也没了！
+ */
+
+void cleanupDepart(Depart *start);
+/*  释放Depart链所占用的内存空间
+ *  ARGS:   头节点地址
+ *  RETN:   void
  */
 ```
 
