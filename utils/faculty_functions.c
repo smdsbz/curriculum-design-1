@@ -1,19 +1,21 @@
-#include "data_structure.h"
+#ifndef DATA_STRUCTURE
+#include "data_structure.c"
+#endif
 
 #ifdef BUILDING
 #undef BUILDING
 #endif
-#define BUILDING
+// #define BUILDING
 
 #ifdef DEBUG
 #undef DEBUG
 #endif
-#define DEBUG
+// #define DEBUG
 
-#if defined(BUILDING)
-#include <stdio.h>
-#include <stdlib.h>
-#endif
+// #if defined(BUILDING)
+// #include <stdio.h>
+// #include <stdlib.h>
+// #endif
 
 
 
@@ -80,6 +82,8 @@ void cleanupDepart(Depart *start);
  *  ARGS:   头节点地址
  *  RETN:   void
  */
+
+
 
 
 #if defined(BUILDING)

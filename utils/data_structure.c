@@ -1,3 +1,6 @@
+#ifndef DATA_STRUCTURE
+#define DATA_STRUCTURE  "data_structure.c"
+
 /*  $PROJ_HOME/utils/data_structure.c
  *
  *  @author smdsbz@github.com
@@ -35,9 +38,9 @@ Project_HEAD -----> ... <--> Proj_1 <--> Proj_2 <--> ...
 #endif
 // #define BUILDING        // 正在开发，包含main函数，单元测试
 
-#if defined(BUILDING)
-#include <stdio.h>
-#endif
+// #if defined(BUILDING)
+// #include <stdio.h>
+// #endif
 
 
 // HACK: 双向链表
@@ -48,7 +51,8 @@ Project_HEAD -----> ... <--> Proj_1 <--> Proj_2 <--> ...
 
 
 
-
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>     // will be used in .c files
 
 
@@ -96,6 +100,7 @@ typedef struct _TeamData {
     int     teacher_num;    // 教师人数
     int     student_num;    // 研究生人数
     char    faculty[20];    // 所属院系
+    int     project_num;       // 该团队所管理的项目总数
 } TeamData;
 
 
@@ -159,4 +164,6 @@ typedef struct _ProjectWrapper {
 void main(void) {
     puts("Successfully constructed!");
 }
+#endif
+
 #endif
