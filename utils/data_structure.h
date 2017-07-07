@@ -54,27 +54,31 @@ Project_HEAD -----> ... <--> Proj_1 <--> Proj_2 <--> ...
 
 /*********** Definitions ************/
 
-typedef struct _Depart {
+/**** Depart ****/
 
+typedef struct _DepartData {
     // self.data
     char    name[20];       // 院系名称
     char    manager[12];    // 负责人
     char    mobile[15];     // 负责人电话
     // added
     int     team_num;       // 该院系团队总数
+} DepartData;
 
+
+typedef struct _Depart {
+    // data
+    struct _DepartData  *data;  // 指向数据域
     // navigation
-    // NOTE: 写入文件时没有指针
     #if defined(DUAL_WAY_CHAIN)
     struct _Depart  *prev;  // 上一个院系节点
     #endif
     struct _Depart  *next;  // 下一个院系节点
-
     // navigation - child node range
     struct _Team    *child_team_head;       // 该院系所有团队中的第一个
     struct _Team    *child_team_tail;       // ''''''''''''中的最后一个
-
 } Depart;
+
 
 typedef struct _DepartWrapper {
     /* 用来储存搜索结果 */
@@ -83,30 +87,32 @@ typedef struct _DepartWrapper {
 } DepartWrapper;
 
 
+/**** Team ****/
 
-
-typedef struct _Team {
-
+typedef struct _TeamData {
     // self.data
     char    name[30];       // 团队名称
     char    manager[12];    // 负责人
     int     teacher_num;    // 教师人数
     int     student_num;    // 研究生人数
     char    faculty[20];    // 所属院系
+} TeamData;
 
+
+typedef struct _Team {
+    // data
+    struct _TeamData    *data;
     // navigation
     struct _Depart  *parent_depart; // 所属院系节点
-
     #if defined(DUAL_WAY_CHAIN)
     struct _Team    *prev;      // 上一个同级节点
     #endif
     struct _Team    *next;      // 下一个同级节点
-
     // navigation - child node range
     struct _Project *child_project_head;    // 该团队所有项目中的第一个
     struct _Project *child_project_tail;    // ''''''''''''中的最后一个
-
 } Team;
+
 
 typedef struct _TeamWrapper {
     struct _Team        *team;
@@ -115,9 +121,9 @@ typedef struct _TeamWrapper {
 
 
 
+/**** Project ****/
 
-typedef struct _Project {
-
+typedef struct _ProjectData {
     // self.data
     char    id[15];         // 项目编号
     char    type;           // 项目类别
@@ -125,15 +131,20 @@ typedef struct _Project {
     float   funding;        // 项目经费
     char    manager[12];    // 项目负责人
     char    team[30];       // 所属团队
+} ProjectData;
 
+
+typedef struct _Project {
+    // data
+    struct _ProjectData *data;
     // navigation
     struct _Team    *parent_team;   // 负责团队的节点
-
     #if defined(DUAL_WAY_CHAIN)
     struct _Project *prev;      // 上一个同级节点
     #endif
     struct _Project *next;      // 下一个同级节点
 } Project;
+
 
 typedef struct _ProjectWrapper {
     struct _Project         *project;

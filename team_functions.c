@@ -66,3 +66,44 @@ void cleanupTeamWrapper(TeamWrapper *);
  *  ARGS:   头节点地址
  *  RETN:   void
  */
+
+
+
+/************ Function Realizations *************/
+
+
+
+
+
+Team *appendTeam(Team *tail, Team new_one) {
+    if (tail->next != NULL) {
+        #if defined(DEBUG)
+        puts("[LOG] Error in appendTeam():\n\ttail.next not pointing to NULL");
+        #endif
+        return NULL;
+    }
+
+    tail->next = (Team *)malloc(sizeof(Team));
+    if (tail->next == NULL) {
+        #if defined(DEBUG)
+        puts("[LOG] Error in appendTeam():\n\tfailed to alloc memory");
+        #endif
+        return NULL;
+    }
+
+    *(tail->next) = new_one;
+
+    return tail->next;
+}
+
+
+int modifyTeam(Team *tgt, Team new_one) {
+    if (tgt == NULL) {
+        #if defined(DEBUG)
+        puts("[LOG] modifyTeam():\n\ttarget is NULL");
+        #endif
+        return 0;
+    }
+
+    *tgt = new_one;
+}

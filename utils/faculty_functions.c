@@ -21,13 +21,13 @@
 
 /************ Declaration ************/
 
-Depart *appendDepart(Depart *tail, Depart new_one);
+Depart *appendDepart(Depart *tail, DepartData new_one);
 /*  录入院系
- *  ARGS:   链表尾，已有数据的作为buffer的Depart节点
+ *  ARGS:   链表尾，已有数据的作为buffer的DepartData实例
  *  RETN:   新增节点的地址
  */
 
-int modifyDepart(Depart *target, Depart new_one);
+int modifyDepart(Depart *target, DepartData new_one);
 /*  修改院系信息
  *  ARGS:   目标地址，已经修改数据的buffer
  *  RETN:   success code
@@ -78,10 +78,10 @@ void cleanupDepartWrapper(DepartWrapper *start);
 void printDepartToConsole(Depart *Comp) {
     /* 向终端打印院系信息 */
     printf("<Department @ 0x%p>\n", Comp);
-    printf("\tthis.name = %s\n", Comp->name);
-    printf("\tthis.manager = %s\n", Comp->manager);
-    printf("\t\tthis.mobile = %s\n", Comp->mobile);
-    printf("\tthis.team_num = %d\n", Comp->team_num);
+    printf("\tthis.name = %s\n", Comp->data->name);
+    printf("\tthis.manager = %s\n", Comp->data->manager);
+    printf("\t\tthis.mobile = %s\n", Comp->data->mobile);
+    printf("\tthis.team_num = %d\n", Comp->data->team_num);
     printf("\n\tnext_node @ 0x%p\n", Comp->next);
     printf("\tteam from 0x%p to 0x%p\n", Comp->child_team_head, Comp->child_team_tail);
     putchar('\n'); putchar('\n');
@@ -237,7 +237,6 @@ int removeDepart(Depart **phead, Depart *target) {
         (*phead)->next = target->next->next;   // 链表重新链接
     } else {    // 要删除的节点不是头节点
         Depart *phead_safe = *phead;
-        // HACK: 删除后没有重新连接链表!!!!
         for (; phead_safe->next != target; phead_safe = phead_safe->next) ;
         phead_safe->next = phead_safe->next->next;
     }
