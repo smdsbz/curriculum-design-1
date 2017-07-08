@@ -327,7 +327,15 @@ DepartWrapper *getDepartByManager(Depart *start,
                                   const char *manager) {
     /* NOTE: 这里还是按照有同名的情况来找，以后我就可以复制粘贴了 :doge: */
 
+    // 创建搜索结果挂载点
+    // NOTE: 使用完搜索结果后记得free()
     DepartWrapper *rtn = (DepartWrapper *)malloc(sizeof(DepartWrapper));
+    if (rtn == NULL) {
+        #if defined(DEBUG)
+        puts("[LOG] Error in getDepartByManager():\n\tfailed to malloc for result mounting point");
+        #endif
+        return NULL;
+    }
 
     DepartWrapper *rtn_head = rtn;  // 保存搜索结果链的头指针
     rtn_head->depart = NULL; rtn_head->next = NULL;   // 再次初始化
@@ -373,6 +381,12 @@ DepartWrapper *getDepartByManager(Depart *start,
 DepartWrapper *getDepartByName(Depart *start,
                                const char *name) {
     DepartWrapper *rtn = (DepartWrapper *)malloc(sizeof(DepartWrapper));
+    if (rtn == NULL) {
+        #if defined(DEBUG)
+        puts("[LOG] Error in getDepartByName():\n\tfailed to malloc for result mounting point");
+        #endif
+        return NULL;
+    }
     DepartWrapper *rtn_head = rtn;
     rtn_head->depart = NULL; rtn_head->next = NULL;
     while (1) {
