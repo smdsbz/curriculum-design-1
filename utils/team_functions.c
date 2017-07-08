@@ -108,6 +108,7 @@ TeamData initTeamData(void) {
 
 Team *appendTeam(Team *head, Team *tail, TeamData new_one) {
 
+    Depart *parent_depart = 
 
     // 错误处理
     if (tail->next != NULL) {

@@ -12,11 +12,6 @@
 #endif
 // #define DEBUG
 
-// #if defined(BUILDING)
-// #include <stdio.h>
-// #include <stdlib.h>
-// #endif
-
 
 
 
@@ -45,19 +40,21 @@ int removeDepart(Depart **phead, Depart *target);
 
     /**** SELECT ****/
 
-DepartWrapper *getDepartByManager(Depart *, const char *, DepartWrapper *);
+DepartWrapper *getDepartByManager(Depart *, const char *);
 /*  通过负责人姓名查找院系
- *  ARGS:   院系链表，院系负责人 char[12]，搜索结果挂载点
+ *  ARGS:   院系链表，院系负责人 char[12]
  *  RETN:   搜索结果挂载点 | NULL （没有结果时也返回挂载点地址）
  *  NOTE:   院系负责人不同名，返回的是一个院系的数据，或者也可以像下面的这个函数一样，返回结果链
  *  NOTE:   只能在院系链有数据的情况下调用该函数！
+ *  NOTE:   该函数会申请DepartWrapper占用空间，记得调用cleanupDepartWrapper()
  */
 
-DepartWrapper *getDepartByName(Depart *, const char *, DepartWrapper *);
+DepartWrapper *getDepartByName(Depart *, const char *);
 /*  通过院系名称查找院系
- *  ARGS:   名称线索（不一定是全称）
+ *  ARGS:   院系链表，名称线索（不一定是全称）
  *  RETN:   搜索结果挂载点 | NULL
  *  NOTE:   由于查找结果可能不只有一个，该操作会创建一个用于储存查询结果的新链表，返回链表的头节点地址
+ *  NOTE:   该函数会申请DepartWrapper占用空间，记得调用cleanupDepartWrapper()
  */
 
 DepartData initDepartData(void);
@@ -132,20 +129,18 @@ void main(void) {
     printDepartToConsole(HEAD->next);
 
     // query demo
-    DepartWrapper *RST_LIST = (DepartWrapper *)malloc(sizeof(DepartWrapper));
     auto char buf[40] = {'\0'};
 
     printf("search by manager: "); scanf("%s", buf);
-    getDepartByManager(HEAD, buf, RST_LIST);
+    DepartWrapper *RST_LIST = getDepartByManager(HEAD, buf);
     printDepartWrapperToConsole(RST_LIST);
         // NOTE: DON'T FORGET THIS!!!
     cleanupDepartWrapper(RST_LIST);
         // NOTE: RST_LIST在清理之后也free掉了，需要重新申请搜索结果挂载点
 
     // search demo
-    RST_LIST = (DepartWrapper *)malloc(sizeof(DepartWrapper));
     printf("search by name: "); scanf("%s", buf);
-    getDepartByName(HEAD, buf, RST_LIST);
+    RST_LIST = getDepartByName(HEAD, buf);
     printDepartWrapperToConsole(RST_LIST);
     cleanupDepartWrapper(RST_LIST);
 
@@ -329,9 +324,10 @@ void cleanupDepart(Depart *prev) {
     /**** SELECT ****/
 
 DepartWrapper *getDepartByManager(Depart *start,
-                                  const char *manager,
-                                  DepartWrapper *rtn) {
+                                  const char *manager) {
     /* NOTE: 这里还是按照有同名的情况来找，以后我就可以复制粘贴了 :doge: */
+
+    DepartWrapper *rtn = (DepartWrapper *)malloc(sizeof(DepartWrapper));
 
     DepartWrapper *rtn_head = rtn;  // 保存搜索结果链的头指针
     rtn_head->depart = NULL; rtn_head->next = NULL;   // 再次初始化
@@ -375,8 +371,8 @@ DepartWrapper *getDepartByManager(Depart *start,
 
 
 DepartWrapper *getDepartByName(Depart *start,
-                               const char *name,
-                               DepartWrapper *rtn) {
+                               const char *name) {
+    DepartWrapper *rtn = (DepartWrapper *)malloc(sizeof(DepartWrapper));
     DepartWrapper *rtn_head = rtn;
     rtn_head->depart = NULL; rtn_head->next = NULL;
     while (1) {
