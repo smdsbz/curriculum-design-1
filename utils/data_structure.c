@@ -1,5 +1,6 @@
 #ifndef DATA_STRUCTURE
 #define DATA_STRUCTURE  "data_structure.c"
+#endif
 
 /*  $PROJ_HOME/utils/data_structure.c
  *
@@ -158,12 +159,13 @@ typedef struct _ProjectWrapper {
 
 
 
+
+
+
 /*********** Unit Test **************/
 
 #if defined(BUILDING)
 void main(void) {
     puts("Successfully constructed!");
 }
-#endif
-
 #endif

@@ -33,10 +33,18 @@ int modifyDepart(Depart *target, DepartData new_one);
  */
 
 int removeDepart(Depart **phead, Depart *target);
-/*  删除院系节点（也可以用作free方法？？）
+/*  删除院系节点
  *  ARGS:   指向院系链表头节点地址的指针，目标地址 | NULL
  *  RETN:   success code
  */
+
+DepartData initDepartData(void);
+/*  创建一个院系数据的原型
+ *  ARGS:   void
+ *  RETN:   根据在该函数执行过程中输入的数据所创建出来的原型
+ *  NOTE:   will trigger input action
+ */
+
 
     /**** SELECT ****/
 
@@ -57,12 +65,6 @@ DepartWrapper *getDepartByName(Depart *, const char *);
  *  NOTE:   该函数会申请DepartWrapper占用空间，记得调用cleanupDepartWrapper()
  */
 
-DepartData initDepartData(void);
-/*  创建一个院系数据的原型
- *  ARGS:   void
- *  RETN:   根据在该函数执行过程中输入的数据所创建出来的原型
- *  NOTE:   will trigger input action
- */
 
     /**** CLEANUPs ****/
 
@@ -270,7 +272,7 @@ int removeDepart(Depart **phead, Depart *target) {
 
     if (*phead == target) {     // 要删除的节点是头节点
         *phead = target->next;  // 头节点重新赋值
-        (*phead)->next = target->next->next;   // 链表重新链接
+        // (*phead)->next = target->next->next;   // 链表重新链接 // 重言
     } else {    // 要删除的节点不是头节点
         Depart *phead_safe = *phead;
         for (; phead_safe->next != target; phead_safe = phead_safe->next) ;

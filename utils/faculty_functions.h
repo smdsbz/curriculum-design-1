@@ -18,7 +18,7 @@ extern int modifyDepart(Depart *target, DepartData new_one);
  */
 
 extern int removeDepart(Depart **phead, Depart *target);
-/*  删除院系节点（也可以用作free方法？？）
+/*  删除院系节点
  *  ARGS:   指向院系链表头节点地址的指针，目标地址 | NULL
  *  RETN:   success code
  */
