@@ -20,9 +20,9 @@
 
     /**** POST | DELETE | PUT ****/
 
-Depart *appendDepart(Depart *head, Depart *tail, DepartData new_one);
+Depart *appendDepart(Depart *head, DepartData new_one);
 /*  录入院系
- *  ARGS:   链表头，链表尾，已有数据的作为buffer的DepartData实例
+ *  ARGS:   链表头，已有数据的作为buffer的DepartData实例
  *  RETN:   新增节点的地址
  */
 
@@ -182,15 +182,17 @@ DepartData initDepartData(void) {
 
 
 
-Depart *appendDepart(Depart *head, Depart *tail, DepartData new_one) {
+Depart *appendDepart(Depart *head, DepartData new_one) {
+    Depart *tail = head;
+    for (; tail->next; tail = tail->next) ;
 
-    /* 错误处理：传入的节点地址不是最后一个节点的地址，防止数据丢失 */
-    if (tail->next != NULL) {
-        #if defined(DEBUG)
-        puts("[LOG] Error in appendDepart():\n\ttail.next not pointing to NULL");
-        #endif
-        return NULL;
-    }
+    // /* 错误处理：传入的节点地址不是最后一个节点的地址，防止数据丢失 */
+    // if (tail->next != NULL) {
+    //     #if defined(DEBUG)
+    //     puts("[LOG] Error in appendDepart():\n\ttail.next not pointing to NULL");
+    //     #endif
+    //     return NULL;
+    // }
 
     /* 最后一个节点就是头节点，前面没了 - a brand-new chain */
     if (head == tail

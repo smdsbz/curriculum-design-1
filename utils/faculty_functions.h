@@ -5,9 +5,9 @@
 
     /**** POST | DELETE | PUT ****/
 
-extern Depart *appendDepart(Depart *head, Depart *tail, DepartData new_one);
+extern Depart *appendDepart(Depart *head, DepartData new_one);
 /*  录入院系
- *  ARGS:   链表头，链表尾，已有数据的作为buffer的DepartData实例
+ *  ARGS:   链表头，已有数据的作为buffer的DepartData实例
  *  RETN:   新增节点的地址
  */
 

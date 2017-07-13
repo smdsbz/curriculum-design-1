@@ -54,10 +54,17 @@ int (*setJudger(const char *direction))(int, int) {
 
     /**** POST | DELETE | PUT ****/
 
-Team *appendTeam(Team *head, Team *tail, TeamData new_one,
-        Depart *depart_chain);
+TeamData initTeamData(void);
+/*  创建一个团队数据的原型
+ *  ARGS:   void
+ *  RETN:   根据在该函数执行过程中输入的数据所创建出来的原型
+ *  NOTE:   will trigger input action
+ */
+
+
+Team *appendTeam(Team *head, TeamData new_one, Depart *depart_chain);
 /*  录入团队
- *  ARGS:   链表头，链表尾，已有数据的作为buffer的TeamData实例，母结点链（院系链）
+ *  ARGS:   链表头，已有数据的作为buffer的TeamData实例，母结点链（院系链）
  *  RETN:   新增节点的地址
  */
 
@@ -67,7 +74,7 @@ int modifyTeam(Team *target, TeamData new_one);
  *  RETN:   success code
  */
 
-int removeTeam(Team **phead, Team *tgt, Depart *depart_chain);
+int removeTeam(Team **phead, Team *tgt);
 /*  删除团队节点
  *  ARGS:   指向团队链表头节点地址的指针，目标地址 | NULL
  *  RETN:   success code
@@ -76,26 +83,18 @@ int removeTeam(Team **phead, Team *tgt, Depart *depart_chain);
 
     /**** SELECT ****/
 
-TeamWrapper *getTeamByTeacherNum(Team *, const Where cond,
-                                 Depart *depart_chain);
+TeamWrapper *getTeamByTeacherNum(Team *, const Where cond);
 /*  通过教师数量查找团队
- *  ARGS:   团队链表，查找条件，院系链表头
+ *  ARGS:   团队链表，查找条件
  *  RETN:   搜索结果挂载点 | NULL （没有结果时也返回挂载点地址）
  *  NOTE:   调用过程中会为TeamWrapper申请内存空间，使用完搜索结果后记得cleanup
  */
 
-TeamWrapper *getTeamByName(Team *, const char *, Depart *depart_chain);
+TeamWrapper *getTeamByName(Team *, const char *);
 /*  通过团队名称查找团队
- *  ARGS:   团队链表，团队名称线索（不一定是全称），院系链表头
+ *  ARGS:   团队链表，团队名称线索（不一定是全称）
  *  RETN:   搜索结果挂载点 | NULL
  *  NOTE:   调用过程中会为TeamWrapper申请内存空间，使用完搜索结果后记得cleanup
- */
-
-TeamData initTeamData(void);
-/*  创建一个团队数据的原型
- *  ARGS:   void
- *  RETN:   根据在该函数执行过程中输入的数据所创建出来的原型
- *  NOTE:   will trigger input action
  */
 
 
@@ -136,8 +135,10 @@ TeamData initTeamData(void) {
 }
 
 
-Team *appendTeam(Team *head, Team *tail,
-        TeamData new_one, Depart *depart_chain) {
+
+Team *appendTeam(Team *head, TeamData new_one, Depart *depart_chain) {
+    Team *tail = head;
+    for (; tail->next; tail = tail->next) ;
 
     // NOTE: 相比appendDepart()多了寻找并挂载到院系的操作
     DepartWrapper *parent_depart_wrapper = getDepartByName(depart_chain, new_one.faculty);
@@ -156,13 +157,14 @@ Team *appendTeam(Team *head, Team *tail,
     // NOTE: 立即清理搜索结果所占用的空间
     cleanupDepartWrapper(parent_depart_wrapper);
 
-    // 错误处理
-    if (tail->next != NULL) {
-        #if defined(DEBUG)
-        puts("[LOG] Error in appendTeam():\n\ttail->next not pointing to NULL");
-        #endif
-        return NULL;
-    }
+    // // 错误处理
+    // if (tail->next != NULL) {
+    //     #if defined(DEBUG)
+    //     puts("[LOG] Error in appendTeam():\n\ttail->next not pointing to NULL");
+    //     #endif
+    //     return NULL;
+    // }
+
     // 向刚创建的链表的第一个节点写入数据
     if (tail == head
             && tail->data == NULL) {
@@ -178,24 +180,48 @@ Team *appendTeam(Team *head, Team *tail,
         return tail;
     }
     // 需要添加节点的添加操作
-    tail->next = (Team *)malloc(sizeof(Team));
-    if (tail->next == NULL) {
-        #if defined(DEBUG)
-        puts("[LOG] Error in appendTeam():\n\tfailed to alloc memory for container");
-        #endif
-        return NULL;
-    }
-    tail->next->data = (TeamData *)malloc(sizeof(TeamData));
-    if (tail->next->data == NULL) {
-        #if defined(DEBUG)
-        puts("[LOG] Error in appendTeam():\n\tfailed to alloc memory for data");
-        #endif
-        return NULL;
+    if (parent_depart->child_team_tail == NULL
+            || parent_depart->child_team_tail->next == NULL) {
+        // 母结点在当前还没有子节点
+        // 或者 母结点的子节点尾就是团队链表尾
+        // --> tail
+        // append
+        tail->next = (Team *)malloc(sizeof(Team));
+        if (tail->next == NULL) {
+            #if defined(DEBUG)
+            puts("[LOG] Error in appendTeam():\n\tfailed to alloc memory for container");
+            #endif
+            return NULL;
+        }
+        // NOTE: 由于传进来的参数是形参，必须另外为数据域分配储存空间
+        tail->next->data = (TeamData *)malloc(sizeof(TeamData));
+        if (tail->next->data == NULL) {
+            #if defined(DEBUG)
+            puts("[LOG] Error in appendTeam():\n\tfailed to alloc memory for data");
+            #endif
+            return NULL;
+        }
+    } else {    // 母结点已经有子节点了
+        // insert after parent_depart->child_team_tail
+        // HACK
+
+        // NOTE: 为保证后续兼容性，退出此区块时 tail->next 指向新添加的节点
     }
 
+
     *(tail->next->data) = new_one;
+
     // 在母结点中注册
+        // 注册团队数量
     parent_depart->data->team_num += 1;
+        // 注册指针指向
+    if (parent_depart->data->team_num == 1) {
+            // 该团队为母结点的第一个子节点
+        parent_depart->child_team_head = tail->next;
+    }
+            // 该团队一定是母结点最后一个注册的子节点
+    parent_depart->child_team_tail = tail->next;
+
     // 子节点链接母结点
     tail->next->parent_depart = parent_depart;
 
@@ -228,14 +254,14 @@ int modifyTeam(Team *tgt, TeamData new_one) {
 }
 
 
-int removeTeam(Team **phead, Team *tgt, Depart *depart_chain) {
+int removeTeam(Team **phead, Team *tgt) {
     if (tgt == NULL) {   // 无效参数
         #if defined(DEBUG)
         puts("[LOG] Error in removeTeam():\n\ttarget is NULL");
         #endif
         return 0;
     }
-    // HACK: 注销该组的时候，同时注销该组运营的所有项目
+    // TODO: 注销该组的时候，同时注销该组运营的所有项目
     if (tgt->child_project_head
             || tgt->child_project_tail) {  // 该组有正在运行的项目
         #if defined(DEBUG)
@@ -264,8 +290,8 @@ int removeTeam(Team **phead, Team *tgt, Depart *depart_chain) {
 
 
     /**** SELECT ****/
-TeamWrapper *getTeamByTeacherNum(Team *start, const Where cond,
-                                 Depart *depart_chain) {
+
+TeamWrapper *getTeamByTeacherNum(Team *start, const Where cond) {
     // (auto-indent fixer)
     // NOTE: TeamWrapper中会有多个结果
 
@@ -329,4 +355,163 @@ TeamWrapper *getTeamByTeacherNum(Team *start, const Where cond,
 
 
 
+TeamWrapper *getTeamByName(Team *start, const char *hint) {
+    TeamWrapper *rtn = (TeamWrapper *)malloc(sizeof(TeamWrapper));
+    if (rtn == NULL) {
+        #if defined(DEBUG)
+        puts("[LOG] Error in getTeamByName():\n\tfailed to malloc for result mounting point");
+        #endif
+        return NULL;
+    }
+
+    TeamWrapper *rtn_head = rtn;
+    rtn_head->team = NULL; rtn_head->next = NULL;
+
+    while (1) {
+        if (strstr(start->data->name, hint)) {
+            #if defined(BUILDING)
+            printf("[LOG] getTeamByName(): found %s @ 0x%p\n",
+                   start->data->name, start);
+            #endif
+            if (rtn_head->team == NULL) {
+                rtn->team = start;
+            } else {
+                rtn->next = (TeamWrapper *)malloc(sizeof(TeamWrapper));
+                if (rtn->next == NULL) {
+                    #if defined(DEBUG)
+                    puts("[LOG] Error in getTeamByName():\n\tfailed to malloc for result container");
+                    #endif
+                    cleanupTeamWrapper(rtn_head);
+                    return NULL;
+                }
+                rtn = rtn->next; rtn->next = NULL;
+                rtn->team = start;
+            }
+        }
+        start = start->next;
+        if (start == NULL) { break; }
+    }
+    return rtn_head;
+}
+
+
+
     /**** CLEANUPs ****/
+
+void cleanupTeamWrapper(TeamWrapper *prev) {
+    TeamWrapper *after = prev;
+    while (1) {
+        after = prev->next;
+        free(prev);
+        #if defined(BUILDING)
+        printf("[LOG] cleanupTeamWrapper(): freed 0x%p\n",
+               prev);
+        #endif
+        prev = after;
+        if (prev == NULL) { break; }
+    }
+    return;
+}
+
+
+
+void cleanupTeam(Team *prev) {
+    Team *after = prev;
+    while (1) {
+        after = prev->next;
+        free(prev);
+        #if defined(BUILDING)
+        printf("[LOG] cleanupTeam(): freed 0x%p\n",
+               prev);
+        #endif
+        prev = after;
+        if (prev == NULL) { break; }
+    }
+    return;
+}
+
+
+
+
+/******** Unit Test ********/
+
+#if defined(BUILDING)
+
+
+void printTeamToConsole(Team *VirtusPro) {
+    printf("<Team @ 0x%p>\n", VirtusPro);
+    printf("\tthis.name = %s\n", VirtusPro->data->name);
+    printf("\tthis.manager = %s\n", VirtusPro->data->manager);
+    printf("\tthis.teacher_num = %d\n", VirtusPro->data->teacher_num);
+    printf("\tthis.student_num = %d\n", VirtusPro->data->student_num);
+    printf("\tthis.faculty = %s\n", VirtusPro->data->faculty);
+}
+
+
+void printTeamWrapperToConsole(TeamWrapper *head) {
+    printf("<TeamWrapper @ 0x%p>\n", head);
+    int counter = 0;
+    while (head->team != NULL) {
+        ++counter;
+        printf("\tfound %s @ 0x%p\n", head->team->data->name, head->team);
+        head = head->next;
+        if (head == NULL) { break; }
+    }
+    if (!counter) { puts("no match!"); }
+    putchar('\n'); putchar('\n');
+}
+
+
+
+void main(void) {
+    // building test env
+    DepartData depart_data_1 = {
+        "计算机", "张三", "13322224444", 0
+    };
+    Depart depart_1 = {
+        &depart_data_1, NULL, NULL, NULL
+    };
+
+    DepartData depart_data_2 = {
+        "物理", "李四", "13344445555", 0
+    };
+    Depart depart_2 = {
+        &depart_data_2, NULL, NULL, NULL
+    };
+
+    depart_1->next = &depart_2;
+    Depart *Depart_HEAD = &depart_1;
+
+    Team *Team_HEAD = (Team *)malloc(sizeof(Team));
+    Team_HEAD->data = NULL; Team_HEAD->next = NULL;
+    Team_HEAD->parent_depart = NULL;
+    Team_HEAD->child_project_head = NULL;
+    Team_HEAD->child_project_tail = NULL;
+
+    TeamData team_data_1 = {
+        "火箭队", "武藏", 1, 2, "计算机"
+    };
+    TeamData team_data_2 = {
+        "银河队", "小次郎", 2, 3, "物理"
+    };
+    TeamData team_data_3 = {
+        "电子队", "洛伦兹", 3, 4, "计算机"
+    };
+
+
+    // initTeamData()
+    // pass
+
+    // appendTeam()
+    appendTeam(Team_HEAD, team_data_1, Depart_HEAD);
+    appendTeam(Team_HEAD, team_data_2, Depart_HEAD);
+    appendTeam(Team_HEAD, team_data_3, Depart_HEAD);
+
+    printTeamToConsole(Team_HEAD);
+    printTeamToConsole(Team_HEAD->next);
+    printTeamToConsole(Team_HEAD->next->next);
+
+}
+
+
+#endif
