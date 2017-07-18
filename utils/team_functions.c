@@ -137,18 +137,25 @@ TeamData initTeamData(void) {
 
 
 Team *appendTeam(Team *head, TeamData new_one, Depart *depart_chain) {
+
+    // NOTE: 该函数遵循FILO顺序，因此最后生成的链表中节点的顺序与院系链表节点顺序不相关
+    //       （但还是有按照院系分块的）
+    //       该链表节点的顺序将在负责存储的函数中进行整理
+
+    // NOTE: 数据域需要深复制，因为出函数体后传进来的形参 new_one 会被销毁
+
     Team *tail = head;
     for (; tail->next; tail = tail->next) ;
     // tail->next == NULL
 
-    // NOTE: 相比appendDepart()多了寻找并挂载到院系的操作
+    // 获取院系母结点
     DepartWrapper *parent_depart_wrapper = getDepartByName(depart_chain, new_one.faculty);
     if (parent_depart_wrapper->depart == NULL) {
-        puts("target department not found\n");
+        puts("target parent department not found\n");
         return NULL;
     }
     if (parent_depart_wrapper->next != NULL) {
-        puts("multiple departments found\n");
+        puts("multiple parent departments found\n");
         return NULL;
     }
 
@@ -160,11 +167,12 @@ Team *appendTeam(Team *head, TeamData new_one, Depart *depart_chain) {
 
     // got parent_depart
 
-    // 添加节点↓
+    // 添加节点
 
-    //   case 1: 团队链表是刚创建的，此次操作将写入链表的第一个数据
+    //   case 1: 团队链表中目前还没有数据，此次操作将写入链表的第一个数据
     if (tail == head
             && tail->data == NULL) {
+        // 数据域深复制内存空间准备
         tail->data = (TeamData *)malloc(sizeof(TeamData));
         if (tail->data == NULL) {
             #if defined(DEBUG)
@@ -172,17 +180,20 @@ Team *appendTeam(Team *head, TeamData new_one, Depart *depart_chain) {
             #endif
             return NULL;
         }
+        // 数据域深复制
         *(tail->data) = new_one; tail->next = NULL;
         tail->child_project_head = NULL; tail->child_project_tail = NULL;
+        tail->parent_depart = parent_depart;
+        tail->parent_depart->team_num += 1;
         // 退出函数
         return tail;
     }
-    //   case 2 & 3: 需要添加节点的添加操作
+    //   case 2 & 3: 需要添加节点的操作
     if (parent_depart->child_team_tail == NULL
             || parent_depart->child_team_tail->next == NULL) {
-        // case 2: 母结点在当前还没有子节点???
+        // case 2: 母结点在当前还没有子节点
         //         或者 母结点的团队链的尾就是团队链表的尾节点
-        //         --> tail
+        //         --> 向尾节点 tail 后添加节点
         //         append
         tail->next = (Team *)malloc(sizeof(Team));
         if (tail->next == NULL) {
@@ -191,7 +202,7 @@ Team *appendTeam(Team *head, TeamData new_one, Depart *depart_chain) {
             #endif
             return NULL;
         }
-        // NOTE: 由于传进来的参数是形参，必须另外为数据域分配储存空间
+        // 由于传进来的参数是形参，必须另外为数据域分配储存空间
         tail->next->data = (TeamData *)malloc(sizeof(TeamData));
         if (tail->next->data == NULL) {
             #if defined(DEBUG)
@@ -199,35 +210,56 @@ Team *appendTeam(Team *head, TeamData new_one, Depart *depart_chain) {
             #endif
             return NULL;
         }
-    } else {    // 母结点已经有子节点了
+        // 下一个节点的指向需要在这里设置
+        // 因为在下一个条件块中，该处指向不同
+        tail->next->next = NULL;
+    } else {    // case 3: 母结点已经有子节点了
         // insert after parent_depart->child_team_tail
         // HACK
+        // NOTE: parent_depart->child_team_tail->next == xxx || NULL
 
-        // NOTE: 为保证后续兼容性，退出此区块时 tail->next 指向新添加的节点
+        // 为保证后续代码兼容性，退出此区块时 tail->next 指向新添加的节点
+        // 将tail指向现有子节点链的尾部
+        tail = parent_depart->child_team_tail;
+        // 将原链表尾的下一个节点进行备份
+        Team *after = tail->next;   // something or NULL
+        // 为新节点开辟空间
+        tail->next = (Team *)malloc(sizeof(Team));
+        if (tail->next == NULL) {
+            #if defined(DEBUG)
+            puts("[LOG] Error in appendTeam():\n\tfailed to alloc memory for container");
+            #endif
+            return NULL;
+        }
+        tail->next->data = (TeamData *)malloc(sizeof(TeamData));
+        if (tail->next->data == NULL) {
+            #if defined(DEBUG)
+            puts("[LOG] Error in appendTeam():\n\tfailed to alloc memory for data");
+            #endif
+            return NULL;
+        }
+        // 下一个节点指向 - 重新链接链表
+        tail->next->next = after;
     }
 
-
+    // 数据域深复制
     *(tail->next->data) = new_one;
-
     // 在母结点中注册
-        // 注册团队数量
+    //   注册团队数量
     parent_depart->data->team_num += 1;
-        // 注册指针指向
+    //   注册指针指向
     if (parent_depart->data->team_num == 1) {
-            // 该团队为母结点的第一个子节点
+    //     该团队为母结点的第一个子节点
         parent_depart->child_team_head = tail->next;
     }
-            // 该团队一定是母结点最后一个注册的子节点
+    //     该团队一定是母结点最后一个注册的子节点
     parent_depart->child_team_tail = tail->next;
-
     // 子节点链接母结点
     tail->next->parent_depart = parent_depart;
-
-    tail->next->next = NULL;
+    // 子节点的子节点指向初始化
     tail->next->child_project_head = NULL;
     tail->next->child_project_tail = NULL;
-
-
+    // 返回新添加的节点
     return tail->next;
 }
 

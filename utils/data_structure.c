@@ -101,7 +101,7 @@ typedef struct _TeamData {
     int     teacher_num;    // 教师人数
     int     student_num;    // 研究生人数
     char    faculty[20];    // 所属院系
-    int     project_num;       // 该团队所管理的项目总数
+    int     project_num;    // 该团队所管理的项目总数
 } TeamData;
 
 

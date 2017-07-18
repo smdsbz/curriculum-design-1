@@ -151,6 +151,7 @@ manager     |   负责人             |   char[12]    |   "李四"
 teacher_num |   教师人数            |   int         |   5
 student_num |   研究生人数           |   int         |   20
 faculty     |   所属院系            |   char[20]    |   "Computer"
+project_num |   该团队所管理项目的总数 |   int         |   123
 ---         |   ---                 |   ---         |   ---
 parent_depart   |   该团队所属院系的节点  |   Depart *    |   NULL
 next        |   下一个团队节点         |   Team *      |   NULL
