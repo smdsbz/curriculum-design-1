@@ -139,6 +139,7 @@ TeamData initTeamData(void) {
 Team *appendTeam(Team *head, TeamData new_one, Depart *depart_chain) {
     Team *tail = head;
     for (; tail->next; tail = tail->next) ;
+    // tail->next == NULL
 
     // NOTE: 相比appendDepart()多了寻找并挂载到院系的操作
     DepartWrapper *parent_depart_wrapper = getDepartByName(depart_chain, new_one.faculty);
@@ -151,21 +152,17 @@ Team *appendTeam(Team *head, TeamData new_one, Depart *depart_chain) {
         return NULL;
     }
 
-    // 此时，已经验证了parent_depart_wrapper中只有一个院系
+    // 此时，已经验证了 parent_depart_wrapper 中只有一个院系
     Depart *parent_depart = parent_depart_wrapper->depart;
 
-    // NOTE: 立即清理搜索结果所占用的空间
+    // 立即清理搜索结果所占用的空间
     cleanupDepartWrapper(parent_depart_wrapper);
 
-    // // 错误处理
-    // if (tail->next != NULL) {
-    //     #if defined(DEBUG)
-    //     puts("[LOG] Error in appendTeam():\n\ttail->next not pointing to NULL");
-    //     #endif
-    //     return NULL;
-    // }
+    // got parent_depart
 
-    // 向刚创建的链表的第一个节点写入数据
+    // 添加节点↓
+
+    //   case 1: 团队链表是刚创建的，此次操作将写入链表的第一个数据
     if (tail == head
             && tail->data == NULL) {
         tail->data = (TeamData *)malloc(sizeof(TeamData));
@@ -177,15 +174,16 @@ Team *appendTeam(Team *head, TeamData new_one, Depart *depart_chain) {
         }
         *(tail->data) = new_one; tail->next = NULL;
         tail->child_project_head = NULL; tail->child_project_tail = NULL;
+        // 退出函数
         return tail;
     }
-    // 需要添加节点的添加操作
+    //   case 2 & 3: 需要添加节点的添加操作
     if (parent_depart->child_team_tail == NULL
             || parent_depart->child_team_tail->next == NULL) {
-        // 母结点在当前还没有子节点
-        // 或者 母结点的子节点尾就是团队链表尾
-        // --> tail
-        // append
+        // case 2: 母结点在当前还没有子节点???
+        //         或者 母结点的团队链的尾就是团队链表的尾节点
+        //         --> tail
+        //         append
         tail->next = (Team *)malloc(sizeof(Team));
         if (tail->next == NULL) {
             #if defined(DEBUG)

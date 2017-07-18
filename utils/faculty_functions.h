@@ -50,6 +50,12 @@ extern DepartWrapper *getDepartByName(Depart *, const char *);
  *  NOTE:   该函数会申请DepartWrapper占用空间，记得调用cleanupDepartWrapper()
  */
 
+Depart *getPrevDepart(Depart *cur, Depart *head);
+/*  获得当前院系节点的前一个节点
+ *  ARGS:   当前节点，院系链表头
+ *  RETN:   前一个节点 || NULL
+ */
+
 
     /**** CLEANUPs ****/
 

@@ -160,7 +160,7 @@ child_project_tail  |   项目链表中该团队的最后一个节点 |   Projec
 ```C
     /**** POST | DELETE | PUT ****/
 
-Team *appendTeam(Team *head, Team *tail, TeamData new_one);
+Team *appendTeam(Team *head, TeamData new_one);
 /*  录入团队
  *  ARGS:   链表头，链表尾，已有数据的作为buffer的TeamData实例
  *  RETN:   新增节点的地址

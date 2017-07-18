@@ -65,6 +65,11 @@ DepartWrapper *getDepartByName(Depart *, const char *);
  *  NOTE:   该函数会申请DepartWrapper占用空间，记得调用cleanupDepartWrapper()
  */
 
+Depart *getPrevDepart(Depart *cur, Depart *head);
+/*  获得当前院系节点的前一个节点
+ *  ARGS:   当前节点，院系链表头
+ *  RETN:   前一个节点 || NULL
+ */
 
     /**** CLEANUPs ****/
 
@@ -123,11 +128,11 @@ void main(void) {
 
     // first node creation demo
     // modifyDepart(HEAD, initDepartData());   // 向第一节点写入数据用modify
-    appendDepart(HEAD, HEAD, initDepartData());
+    appendDepart(HEAD, initDepartData());
     printDepartToConsole(HEAD);
 
     // second node creation demo
-    appendDepart(HEAD, HEAD, initDepartData());   // 第一个节点的数据已经初始化了，则用添加节点
+    appendDepart(HEAD, initDepartData());   // 第一个节点的数据已经初始化了，则用添加节点
     printDepartToConsole(HEAD->next);
 
     // query demo
@@ -419,4 +424,14 @@ DepartWrapper *getDepartByName(Depart *start,
         if (start == NULL) { break; }
     }
     return rtn_head;
+}
+
+
+Depart *getPrevDepart(Depart *cur, Depart *head) {
+    for (;
+         head->next != cur
+            && head != NULL;
+         head = head->next) ;
+    //  head->next == cur || head == NULL
+    return head;
 }
