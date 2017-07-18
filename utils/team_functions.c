@@ -165,6 +165,11 @@ Team *appendTeam(Team *head, TeamData new_one, Depart *depart_chain) {
     // 立即清理搜索结果所占用的空间
     cleanupDepartWrapper(parent_depart_wrapper);
 
+    #if defined(BUILDING)
+    printf("[LOG] appendTeam(): parent_depart %s @ 0x%p\n",
+           parent_depart->data->name, parent_depart);
+    #endif
+
     // got parent_depart
 
     // 添加节点
@@ -172,6 +177,9 @@ Team *appendTeam(Team *head, TeamData new_one, Depart *depart_chain) {
     //   case 1: 团队链表中目前还没有数据，此次操作将写入链表的第一个数据
     if (tail == head
             && tail->data == NULL) {
+        #if defined(BUILDING)
+        puts("[LOG] appendTeam(): case 1");
+        #endif
         // 数据域深复制内存空间准备
         tail->data = (TeamData *)malloc(sizeof(TeamData));
         if (tail->data == NULL) {
@@ -180,17 +188,24 @@ Team *appendTeam(Team *head, TeamData new_one, Depart *depart_chain) {
             #endif
             return NULL;
         }
+        // 子节点注册母结点
         // 数据域深复制
         *(tail->data) = new_one; tail->next = NULL;
         tail->child_project_head = NULL; tail->child_project_tail = NULL;
         tail->parent_depart = parent_depart;
-        tail->parent_depart->team_num += 1;
+        // 母结点注册子节点
+        parent_depart->data->team_num += 1;
+        parent_depart->child_team_head = tail;
+        parent_depart->child_team_tail = tail;
         // 退出函数
         return tail;
     }
     //   case 2 & 3: 需要添加节点的操作
     if (parent_depart->child_team_tail == NULL
             || parent_depart->child_team_tail->next == NULL) {
+        #if defined(BUILDING)
+        puts("[LOG] appendTeam(): case 2");
+        #endif
         // case 2: 母结点在当前还没有子节点
         //         或者 母结点的团队链的尾就是团队链表的尾节点
         //         --> 向尾节点 tail 后添加节点
@@ -214,10 +229,9 @@ Team *appendTeam(Team *head, TeamData new_one, Depart *depart_chain) {
         // 因为在下一个条件块中，该处指向不同
         tail->next->next = NULL;
     } else {    // case 3: 母结点已经有子节点了
-        // insert after parent_depart->child_team_tail
-        // HACK
-        // NOTE: parent_depart->child_team_tail->next == xxx || NULL
-
+        #if defined(BUILDING)
+        puts("[LOG] appendTeam(): case 3");
+        #endif
         // 为保证后续代码兼容性，退出此区块时 tail->next 指向新添加的节点
         // 将tail指向现有子节点链的尾部
         tail = parent_depart->child_team_tail;
@@ -509,7 +523,7 @@ void main(void) {
         &depart_data_2, NULL, NULL, NULL
     };
 
-    depart_1->next = &depart_2;
+    depart_1.next = &depart_2;
     Depart *Depart_HEAD = &depart_1;
 
     Team *Team_HEAD = (Team *)malloc(sizeof(Team));
@@ -533,10 +547,14 @@ void main(void) {
     // pass
 
     // appendTeam()
+    puts("[LOG] adding team \"火箭队\"");
     appendTeam(Team_HEAD, team_data_1, Depart_HEAD);
+    puts("[LOG] adding team \"银河队\"");
     appendTeam(Team_HEAD, team_data_2, Depart_HEAD);
+    puts("[LOG] adding team \"电子队\"");
     appendTeam(Team_HEAD, team_data_3, Depart_HEAD);
 
+    puts("Expecting sequence:\n\t火箭队 --> 电子队 --> 银河队");
     printTeamToConsole(Team_HEAD);
     printTeamToConsole(Team_HEAD->next);
     printTeamToConsole(Team_HEAD->next->next);
