@@ -10,7 +10,7 @@
 #ifdef BUILDING
 #undef BUILDING
 #endif
-#define BUILDING
+// #define BUILDING
 
 #ifdef DEBUG
 #undef DEBUG
@@ -26,6 +26,12 @@ typedef struct _Where {
     int     value;
 } Where;
 
+// 实际执行的函数应在外部申明，否则在第一轮执行后，judger指向的函数内存空间会被收回
+int isSmaller(int valve, int data) { return (data < valve); }
+int isLarger(int valve, int data) { return (data > valve); }
+int isEqualTo(int valve, int data) { return (data == valve); }
+int noLargerThan(int valve, int data) { return (data <= valve); }
+int noSmallerThan(int valve, int data) { return (data >= valve); }
 
 int (*setJudger(const char *direction))(int, int) {
 /*  返回匹配规则函数
@@ -33,11 +39,6 @@ int (*setJudger(const char *direction))(int, int) {
  *  RETN:   int judger(int valve, int data)
  *               实际为上面申明的函数中的一种
  */
-    int isSmaller(int valve, int data) { return (data < valve); }
-    int isLarger(int valve, int data) { return (data > valve); }
-    int isEqualTo(int valve, int data) { return (data == valve); }
-    int noLargerThan(int valve, int data) { return (data <= valve); }
-    int noSmallerThan(int valve, int data) { return (data >= valve); }
 
     if (!strcmp("<", direction)) { return isSmaller; }
     if (!strcmp(">", direction)) { return isLarger; }
@@ -166,7 +167,7 @@ Team *appendTeam(Team *head, TeamData new_one, Depart *depart_chain) {
     cleanupDepartWrapper(parent_depart_wrapper);
 
     #if defined(BUILDING)
-    printf("[LOG] appendTeam(): parent_depart %s @ 0x%p\n",
+    printf("[LOG] appendTeam(): parent_depart is %s @ 0x%p\n",
            parent_depart->data->name, parent_depart);
     #endif
 
@@ -285,11 +286,14 @@ int modifyTeam(Team *tgt, TeamData new_one) {
         #endif
         return 0;
     }
-    // HACK: 易主 - 改变团队所属院系
+    // TODO: 易主 - 改变团队所属院系
     // 目前解决方案：删掉重来
-    if (tgt->data->faculty != new_one.faculty) {
+    if (strcmp(tgt->data->faculty, new_one.faculty) != 0) {
         #if defined(DEBUG)
-        puts("[LOG] Error in modifyTeam():\n\tchanging team owner");
+        printf("[LOG] Error in modifyTeam():\n\tchanging team faculty,");
+        printf(" from %s to %s, strcmp() got %d\n",
+               tgt->data->faculty, new_one.faculty,
+               strcmp(tgt->data->faculty, new_one.faculty));
         #endif
         return 0;
     }
@@ -307,25 +311,46 @@ int removeTeam(Team **phead, Team *tgt) {
     }
     // TODO: 注销该组的时候，同时注销该组运营的所有项目
     if (tgt->child_project_head
-            || tgt->child_project_tail) {  // 该组有正在运行的项目
+            || tgt->child_project_tail) {
+        // 该组有正在运行的项目，删除会导致项目信息失效
         #if defined(DEBUG)
         puts("[LOG] Error in removeTeam():\n\tteam has working porjects, can't move");
         #endif
         return 0;
     }
 
-    if (*phead == tgt) {    // removing the first node
-        *phead = tgt->next;  // shift pointer
-    }
-    else {
-        Team *phead_safe = *phead;
-        for (; phead_safe->next != tgt; phead_safe = phead_safe->next) ;
-        phead_safe->next = phead_safe->next->next;  // route around
+    // prev 为 tgt 之前的节点
+    Team *prev = *phead;
+    for (; prev->next != tgt; prev = prev->next) ;
+    // prev->next == tgt
+
+    // 团队链表重新链接 - 绕开需要删除的节点
+    if (*phead == tgt) {        // 删除头节点操作
+        *phead = tgt->next;     //      只需将头指针指向下一个节点
+    } else {                    // 要删除的不是头节点
+        // 使链表指向绕开 tgt
+        prev->next = prev->next->next;  // route around
     }
 
-    // NOTE: register changes in parent node (before calling free())
+    // 在母结点数据域注册
     tgt->parent_depart->data->team_num -= 1;
+    // 在母结点的指针域注册
+    if (tgt->parent_depart->data == 0) {
+        // case 1: tgt 是母结点下唯一一个子节点
+        tgt->parent_depart->child_team_head = NULL;
+        tgt->parent_depart->child_team_tail = NULL;
+    } else if (tgt->parent_depart->child_team_head == tgt) {
+        // case 2: tgt 是母结点子链头节点
+        tgt->parent_depart->child_team_head = tgt->next;
+    } else if (tgt->parent_depart->child_team_tail == tgt) {
+        // case 3: tgt 是母结点子链尾节点
+        tgt->parent_depart->child_team_tail = prev;
+    }
 
+    #if defined(BUILDING)
+    printf("[LOG] removeTeam(): freed %s @ 0x%p",
+           tgt->data->name, tgt);
+    #endif
     free(tgt->data);
     free(tgt);
 
@@ -337,8 +362,9 @@ int removeTeam(Team **phead, Team *tgt) {
 
 TeamWrapper *getTeamByTeacherNum(Team *start, const Where cond) {
     // (auto-indent fixer)
-    // NOTE: TeamWrapper中会有多个结果
+    // TeamWrapper中会有多个结果
 
+    // NOTE: 传进来的 start 只是别名，不要求有指向
     TeamWrapper *rtn = (TeamWrapper *)malloc(sizeof(TeamWrapper));
     if (rtn == NULL) {
         #if defined(DEBUG)
@@ -359,6 +385,9 @@ TeamWrapper *getTeamByTeacherNum(Team *start, const Where cond) {
         #endif
         return NULL;
     }
+    // #if defined(BUILDING)
+    // puts("[LOG] getTeamByTeacherNum(): judger() set");
+    // #endif
 
     // start finding matching nodes
     while (1) {
@@ -378,7 +407,7 @@ TeamWrapper *getTeamByTeacherNum(Team *start, const Where cond) {
                     #if defined(DEBUG)
                     puts("[LOG] Error in getTeamByTeacherNum():\n\tfailed to malloc for result container");
                     #endif
-                    // HACK
+                    // cleanup before leaving
                     cleanupTeamWrapper(rtn_head);
                     return NULL;
                 }   // finished verifying malloc-ed space
@@ -392,6 +421,9 @@ TeamWrapper *getTeamByTeacherNum(Team *start, const Where cond) {
         start = start->next;
         // al done?
         if (start == NULL) { break; }
+        #if defined(BUILDING)
+        puts("[LOG] getTeamByTeacherNum(): moving to next node");
+        #endif
     }   // al done!
     // return result container
     return rtn_head;
@@ -412,7 +444,7 @@ TeamWrapper *getTeamByName(Team *start, const char *hint) {
     rtn_head->team = NULL; rtn_head->next = NULL;
 
     while (1) {
-        if (strstr(start->data->name, hint)) {
+        if (strstr(start->data->name, hint) != NULL) {
             #if defined(BUILDING)
             printf("[LOG] getTeamByName(): found %s @ 0x%p\n",
                    start->data->name, start);
@@ -425,6 +457,7 @@ TeamWrapper *getTeamByName(Team *start, const char *hint) {
                     #if defined(DEBUG)
                     puts("[LOG] Error in getTeamByName():\n\tfailed to malloc for result container");
                     #endif
+                    // cleanup before leaving
                     cleanupTeamWrapper(rtn_head);
                     return NULL;
                 }
@@ -491,20 +524,27 @@ void printTeamToConsole(Team *VirtusPro) {
     printf("\tthis.faculty = %s\n", VirtusPro->data->faculty);
 }
 
+void printTeamChainToConsole(Team *head) {
+    for (; head; head = head->next) {
+        printTeamToConsole(head);
+    }
+    putchar('\n');
+}
+
 
 void printTeamWrapperToConsole(TeamWrapper *head) {
     printf("<TeamWrapper @ 0x%p>\n", head);
-    int counter = 0;
-    while (head->team != NULL) {
-        ++counter;
-        printf("\tfound %s @ 0x%p\n", head->team->data->name, head->team);
-        head = head->next;
-        if (head == NULL) { break; }
+    if (head->team == NULL) {
+        puts("\tnot match!");
+    } else {
+        for (; head; head = head->next) {
+            printf("\tfound %s @ 0x%p\n",
+                   head->team->data->name, head->team);
+            // indent-fixer
+        }
     }
-    if (!counter) { puts("no match!"); }
-    putchar('\n'); putchar('\n');
+    putchar('\n');
 }
-
 
 
 void main(void) {
@@ -555,11 +595,41 @@ void main(void) {
     appendTeam(Team_HEAD, team_data_3, Depart_HEAD);
 
     puts("Expecting sequence:\n\t火箭队 --> 电子队 --> 银河队");
-    printTeamToConsole(Team_HEAD);
-    printTeamToConsole(Team_HEAD->next);
-    printTeamToConsole(Team_HEAD->next->next);
+    printTeamChainToConsole(Team_HEAD);
+
+    // modifyTeam()
+    TeamData team_data_4 = {
+        "电子队", "库仑", 3, 4, "计算机"
+    };
+    modifyTeam(Team_HEAD->next, team_data_4);
+    printTeamChainToConsole(Team_HEAD);
+
+    // getTeamByTeacherNum()
+    TeamWrapper *Team_Wrapper_HEAD;
+    Where cond = {">=", 2};
+    Team_Wrapper_HEAD = getTeamByTeacherNum(Team_HEAD, cond);
+    printTeamWrapperToConsole(Team_Wrapper_HEAD);
+    cleanupTeamWrapper(Team_Wrapper_HEAD);
+
+    // getTeamByName()
+    Team_Wrapper_HEAD = getTeamByName(Team_HEAD, "火箭");
+    printTeamWrapperToConsole(Team_Wrapper_HEAD);
+    cleanupTeamWrapper(Team_Wrapper_HEAD);
+
+    // removeTeam()
+    // puts("[LOG] ")
+
+    cleanupTeam(Team_HEAD);
 
 }
 
 
+#endif
+
+#ifdef BUILDING
+#undef BUILDING
+#endif
+
+#ifdef DEBUG
+#undef DEBUG
 #endif
