@@ -435,3 +435,15 @@ Depart *getPrevDepart(Depart *cur, Depart *head) {
     //  head->next == cur || head == NULL
     return head;
 }
+
+
+
+
+
+#ifdef BUILDING
+#undef BUILDING
+#endif
+
+#ifdef DEBUG
+#undef DEBUG
+#endif
