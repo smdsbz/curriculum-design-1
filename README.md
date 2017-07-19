@@ -98,6 +98,14 @@ int removeDepart(Depart **phead, Depart *target);
  *  RETN:   success code
  */
 
+DepartData initDepartData(void);
+/*  创建一个院系数据的原型
+ *  ARGS:   void
+ *  RETN:   根据在该函数执行过程中输入的数据所创建出来的原型
+ *  NOTE:   will trigger input action
+ */
+
+
     /**** SELECT ****/
 
 DepartWrapper *getDepartByManager(Depart *, const char *);
@@ -117,11 +125,10 @@ DepartWrapper *getDepartByName(Depart *, const char *);
  *  NOTE:   该函数会申请DepartWrapper占用空间，记得调用cleanupDepartWrapper()
  */
 
-DepartData initDepartData(void);
-/*  创建一个院系数据的原型
- *  ARGS:   void
- *  RETN:   根据在该函数执行过程中输入的数据所创建出来的原型
- *  NOTE:   will trigger input action
+Depart *getPrevDepart(Depart *cur, Depart *head);
+/*  获得当前院系节点的前一个节点
+ *  ARGS:   当前节点，院系链表头
+ *  RETN:   前一个节点 || NULL
  */
 
     /**** CLEANUPs ****/
@@ -158,12 +165,21 @@ next        |   下一个团队节点         |   Team *      |   NULL
 child_project_head  |   项目链表中该团队的第一个节点  |   Project *   |   NULL
 child_project_tail  |   项目链表中该团队的最后一个节点 |   Project *   |   NULL
 
+
 ```C
     /**** POST | DELETE | PUT ****/
 
-Team *appendTeam(Team *head, TeamData new_one);
+TeamData initTeamData(void);
+/*  创建一个团队数据的原型
+ *  ARGS:   void
+ *  RETN:   根据在该函数执行过程中输入的数据所创建出来的原型
+ *  NOTE:   will trigger input action
+ */
+
+
+Team *appendTeam(Team *head, TeamData new_one, Depart *depart_chain);
 /*  录入团队
- *  ARGS:   链表头，链表尾，已有数据的作为buffer的TeamData实例
+ *  ARGS:   链表头，已有数据的作为buffer的TeamData实例，母结点链（院系链）
  *  RETN:   新增节点的地址
  */
 
@@ -173,7 +189,7 @@ int modifyTeam(Team *target, TeamData new_one);
  *  RETN:   success code
  */
 
-int removeTeam(Team **phead, Team *target);
+int removeTeam(Team **phead, Team *tgt);
 /*  删除团队节点
  *  ARGS:   指向团队链表头节点地址的指针，目标地址 | NULL
  *  RETN:   success code
@@ -182,25 +198,35 @@ int removeTeam(Team **phead, Team *target);
 
     /**** SELECT ****/
 
-TeamWrapper *getTeamByManager(Team *, const char *, TeamWrapper *, Depart *depart_chain);
-/*  通过负责人姓名查找团队
- *  ARGS:   团队链表，团队负责人 char[12]，搜索结果挂载点，团队链表头
+TeamWrapper *getTeamByTeacherNum(Team *, const Where cond);
+/*  通过教师数量查找团队
+ *  ARGS:   团队链表，查找条件
  *  RETN:   搜索结果挂载点 | NULL （没有结果时也返回挂载点地址）
  *  NOTE:   调用过程中会为TeamWrapper申请内存空间，使用完搜索结果后记得cleanup
  */
 
-TeamWrapper *getTeamByTeacherNumber(Team *, const char *, TeamWrapper *, Depart *depart_chain);
+TeamWrapper *getTeamByName(Team *, const char *);
 /*  通过团队名称查找团队
- *  ARGS:   团队名称线索（不一定是全称），团队链表头
+ *  ARGS:   团队链表，团队名称线索（不一定是全称）
  *  RETN:   搜索结果挂载点 | NULL
  *  NOTE:   调用过程中会为TeamWrapper申请内存空间，使用完搜索结果后记得cleanup
  */
 
-TeamData initTeamData(void);
-/*  创建一个团队数据的原型
- *  ARGS:   void
- *  RETN:   根据在该函数执行过程中输入的数据所创建出来的原型
- *  NOTE:   will trigger input action
+
+    /**** CLEANUPs ****/
+
+void cleanupTeamWrapper(TeamWrapper *start);
+/*  清空搜索结果序列
+ *  ARGS:   头节点地址
+ *  RETN:   void
+ *  NOTE:   每次搜完了记得调一次啊。。。
+ *  NOTE:   调用后传进来的那个节点也没了！
+ */
+
+void cleanupTeam(Team *start);
+/*  释放Team链所占用的内存空间
+ *  ARGS:   头节点地址
+ *  RETN:   void
  */
 ```
 
