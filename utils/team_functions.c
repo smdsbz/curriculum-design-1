@@ -10,12 +10,12 @@
 #ifdef BUILDING
 #undef BUILDING
 #endif
-#define BUILDING
+// #define BUILDING
 
 #ifdef DEBUG
 #undef DEBUG
 #endif
-#define DEBUG
+// #define DEBUG
 
 
 
@@ -331,6 +331,7 @@ int removeTeam(Team **phead, Team *tgt) {
     // case 1 - 要删除的节点是头节点
     if (*phead == tgt) {
         *phead = tgt->next;     // 只需将头指针指向下一个节点
+        // NOTE: 若tgt是最后一个节点，此时phead会指向NULL
     } else {    // case 2 - 要删除的不是头节点
         // 使链表指向绕开 tgt
         prev->next = tgt->next;  // route around
@@ -352,7 +353,7 @@ int removeTeam(Team **phead, Team *tgt) {
     }
 
     #if defined(BUILDING)
-    printf("[LOG] removeTeam(): freed %s @ 0x%p",
+    printf("[LOG] removeTeam(): freed %s @ 0x%p\n",
            tgt->data->name, tgt);
     #endif
     free(tgt->data);
@@ -480,13 +481,18 @@ TeamWrapper *getTeamByName(Team *start, const char *hint) {
     /**** CLEANUPs ****/
 
 void cleanupTeamWrapper(TeamWrapper *prev) {
+    if (prev == NULL) {
+        #if defined(DEBUG)
+        puts("Nothing left to be cleaned");
+        #endif
+        return;
+    }
     TeamWrapper *after = prev;
     while (1) {
         after = prev->next;
         free(prev);
         #if defined(BUILDING)
-        printf("[LOG] cleanupTeamWrapper(): freed 0x%p\n",
-               prev);
+        printf("[LOG] cleanupTeamWrapper(): freed 0x%p\n", prev);
         #endif
         prev = after;
         if (prev == NULL) { break; }
@@ -497,6 +503,12 @@ void cleanupTeamWrapper(TeamWrapper *prev) {
 
 
 void cleanupTeam(Team *prev) {
+    if (prev == NULL) {
+        #if defined(DEBUG)
+        puts("Nothing left to be cleaned");
+        #endif
+        return;
+    }
     Team *after = prev;
     while (1) {
         after = prev->next;
@@ -529,6 +541,10 @@ void printTeamToConsole(Team *VirtusPro) {
 }
 
 void printTeamChainToConsole(Team *head) {
+    if (head == NULL) {
+        puts("no data!");
+        return;
+    }
     for (; head; head = head->next) {
         printTeamToConsole(head);
     }
@@ -628,6 +644,10 @@ void main(void) {
     puts("[LOG] removing team No.3");
     puts("Expecting sequence:\n\t电子队");
     removeTeam(&Team_HEAD, Team_HEAD->next);
+    printTeamChainToConsole(Team_HEAD);
+    puts("[LOG] removing the last node");
+    puts("Expecting literally NOTHING");
+    removeTeam(&Team_HEAD, Team_HEAD);
     printTeamChainToConsole(Team_HEAD);
 
     cleanupTeam(Team_HEAD);

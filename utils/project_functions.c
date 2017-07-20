@@ -230,16 +230,159 @@ int removeProject(Project **phead, Project *tgt) {
         #endif
         return 0;
     }
-    // HACK
+
+    Project *prev = *phead;
+    for (; prev->next != NULL && prev->next != tgt; prev->next) ;
+
+    if (*phead == tgt) {
+        *phead = tgt->next;
+    } else {
+        prev->next = tgt->next;
+    }
+
+    tgt->parent_team->data->project_num -= 1;
+    if (tgt->parent_team->data->project_num == 0) {
+        tgt->parent_team->child_project_head = NULL;
+        tgt->parent_team->child_project_tail = NULL;
+    } else if (tgt->parent_depart->child_project_head == tgt) {
+        tgt->parent_team->child_project_head = tgt->next;
+    } else if (tgt->parent_team->child_team_tail == tgt) {
+        tgt->parent_team->child_team_tail = prev;
+    }
+
+    #if defined(BUILDING)
+    printf("[LOG] removeProject(): freed %s @ 0x%p\n",
+           tgt->data->id, tgt);
+    #endif
+    free(tgt->data);
+    free(tgt);
+
+    return 1;
+}
 
 
+    /**** SELECT ****/
+
+ProjectWrapper *getProjectById(Project *start, const char *id) {
+    ProjectWrapper *rtn = (ProjectWrapper *)malloc(sizeof(ProjectWrapper));
+    if (rtn == NULL) {
+        #if defined(DEBUG)
+        puts("[LOG] Error in getProjectById():\n\tfailed to malloc for result mounting point");
+        #endif
+        return NULL;
+    }
+
+    ProjectWrapper *rtn_head = rtn;
+    rtn_head->project = NULL; rtn_head->next = NULL;
+
+    for (; start; start = start->next) {
+        if (strstr(start->data->id, id) != NULL) {
+            #if defined(BUILDING)
+            printf("[LOG] getProjectById(): found %s @ 0x%p",
+                   start->data->id, start);
+            #endif
+            if (rtn_head->project == NULL) {
+                rtn->project = start;
+            } else {
+                rtn->next = (ProjectWrapper *)malloc(sizeof(ProjectWrapper));
+                if (rtn->next == NULL) {
+                    #if defined(DEBUG)
+                    puts("[LOG] Error in getProjectById():\n\tfailed to malloc for result container");
+                    #endif
+                }
+                cleanupProjectWrapper(rtn_head);
+                return NULL;
+            }
+            rtn = rtn->next; rtn->next = NULL;
+            rtn->project = start;
+        }
+    }
+    return rtn_head;
 }
 
 
 
+ProjectWrapper *getProjectByTeam(Team *parent_team) {
+    // 创建结果挂载点
+    ProjectWrapper *rtn_head = (ProjectWrapper *)malloc(sizeof(ProjectWrapper));
+    if (rtn_head == NULL) {
+        #if defined(DEBUG)
+        puts("[LOG] Error in getProjectByTeam():\n\tfailed to malloc for result maunting point");
+        #endif
+        return NULL;
+    }
+    rtn_head->project = NULL; rtn_head->next = NULL;
+
+    // 母结点没有子节点
+    if (parent_team->child_project_head == NULL) {
+        return rtn_head;    // 返回空结果
+    }
+    // 母结点下有子节点
+    Project *cur = parent_team->child_project_head;
+    ProjectWrapper *rtn = rtn_head;
+    for (; cur != parent_team->child_project_tail->next; cur = cur->next) {
+        rtn->next = (ProjectWrapper *)malloc(sizeof(ProjectWrapper));
+        if (rtn->next == NULL) {
+            #if defined(DEBUG)
+            puts("[LOG] Error in getProjectByTeam():\n\tfailed to malloc for result container");
+            #endif
+            cleanupProjectWrapper(rtn_head);
+            return NULL;
+        }
+        rtn = rtn->next;
+        rtn->project = cur; rtn->next = NULL;
+    }
+    return rtn_head;
+}
 
 
 
+    /**** CLEANUPs ****/
+
+void cleanupProjectWrapper(ProjectWrapper *prev) {
+    if (prev == NULL) {
+        #if defined(DEBUG)
+        puts("Nothing left to be cleaned");
+        #endif
+        return;
+    }
+    ProjectWrapper *after;
+    for (; (after = prev->next, prev); prev = after) {
+        #if defined(BUILDING)
+        printf("[LOG] cleanupProjectWrapper(): freed 0x%p\n", prev);
+        #endif
+        free(prev);
+    }
+    return;
+}
+
+
+void cleanupProject(Project *prev) {
+    if (prev == NULL) {
+        #if defined(DEBUG)
+        puts("Nothing left to be cleaned");
+        #endif
+        return;
+    }
+    Project *after;
+    for (; (after = prev->next, prev); prev = after) {
+        #if defined(BUILDING)
+        printf("[LOG] cleanupProject(): freed 0x%p\n", prev);
+        #endif
+        free(prev);
+    }
+    return;
+}
+
+
+
+/********** Unit Test **********/
+
+#if defined(BUILDING)
+
+
+
+#endif
 
 
 

@@ -1,4 +1,6 @@
 main:
 	gcc ./data_structure.c ./faculty_functions.c ./team_functions.c
-	./a.exe
 
+run:
+	chcp 65001
+	./a.exe
