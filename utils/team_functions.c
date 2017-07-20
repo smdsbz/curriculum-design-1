@@ -319,24 +319,28 @@ int removeTeam(Team **phead, Team *tgt) {
         return 0;
     }
 
+    // prev 为 tgt 之前的节点
+    // NOTE: 若链表只有一个节点，prev == phead，prev->next == NULL，prev无效
+    Team *prev = *phead;
+    for (; prev->next != NULL && prev->next != tgt; prev = prev->next) ;
+    // prev->next == tgt || NULL
+    // if (prev->next == NULL) { prev = NULL; }
 
-    // 团队链表重新链接 - 绕开需要删除的节点
-    if (*phead == tgt) {        // 删除头节点操作
-        *phead = tgt->next;     //      只需将头指针指向下一个节点
-    } else {                    // 要删除的不是头节点
-        // prev 为 tgt 之前的节点
-        Team *prev = *phead;
-        for (; prev->next != tgt; prev = prev->next) ;
-        // prev->next == tgt
+    // 删除节点
+
+    // case 1 - 要删除的节点是头节点
+    if (*phead == tgt) {
+        *phead = tgt->next;     // 只需将头指针指向下一个节点
+    } else {    // case 2 - 要删除的不是头节点
         // 使链表指向绕开 tgt
-        prev->next = prev->next->next;  // route around
+        prev->next = tgt->next;  // route around
     }
 
-    // 在母结点数据域注册
+    // 在母结点数据域注册删除操作
     tgt->parent_depart->data->team_num -= 1;
     // 在母结点的指针域注册
-    if (tgt->parent_depart->data == 0) {
-        // case 1: tgt 是母结点下唯一一个子节点
+    if (tgt->parent_depart->data->team_num == 0) {
+        // case 1: tgt 是母结点下最后一个子节点，现在母结点没有子节点了
         tgt->parent_depart->child_team_head = NULL;
         tgt->parent_depart->child_team_tail = NULL;
     } else if (tgt->parent_depart->child_team_head == tgt) {
@@ -618,10 +622,12 @@ void main(void) {
 
     // removeTeam()
     puts("[LOG] removing team No.1");
+    puts("Expecting sequence:\n\t电子队 --> 银河队");
     removeTeam(&Team_HEAD, Team_HEAD);
     printTeamChainToConsole(Team_HEAD);
     puts("[LOG] removing team No.3");
-    removeTeam(&Team_HEAD, Team_HEAD);
+    puts("Expecting sequence:\n\t电子队");
+    removeTeam(&Team_HEAD, Team_HEAD->next);
     printTeamChainToConsole(Team_HEAD);
 
     cleanupTeam(Team_HEAD);
