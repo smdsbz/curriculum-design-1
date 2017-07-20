@@ -10,12 +10,12 @@
 #ifdef BUILDING
 #undef BUILDING
 #endif
-// #define BUILDING
+#define BUILDING
 
 #ifdef DEBUG
 #undef DEBUG
 #endif
-// #define DEBUG
+#define DEBUG
 
 
 
@@ -319,15 +319,15 @@ int removeTeam(Team **phead, Team *tgt) {
         return 0;
     }
 
-    // prev 为 tgt 之前的节点
-    Team *prev = *phead;
-    for (; prev->next != tgt; prev = prev->next) ;
-    // prev->next == tgt
 
     // 团队链表重新链接 - 绕开需要删除的节点
     if (*phead == tgt) {        // 删除头节点操作
         *phead = tgt->next;     //      只需将头指针指向下一个节点
     } else {                    // 要删除的不是头节点
+        // prev 为 tgt 之前的节点
+        Team *prev = *phead;
+        for (; prev->next != tgt; prev = prev->next) ;
+        // prev->next == tgt
         // 使链表指向绕开 tgt
         prev->next = prev->next->next;  // route around
     }
@@ -617,7 +617,12 @@ void main(void) {
     cleanupTeamWrapper(Team_Wrapper_HEAD);
 
     // removeTeam()
-    // puts("[LOG] ")
+    puts("[LOG] removing team No.1");
+    removeTeam(&Team_HEAD, Team_HEAD);
+    printTeamChainToConsole(Team_HEAD);
+    puts("[LOG] removing team No.3");
+    removeTeam(&Team_HEAD, Team_HEAD);
+    printTeamChainToConsole(Team_HEAD);
 
     cleanupTeam(Team_HEAD);
 

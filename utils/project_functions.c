@@ -88,9 +88,152 @@ void cleanupProject(Project *start);
 
     /**** POST | DELETE | PUT ****/
 
+ProjectData initProjectData(void) {
+    ProjectData Manhatan;
+    printf("project.id = "); scanf("%s", Manhatan.id);
+    printf("project.type = "); scanf("%s", Manhatan.type);
+    printf("project.start_date = "); scanf("%s", Manhatan.start_date);
+    printf("project.funding = "); scanf("%s", Manhatan.funding);
+    printf("project.manager = "); scanf("%s", Manhatan.manager);
+    printf("project.team = "); scanf("%s", Manhatan.team);
+    return Manhatan;
+}
 
 
 
+Project *appendProject(Project *head, ProjectData new_one, Team *team_chain) {
+    // get tail node
+    Project *tail = head;
+    for (; tail->next; tail = tail->next) ;
+    // tail->next == NULL
+
+    // get parent_team
+    TeamWrapper *parent_team_wrapper = getTeamByName(team_chain, new_one.team);
+    if (parent_team_wrapper->team == NULL) {
+        puts("target parent team not found\n");
+        return NULL;
+    }
+    if (parent_team_wrapper->next != NULL) {
+        puts("multiple parent teams found\n");
+        return NULL;
+    }
+
+    Team *parent_team = parent_team_wrapper->team;
+    cleanupTeamWrapper(parent_team_wrapper);
+
+    #if defined(BUILDING)
+    printf("[LOG] appendProject(): parent_team is %s @ 0x%p\n",
+           parent_team->data->name, parent_team);
+    #endif
+
+    // I/O - case 1
+    if (tail == head
+            && tail->data == NULL) {
+        // indent-fixer
+        #if defined(BUILDING)
+        puts("[LOG] appendTeam(): case 1");
+        #endif
+        // malloc for tail->data
+        tail->data = (ProjectData *)malloc(sizeof(ProjectData));
+        if (tail->data == NULL) {
+            #if defined(DEBUG)
+            puts("[LOG] Error in appendProject():\n\tfailed to malloc for data (head)");
+            #endif
+            return NULL;
+        }
+        // writing in
+        *(tail->data) = new_one; tail->next = NULL;
+        tail->parent_team = parent_team;
+        parent_depart->data->project_num += 1;
+        parent_depart->child_project_head = tail;
+        parent_depart->child_project_tail = tail;
+        return tail;
+    }
+    // I/O - case 2 & 3
+    if (parent_depart->child_project_tail == NULL
+            || parent_depart->child_project_tail->next == NULL) {
+        // indent-fixer
+        #if defined(BUILDING)
+        puts("[LOG] appendProject(): case 2");
+        #endif
+        tail->next = (Project *)malloc(sizeof(Project));
+        if (tail->next == NULL) {
+            #if defined(DEBUG)
+            puts("[LOG] Error in appendProject():\n\tfailed to malloc for data");
+            #endif
+            return NULL;
+        }
+        tail->next->next = NULL;
+    } else {
+        #if defined(BUILDING)
+        puts("[LOG] appendProject(): case 3");
+        #endif
+        tail = parent_depart->child_project_tail;
+        Project *after - tail->next;
+        tail->next = (Project *)malloc(sizeof(Project));
+        if (tail->next == NULL) {
+            #if defined(DEBUG)
+            puts("[LOG] Error in appendProject():\n\tfailed to malloc for container");
+            #endif
+            return NULL;
+        }
+        tail->next->data = (ProjectData *)malloc(sizeof(ProjectData));
+        if (tail->next->data == NULL) {
+            #if defined(DEBUG)
+            puts("[LOG] Error in appendProject():\n\tfailed to malloc for data");
+            #endif
+            return NULL;
+        }
+        tail->next->next = after;
+    }
+
+    // I/O - case 2 & 3
+    *(tail->next->data) = new_one;
+    parent_depart->data->project_num += 1;
+    if (parent_depart->data->project_num == 1) {
+        parent_depart->child_project_head = tail->next;
+    }
+    parent_depart->child_project_tail = tail->next;
+    tail->next->parent_team = parent_team;
+
+    return tail->next;
+}
+
+
+
+int modifyProject(Project *tgt, ProjectData new_one) {
+    if (tgt == NULL) {
+        #if defined(DEBUG)
+        puts("[LOG] Error in modifyProject():\n\ttarget is NULL");
+        #endif
+        return 0;
+    }
+    if (strcmp(tgt->data->team, new_one.team) != 0) {
+        #if defined(DEBUG)
+        printf("[LOG] Error in modifyProject():\n\tchanging project team,");
+        printf(" from %s to %s, strcmp() got %d\n",
+               tgt->data->team, new_one.team,
+               strcmp(tgt->data->team, new_one.team));
+        #endif
+        return 0;
+    }
+    *(tgt->data) = new_one;
+    return 1;
+}
+
+
+
+int removeProject(Project **phead, Project *tgt) {
+    if (tgt == NULL) {
+        #if defined(DEBUG)
+        puts("[LOG] Error in removeProject():\n\ttarget is NULL");
+        #endif
+        return 0;
+    }
+    // HACK
+
+
+}
 
 
 
