@@ -303,7 +303,7 @@ void cleanupDepartWrapper(DepartWrapper *prev) {
     while (1) {
         after = prev->next;   // 保存下一个节点位置
         free(prev);
-        #if defined(BUILDING)
+        #if defined(DEBUG)
         printf("[LOG] cleanupDepartWrapper(): freed 0x%p\n", prev);
         #endif
         prev = after;
@@ -320,7 +320,7 @@ void cleanupDepart(Depart *prev) {
     while (1) {
         after = prev->next;
         free(prev->data); free(prev);
-        #if defined(BUILDING)
+        #if defined(DEBUG)
         printf("[LOG] cleanupDepart(): freed 0x%p\n", prev);
         #endif
         prev = after;

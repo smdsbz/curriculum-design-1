@@ -15,7 +15,7 @@
 #ifdef DEBUG
 #undef DEBUG
 #endif
-#define DEBUG
+// #define DEBUG
 
 
 // /**** Additional typdef: Search Condition ****/
@@ -153,6 +153,12 @@ Team *appendTeam(Team *head, TeamData new_one, Depart *depart_chain) {
 
     // 获取院系母结点
     DepartWrapper *parent_depart_wrapper = getDepartByName(depart_chain, new_one.faculty);
+    if (parent_depart_wrapper == NULL) {
+        #if defined(DEBUG)
+        puts("[LOG] appendTeam():\n\tgetDepartByName() failed");
+        #endif
+        return NULL;
+    }
     if (parent_depart_wrapper->depart == NULL) {
         puts("target parent department not found\n");
         return NULL;
@@ -180,7 +186,7 @@ Team *appendTeam(Team *head, TeamData new_one, Depart *depart_chain) {
     //   case 1: 团队链表中目前还没有数据，此次操作将写入链表的第一个数据
     if (tail == head
             && tail->data == NULL) {
-        #if defined(BUILDING)
+        #if defined(DEBUG)
         puts("[LOG] appendTeam(): case 1");
         #endif
         // 数据域深复制内存空间准备
@@ -206,7 +212,7 @@ Team *appendTeam(Team *head, TeamData new_one, Depart *depart_chain) {
     //   case 2 & 3: 需要添加节点的操作
     if (parent_depart->child_team_tail == NULL
             || parent_depart->child_team_tail->next == NULL) {
-        #if defined(BUILDING)
+        #if defined(DEBUG)
         puts("[LOG] appendTeam(): case 2");
         #endif
         // case 2: 母结点在当前还没有子节点
@@ -232,7 +238,7 @@ Team *appendTeam(Team *head, TeamData new_one, Depart *depart_chain) {
         // 因为在下一个条件块中，该处指向不同
         tail->next->next = NULL;
     } else {    // case 3: 母结点已经有子节点了
-        #if defined(BUILDING)
+        #if defined(DEBUG)
         puts("[LOG] appendTeam(): case 3");
         #endif
         // 为保证后续代码兼容性，退出此区块时 tail->next 指向新添加的节点
@@ -505,20 +511,21 @@ void cleanupTeamWrapper(TeamWrapper *prev) {
 
 
 void cleanupTeam(Team *prev) {
+    // puts("[LOG] cleanupTeam(): entered");
     if (prev == NULL) {
         #if defined(DEBUG)
         puts("Nothing left to be cleaned");
         #endif
         return;
     }
-    Team *after = prev;
+    Team *after;
     while (1) {
         after = prev->next;
-        free(prev);
-        #if defined(BUILDING)
-        printf("[LOG] cleanupTeam(): freed 0x%p\n",
-               prev);
+        #if defined(DEBUG)
+        printf("[LOG] cleanupTeam(): freed 0x%p\n", prev);
         #endif
+        free(prev->data);
+        free(prev);
         prev = after;
         if (prev == NULL) { break; }
     }

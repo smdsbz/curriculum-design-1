@@ -109,18 +109,16 @@ Project *appendProject(Project *head, ProjectData new_one, Team *team_chain) {
 
     // get parent_team
     TeamWrapper *parent_team_wrapper = getTeamByName(team_chain, new_one.team);
-    printf("parent_team_wrapper - 0x%p\n",
-           parent_team_wrapper);
     if (parent_team_wrapper == NULL) {
         #if defined(DEBUG)
-        puts("[LOG] appendProject(): getTeamByName() failed");
+        puts("[LOG] appendProject():\n\tgetTeamByName() failed");
         #endif
         return NULL;
     }
     if (parent_team_wrapper->team == NULL) {
         puts("target parent team not found\n");
         return NULL;
-    } else { puts("bp - else"); }
+    }
     if (parent_team_wrapper->next != NULL) {
         puts("multiple parent teams found\n");
         return NULL;
@@ -128,9 +126,7 @@ Project *appendProject(Project *head, ProjectData new_one, Team *team_chain) {
 
     Team *parent_team = parent_team_wrapper->team;
     cleanupTeamWrapper(parent_team_wrapper);
-
-
-    #if defined(BUILDING)
+    #if defined(DEBUG)
     printf("[LOG] appendProject(): parent_team is %s @ 0x%p\n",
            parent_team->data->name, parent_team);
     #endif
@@ -139,7 +135,7 @@ Project *appendProject(Project *head, ProjectData new_one, Team *team_chain) {
     if (tail == head
             && tail->data == NULL) {
         // indent-fixer
-        #if defined(BUILDING)
+        #if defined(DEBUG)
         puts("[LOG] appendTeam(): case 1");
         #endif
         // malloc for tail->data
@@ -167,6 +163,13 @@ Project *appendProject(Project *head, ProjectData new_one, Team *team_chain) {
         #endif
         tail->next = (Project *)malloc(sizeof(Project));
         if (tail->next == NULL) {
+            #if defined(DEBUG)
+            puts("[LOG] Error in appendProject():\n\tfailed to malloc for data");
+            #endif
+            return NULL;
+        }
+        tail->next->data = (ProjectData *)malloc(sizeof(ProjectData));
+        if (tail->next->data == NULL) {
             #if defined(DEBUG)
             puts("[LOG] Error in appendProject():\n\tfailed to malloc for data");
             #endif
@@ -356,7 +359,8 @@ void cleanupProjectWrapper(ProjectWrapper *prev) {
         return;
     }
     ProjectWrapper *after;
-    for (; (after = prev->next, prev); prev = after) {
+    for (; prev; prev = after) {
+        after = prev->next;
         #if defined(BUILDING)
         printf("[LOG] cleanupProjectWrapper(): freed 0x%p\n", prev);
         #endif
@@ -374,13 +378,17 @@ void cleanupProject(Project *prev) {
         return;
     }
     Project *after;
-    for (; (after = prev->next, prev); prev = after) {
-        #if defined(BUILDING)
+    for (; prev; prev = after) {
+        after = prev->next;
+        #if defined(DEBUG)
         printf("[LOG] cleanupProject(): freed 0x%p\n", prev);
         #endif
         free(prev->data);
         free(prev);
     }
+    #if defined(DEBUG)
+    puts("[LOG] cleanupProject(): exit");
+    #endif
     return;
 }
 
@@ -433,10 +441,6 @@ void main(void) {
     DepartData depart_data_1 = {
         "计算机", "张三", "13344445555", 0
     };
-    Depart depart_1 = {
-        &depart_data_1, NULL, NULL, NULL
-    };
-    Depart *Depart_HEAD = &depart_1;
 
     TeamData team_data_1 = {
         "火箭队", "武藏", 2, 3, "计算机"
@@ -444,19 +448,6 @@ void main(void) {
     TeamData team_data_2 = {
         "银河队", "小次郎", 3, 4, "计算机"
     };
-    Team team_1 = {
-        &team_data_1, &depart_1, NULL, NULL, NULL
-    };
-    Team team_2 = {
-        &team_data_2, &depart_1, NULL, NULL, NULL
-    };
-
-    team_1.next = &team_2;
-    Team *Team_HEAD = &team_1;
-
-    depart_1.child_team_head = &team_1;
-    depart_1.child_team_tail = &team_2;
-
 
     ProjectData project_data_1 = {
         "123456", '1', "1970/01", 1.2, "王五", "火箭队"
@@ -468,32 +459,38 @@ void main(void) {
         "123234", '3', "1990/01", 3.4, "李四", "火箭队"
     };
 
+
+    Depart *Depart_HEAD = (Depart *)malloc(sizeof(Depart));
+    Depart_HEAD->data = NULL; Depart_HEAD->next = NULL;
+    Depart_HEAD->child_team_head = NULL;
+    Depart_HEAD->child_team_tail = NULL;
+
+    Team *Team_HEAD = (Team *)malloc(sizeof(Team));
+    Team_HEAD->data = NULL; Team_HEAD->next = NULL;
+    Team_HEAD->parent_depart = NULL;
+    Team_HEAD->child_project_head = NULL;
+    Team_HEAD->child_project_tail = NULL;
+
     Project *Project_HEAD = (Project *)malloc(sizeof(Project));
     Project_HEAD->data = NULL; Project_HEAD->next = NULL;
     Project_HEAD->parent_team = NULL;
 
+    appendDepart(Depart_HEAD, depart_data_1);
+    appendTeam(Team_HEAD, team_data_1, Depart_HEAD);
+    appendTeam(Team_HEAD, team_data_2, Depart_HEAD);
+
+
+    // printTeamChainToConsole(Team_HEAD);
+
     // appendProject()
     puts("[LOG] adding project \"123456\"");
     appendProject(Project_HEAD, project_data_1, Team_HEAD);
-    // printProjectChainToConsole(Project_HEAD);
-
-    TeamWrapper *team_wrapper = getTeamByName(Team_HEAD, "火箭队");
-    printf("[LOG] team_wrapper @ 0x%p\n", team_wrapper);
-    printf("\twrapper.team = %s @ 0x%p\n\n",
-           team_wrapper->team->data->name, team_wrapper->team);
-    cleanupTeamWrapper(team_wrapper);
-    return;
-
     puts("[LOG] adding project \"123345\"");
     appendProject(Project_HEAD, project_data_2, Team_HEAD);
-
-
     puts("[LOG] adding project \"123234\"");
     appendProject(Project_HEAD, project_data_3, Team_HEAD);
-
-    puts("Expecting sequence:\n\t123456 --> 123345 --> 123234");
+    puts("Expecting sequence:\n\t123456 --> 123234 --> 123345");
     printProjectChainToConsole(Project_HEAD);
-
 
     cleanupProject(Project_HEAD);
     cleanupTeam(Team_HEAD);
