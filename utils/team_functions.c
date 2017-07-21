@@ -1,5 +1,5 @@
 #ifndef DATA_STRUCTURE
-#include "data_structure.c"
+#include "data_structure.h"
 #endif
 
 #ifndef FACULTY_FUNCTIONS
@@ -15,16 +15,15 @@
 #ifdef DEBUG
 #undef DEBUG
 #endif
-// #define DEBUG
+#define DEBUG
 
 
-
-/**** Additional typdef: Search Condition ****/
-
-typedef struct _Where {
-    char    direction[3];   // 查找条件 - ^[\>\<]=?|=$
-    int     value;
-} Where;
+// /**** Additional typdef: Search Condition ****/
+//
+// typedef struct _Where {
+// char    direction[3];   // 查找条件 - ^[\>\<]=?|=$
+// int     value;
+// } Where;
 
 // 实际执行的函数应在外部申明，否则在第一轮执行后，judger指向的函数内存空间会被收回
 int isSmaller(int valve, int data) { return (data < valve); }
@@ -35,18 +34,21 @@ int noSmallerThan(int valve, int data) { return (data >= valve); }
 
 int (*setJudger(const char *direction))(int, int) {
 /*  返回匹配规则函数
- *  ARGS:   代表搜索规则的字符串(eg "<=")
- *  RETN:   int judger(int valve, int data)
- *               实际为上面申明的函数中的一种
- */
+*  ARGS:   代表搜索规则的字符串(eg "<=")
+*  RETN:   int judger(int valve, int data)
+*               实际为上面申明的函数中的一种
+*/
 
-    if (!strcmp("<", direction)) { return isSmaller; }
-    if (!strcmp(">", direction)) { return isLarger; }
-    if (!strcmp("=", direction)) { return isEqualTo; }
-    if (!strcmp("<=", direction)) { return noLargerThan; }
-    if (!strcmp(">=", direction)) { return noSmallerThan; }
-    else { return NULL; }
+if (!strcmp("<", direction)) { return isSmaller; }
+if (!strcmp(">", direction)) { return isLarger; }
+if (!strcmp("=", direction)) { return isEqualTo; }
+if (!strcmp("<=", direction)) { return noLargerThan; }
+if (!strcmp(">=", direction)) { return noSmallerThan; }
+else { return NULL; }
 }
+
+
+
 
 
 
@@ -128,8 +130,8 @@ TeamData initTeamData(void) {
     TeamData VirtusPro;
     printf("team.name = "); scanf("%s", VirtusPro.name);
     printf("team.manager = "); scanf("%s", VirtusPro.manager);
-    printf("team.teacher_num = "); scanf("%s", VirtusPro.teacher_num);
-    printf("team.student_num = "); scanf("%s", VirtusPro.student_num);
+    printf("team.teacher_num = "); scanf("%d", &(VirtusPro.teacher_num));
+    printf("team.student_num = "); scanf("%d", &(VirtusPro.student_num));
     printf("team.faculty = "); scanf("%s", VirtusPro.faculty);
     VirtusPro.project_num = 0;
     return VirtusPro;

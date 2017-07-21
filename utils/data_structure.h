@@ -1,6 +1,6 @@
 #ifndef DATA_STRUCTURE
-#define DATA_STRUCTURE  "data_structure.c"
-#endif
+#define DATA_STRUCTURE  "data_structure.h"
+// #endif
 
 /*  $PROJ_HOME/utils/data_structure.c
  *
@@ -59,7 +59,7 @@ Project_HEAD -----> ... <--> Proj_1 <--> Proj_2 <--> ...
 
 /*********** Definitions ************/
 
-/**** Depart ****/
+    /**** Depart ****/
 
 typedef struct _DepartData {
     // self.data
@@ -92,7 +92,7 @@ typedef struct _DepartWrapper {
 } DepartWrapper;
 
 
-/**** Team ****/
+    /**** Team ****/
 
 typedef struct _TeamData {
     // self.data
@@ -127,7 +127,7 @@ typedef struct _TeamWrapper {
 
 
 
-/**** Project ****/
+    /**** Project ****/
 
 typedef struct _ProjectData {
     // self.data
@@ -159,6 +159,12 @@ typedef struct _ProjectWrapper {
 
 
 
+/**** Additional typdef: Search Condition ****/
+
+typedef struct _Where {
+char    direction[3];   // 查找条件 - ^[\>\<]=?|=$
+int     value;
+} Where;
 
 
 
@@ -168,4 +174,7 @@ typedef struct _ProjectWrapper {
 void main(void) {
     puts("Successfully constructed!");
 }
+#endif
+
+
 #endif

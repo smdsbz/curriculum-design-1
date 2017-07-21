@@ -1,5 +1,5 @@
 #ifndef DATA_STRUCTURE
-#include "data_structure.c"
+#include "data_structure.h"
 #endif
 
 #ifdef BUILDING

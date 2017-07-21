@@ -243,7 +243,7 @@ void cleanupTeam(Team *start);
 name        |   description         |   type        |   sample
 ------------|-----------------------|---------------|--------------------
 id          |   项目编号            |   char[15]    |   "0121210044"
-type        |   项目类别            |   char        |   [1-5] (*[1])
+type        |   项目类别            |   char        |   ['1'-'5'] (*[1])
 start_date  |   起始时间            |   char[8]     |   "2015/03"
 funding     |   项目经费            |   float           |   23.5 (x 1000 CNY)
 manager     |   项目负责人           |   char[12]    |   "王五"

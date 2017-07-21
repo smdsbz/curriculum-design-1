@@ -1,5 +1,5 @@
 #ifndef DATA_STRUCTURE
-#include "data_structure.c"
+#include "data_structure.h"
 #endif
 
 
@@ -70,7 +70,7 @@ ProjectWrapper *getProjectById(Project *head, const char *id);
 
     /**** CLEANUPs ****/
 
-void cleanupProjectWrapper(TeamWrapper *start);
+void cleanupProjectWrapper(ProjectWrapper *start);
 /*  清空搜索结果序列
  *  ARGS:   头节点地址
  *  RETN:   void
@@ -91,9 +91,9 @@ void cleanupProject(Project *start);
 ProjectData initProjectData(void) {
     ProjectData Manhatan;
     printf("project.id = "); scanf("%s", Manhatan.id);
-    printf("project.type = "); scanf("%s", Manhatan.type);
+    printf("project.type = "); scanf("%c", &(Manhatan.type));
     printf("project.start_date = "); scanf("%s", Manhatan.start_date);
-    printf("project.funding = "); scanf("%s", Manhatan.funding);
+    printf("project.funding = "); scanf("%f", &(Manhatan.funding));
     printf("project.manager = "); scanf("%s", Manhatan.manager);
     printf("project.team = "); scanf("%s", Manhatan.team);
     return Manhatan;
@@ -109,10 +109,18 @@ Project *appendProject(Project *head, ProjectData new_one, Team *team_chain) {
 
     // get parent_team
     TeamWrapper *parent_team_wrapper = getTeamByName(team_chain, new_one.team);
+    printf("parent_team_wrapper - 0x%p\n",
+           parent_team_wrapper);
+    if (parent_team_wrapper == NULL) {
+        #if defined(DEBUG)
+        puts("[LOG] appendProject(): getTeamByName() failed");
+        #endif
+        return NULL;
+    }
     if (parent_team_wrapper->team == NULL) {
         puts("target parent team not found\n");
         return NULL;
-    }
+    } else { puts("bp - else"); }
     if (parent_team_wrapper->next != NULL) {
         puts("multiple parent teams found\n");
         return NULL;
@@ -120,6 +128,7 @@ Project *appendProject(Project *head, ProjectData new_one, Team *team_chain) {
 
     Team *parent_team = parent_team_wrapper->team;
     cleanupTeamWrapper(parent_team_wrapper);
+
 
     #if defined(BUILDING)
     printf("[LOG] appendProject(): parent_team is %s @ 0x%p\n",
@@ -144,14 +153,14 @@ Project *appendProject(Project *head, ProjectData new_one, Team *team_chain) {
         // writing in
         *(tail->data) = new_one; tail->next = NULL;
         tail->parent_team = parent_team;
-        parent_depart->data->project_num += 1;
-        parent_depart->child_project_head = tail;
-        parent_depart->child_project_tail = tail;
+        parent_team->data->project_num += 1;
+        parent_team->child_project_head = tail;
+        parent_team->child_project_tail = tail;
         return tail;
     }
     // I/O - case 2 & 3
-    if (parent_depart->child_project_tail == NULL
-            || parent_depart->child_project_tail->next == NULL) {
+    if (parent_team->child_project_tail == NULL
+            || parent_team->child_project_tail->next == NULL) {
         // indent-fixer
         #if defined(BUILDING)
         puts("[LOG] appendProject(): case 2");
@@ -168,8 +177,8 @@ Project *appendProject(Project *head, ProjectData new_one, Team *team_chain) {
         #if defined(BUILDING)
         puts("[LOG] appendProject(): case 3");
         #endif
-        tail = parent_depart->child_project_tail;
-        Project *after - tail->next;
+        tail = parent_team->child_project_tail;
+        Project *after = tail->next;
         tail->next = (Project *)malloc(sizeof(Project));
         if (tail->next == NULL) {
             #if defined(DEBUG)
@@ -189,11 +198,11 @@ Project *appendProject(Project *head, ProjectData new_one, Team *team_chain) {
 
     // I/O - case 2 & 3
     *(tail->next->data) = new_one;
-    parent_depart->data->project_num += 1;
-    if (parent_depart->data->project_num == 1) {
-        parent_depart->child_project_head = tail->next;
+    parent_team->data->project_num += 1;
+    if (parent_team->data->project_num == 1) {
+        parent_team->child_project_head = tail->next;
     }
-    parent_depart->child_project_tail = tail->next;
+    parent_team->child_project_tail = tail->next;
     tail->next->parent_team = parent_team;
 
     return tail->next;
@@ -244,10 +253,10 @@ int removeProject(Project **phead, Project *tgt) {
     if (tgt->parent_team->data->project_num == 0) {
         tgt->parent_team->child_project_head = NULL;
         tgt->parent_team->child_project_tail = NULL;
-    } else if (tgt->parent_depart->child_project_head == tgt) {
+    } else if (tgt->parent_team->child_project_head == tgt) {
         tgt->parent_team->child_project_head = tgt->next;
-    } else if (tgt->parent_team->child_team_tail == tgt) {
-        tgt->parent_team->child_team_tail = prev;
+    } else if (tgt->parent_team->child_project_tail == tgt) {
+        tgt->parent_team->child_project_tail = prev;
     }
 
     #if defined(BUILDING)
@@ -369,6 +378,7 @@ void cleanupProject(Project *prev) {
         #if defined(BUILDING)
         printf("[LOG] cleanupProject(): freed 0x%p\n", prev);
         #endif
+        free(prev->data);
         free(prev);
     }
     return;
@@ -380,7 +390,105 @@ void cleanupProject(Project *prev) {
 
 #if defined(BUILDING)
 
+void printProjectToConsole(Project *Manhatan) {
+    printf("<Project @ 0x%p>\n", Manhatan);
+    printf("\tthis.id = %s\n", Manhatan->data->id);
+    printf("\tthis.type = %c\n", Manhatan->data->type);
+    printf("\tthis.start_date = %s\n", Manhatan->data->start_date);
+    printf("\tthis.funding = %.2f\n", Manhatan->data->funding);
+    printf("\tthis.manager = %s\n", Manhatan->data->manager);
+    printf("\tthis.team = %s\n", Manhatan->data->team);
+    printf("\tthis.next = 0x%p\n", Manhatan->next);
+}
 
+void printProjectChainToConsole(Project *start) {
+    if (start == NULL) {
+        puts("no data!");
+        return;
+    }
+    for (; start; start = start->next) {
+        printProjectToConsole(start);
+    }
+    putchar('\n');
+}
+
+void printProjectWrapperToConsole(ProjectWrapper *head) {
+    printf("<ProjectWrapper @ 0x%p>\n", head);
+    if (head->project == NULL) {
+        puts("\tno data!");
+        return;
+    }
+    for (; head; head = head->next) {
+        printf("\tfound %s @ 0x%p\n",
+               head->project->data->id, head->project);
+        // indent-fixer
+    }
+    putchar('\n');
+    return;
+}
+
+
+void main(void) {
+    // building test env
+    DepartData depart_data_1 = {
+        "计算机", "张三", "13344445555", 0
+    };
+    Depart depart_1 = {
+        &depart_data_1, NULL, NULL, NULL
+    };
+    Depart *Depart_HEAD = &depart_1;
+
+    TeamData team_data_1 = {
+        "火箭队", "武藏", 2, 3, "计算机"
+    };
+    TeamData team_data_2 = {
+        "银河队", "小次郎", 3, 4, "计算机"
+    };
+    Team team_1 = {
+        &team_data_1, &depart_1, NULL, NULL, NULL
+    };
+    Team team_2 = {
+        &team_data_2, &depart_1, NULL, NULL, NULL
+    };
+
+    team_1.next = &team_2;
+    Team *Team_HEAD = &team_1;
+
+    depart_1.child_team_head = &team_1;
+    depart_1.child_team_tail = &team_2;
+
+    ProjectData project_data_1 = {
+        "123456", '1', "1970/01", 1.2, "王五", "火箭队"
+    };
+    ProjectData project_data_2 = {
+        "123345", '2', "1980/01", 2.3, "赵六", "银河队"
+    };
+    ProjectData project_data_3 = {
+        "123234", '3', "1990/01", 3.4, "李四", "火箭队"
+    };
+
+    Project *Project_HEAD = (Project *)malloc(sizeof(Project));
+    Project_HEAD->data = NULL; Project_HEAD->next = NULL;
+    Project_HEAD->parent_team = NULL;
+
+    // appendProject()
+    puts("[LOG] adding project \"123456\"");
+    appendProject(Project_HEAD, project_data_1, Team_HEAD);
+    printProjectChainToConsole(Project_HEAD);
+    puts("[LOG] adding project \"123345\"");
+    appendProject(Project_HEAD, project_data_2, Team_HEAD);
+    puts("[LOG] adding project \"123234\"");
+    appendProject(Project_HEAD, project_data_3, Team_HEAD);
+
+    puts("Expecting sequence:\n\t123456 --> 123345 --> 123234");
+    printProjectChainToConsole(Project_HEAD);
+
+
+    cleanupProject(Project_HEAD);
+    cleanupTeam(Team_HEAD);
+    cleanupDepart(Depart_HEAD);
+    return;
+}
 
 #endif
 
