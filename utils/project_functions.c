@@ -457,6 +457,7 @@ void main(void) {
     depart_1.child_team_head = &team_1;
     depart_1.child_team_tail = &team_2;
 
+
     ProjectData project_data_1 = {
         "123456", '1', "1970/01", 1.2, "王五", "火箭队"
     };
@@ -474,9 +475,19 @@ void main(void) {
     // appendProject()
     puts("[LOG] adding project \"123456\"");
     appendProject(Project_HEAD, project_data_1, Team_HEAD);
-    printProjectChainToConsole(Project_HEAD);
+    // printProjectChainToConsole(Project_HEAD);
+
+    TeamWrapper *team_wrapper = getTeamByName(Team_HEAD, "火箭队");
+    printf("[LOG] team_wrapper @ 0x%p\n", team_wrapper);
+    printf("\twrapper.team = %s @ 0x%p\n\n",
+           team_wrapper->team->data->name, team_wrapper->team);
+    cleanupTeamWrapper(team_wrapper);
+    return;
+
     puts("[LOG] adding project \"123345\"");
     appendProject(Project_HEAD, project_data_2, Team_HEAD);
+
+
     puts("[LOG] adding project \"123234\"");
     appendProject(Project_HEAD, project_data_3, Team_HEAD);
 
