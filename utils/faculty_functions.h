@@ -30,6 +30,12 @@ extern DepartData initDepartData(void);
  *  NOTE:   will trigger input action
  */
 
+extern Depart *createDepartHead(void);
+/*  创建并初始化头节点
+ *  ARGS:   void
+ *  RETN:   头节点地址 || NULL
+ */
+
 
     /**** SELECT ****/
 

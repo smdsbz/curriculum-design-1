@@ -15,12 +15,12 @@
 #ifdef BUILDING
 #undef BUILDING
 #endif
-#define BUILDING
+// #define BUILDING
 
 #ifdef DEBUG
 #undef DEBUG
 #endif
-#define DEBUG
+// #define DEBUG
 
 
 
@@ -53,6 +53,12 @@ int removeProject(Project **phead, Project *tgt);
  *  RETN:   success code
  */
 
+Project *createProjectHead(void);
+/*  创建并初始化头节点
+ *  ARGS:   void
+ *  RETN:   头节点地址 || NULL
+ */
+
 
     /**** SELECT ****/
 
@@ -62,9 +68,10 @@ ProjectWrapper *getProjectById(Project *head, const char *id);
  *  RETN:   搜索结果挂载点 | NULL （没有搜索结果时也返回挂载点地址）
  */
 
-// ProjectWrapper *getProjectByTeam(Project *head, const char *team_name);
+ProjectWrapper *getProjectByTeam(Team *parent_team) {
 /*  通过团队查找项目
- *  NOTE:   由于通过团队节点可以很方便地取到相应的项目链，故先不构建该函数
+ *  ARGS:   目标团队节点
+ *  RETN:   搜索结果挂载点 || NULL （没有搜索结果也返回挂载点地址）
  */
 
 
@@ -87,6 +94,20 @@ void cleanupProject(Project *start);
 /********** Realizations **********/
 
     /**** POST | DELETE | PUT ****/
+
+Project *createProjectHead(void) {
+    Project *Project_HEAD = (Project *)malloc(sizeof(Project));
+    if (Project_HEAD == NULL) {
+        #if defined(DEBUG)
+        puts("[LOG] Error in createProjectHead():\n\tfailed to malloc for project (head)");
+        #endif
+        return NULL;
+    }
+    Project_HEAD->data = NULL; Project_HEAD->next = NULL;
+    Project_HEAD->parent_team = NULL;
+    return Project_HEAD;
+}
+
 
 ProjectData initProjectData(void) {
     ProjectData Manhatan;
@@ -244,7 +265,7 @@ int removeProject(Project **phead, Project *tgt) {
     }
 
     Project *prev = *phead;
-    for (; prev->next != NULL && prev->next != tgt; prev->next) ;
+    for (; prev->next != NULL && prev->next != tgt; prev = prev->next) ;
 
     if (*phead == tgt) {
         *phead = tgt->next;
@@ -262,7 +283,7 @@ int removeProject(Project **phead, Project *tgt) {
         tgt->parent_team->child_project_tail = prev;
     }
 
-    #if defined(BUILDING)
+    #if defined(DEBUG)
     printf("[LOG] removeProject(): freed %s @ 0x%p\n",
            tgt->data->id, tgt);
     #endif
@@ -290,7 +311,7 @@ ProjectWrapper *getProjectById(Project *start, const char *id) {
     for (; start; start = start->next) {
         if (strstr(start->data->id, id) != NULL) {
             #if defined(BUILDING)
-            printf("[LOG] getProjectById(): found %s @ 0x%p",
+            printf("[LOG] getProjectById(): found %s @ 0x%p\n",
                    start->data->id, start);
             #endif
             if (rtn_head->project == NULL) {
@@ -301,12 +322,12 @@ ProjectWrapper *getProjectById(Project *start, const char *id) {
                     #if defined(DEBUG)
                     puts("[LOG] Error in getProjectById():\n\tfailed to malloc for result container");
                     #endif
+                    cleanupProjectWrapper(rtn_head);
+                    return NULL;
                 }
-                cleanupProjectWrapper(rtn_head);
-                return NULL;
+                rtn = rtn->next; rtn->next = NULL;
+                rtn->project = start;
             }
-            rtn = rtn->next; rtn->next = NULL;
-            rtn->project = start;
         }
     }
     return rtn_head;
@@ -333,16 +354,24 @@ ProjectWrapper *getProjectByTeam(Team *parent_team) {
     Project *cur = parent_team->child_project_head;
     ProjectWrapper *rtn = rtn_head;
     for (; cur != parent_team->child_project_tail->next; cur = cur->next) {
-        rtn->next = (ProjectWrapper *)malloc(sizeof(ProjectWrapper));
-        if (rtn->next == NULL) {
-            #if defined(DEBUG)
-            puts("[LOG] Error in getProjectByTeam():\n\tfailed to malloc for result container");
-            #endif
-            cleanupProjectWrapper(rtn_head);
-            return NULL;
+        #if defined(DEBUG)
+        printf("[LOG] getProjectByTeam(): reached %s @ 0x%p\n",
+               cur->data->id, cur);
+        #endif
+        if (rtn_head->project == NULL) {
+            rtn->project = cur;
+        } else {
+            rtn->next = (ProjectWrapper *)malloc(sizeof(ProjectWrapper));
+            if (rtn->next == NULL) {
+                #if defined(DEBUG)
+                puts("[LOG] Error in getProjectByTeam():\n\tfailed to malloc for result container");
+                #endif
+                cleanupProjectWrapper(rtn_head);
+                return NULL;
+            }
+            rtn = rtn->next;
+            rtn->project = cur; rtn->next = NULL;
         }
-        rtn = rtn->next;
-        rtn->project = cur; rtn->next = NULL;
     }
     return rtn_head;
 }
@@ -460,20 +489,11 @@ void main(void) {
     };
 
 
-    Depart *Depart_HEAD = (Depart *)malloc(sizeof(Depart));
-    Depart_HEAD->data = NULL; Depart_HEAD->next = NULL;
-    Depart_HEAD->child_team_head = NULL;
-    Depart_HEAD->child_team_tail = NULL;
+    Depart *Depart_HEAD = createDepartHead();
 
-    Team *Team_HEAD = (Team *)malloc(sizeof(Team));
-    Team_HEAD->data = NULL; Team_HEAD->next = NULL;
-    Team_HEAD->parent_depart = NULL;
-    Team_HEAD->child_project_head = NULL;
-    Team_HEAD->child_project_tail = NULL;
+    Team *Team_HEAD = createTeamHead();
 
-    Project *Project_HEAD = (Project *)malloc(sizeof(Project));
-    Project_HEAD->data = NULL; Project_HEAD->next = NULL;
-    Project_HEAD->parent_team = NULL;
+    Project *Project_HEAD = createProjectHead();
 
     appendDepart(Depart_HEAD, depart_data_1);
     appendTeam(Team_HEAD, team_data_1, Depart_HEAD);
@@ -492,9 +512,40 @@ void main(void) {
     puts("Expecting sequence:\n\t123456 --> 123234 --> 123345");
     printProjectChainToConsole(Project_HEAD);
 
+    // modifyProject()
+    puts("[LOG] modifying project \"123234\"");
+    ProjectData project_data_4 = {
+        "123234", '4', "1990/01", 3.5, "李斯特", "火箭队"
+    };
+    modifyProject(Project_HEAD->next, project_data_4);
+    printProjectChainToConsole(Project_HEAD);
+
+    // SELECT
+    ProjectWrapper *project_wrapper;
+    puts("[LOG] getting project \"123234\" via id");
+    project_wrapper = getProjectById(Project_HEAD, "123234");
+    printProjectWrapperToConsole(project_wrapper);
+    cleanupProjectWrapper(project_wrapper);
+
+    // removeProject()
+    puts("[LOG] removing project \"123456\"");
+    removeProject(&Project_HEAD, Project_HEAD);
+    printProjectChainToConsole(Project_HEAD);
+
+    puts("[LOG] getting al project under \"火箭队\"");
+    project_wrapper = getProjectByTeam(Team_HEAD);
+    printProjectWrapperToConsole(project_wrapper);
+    cleanupProjectWrapper(project_wrapper);
+
+    puts("[LOG] removing project \"123345\"");
+    removeProject(&Project_HEAD, Project_HEAD->next);
+    printProjectChainToConsole(Project_HEAD);
+
+
     cleanupProject(Project_HEAD);
     cleanupTeam(Team_HEAD);
     cleanupDepart(Depart_HEAD);
+    puts("Al Success!");
     return;
 }
 

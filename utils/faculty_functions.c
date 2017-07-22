@@ -45,6 +45,12 @@ DepartData initDepartData(void);
  *  NOTE:   will trigger input action
  */
 
+Depart *createDepartHead(void);
+/*  创建并初始化头节点
+ *  ARGS:   void
+ *  RETN:   头节点地址 || NULL
+ */
+
 
     /**** SELECT ****/
 
@@ -121,10 +127,7 @@ void printDepartWrapperToConsole(DepartWrapper *head) {
 
 
 void main(void) {
-    Depart *HEAD = (Depart *)malloc(sizeof(Depart));
-    // NOTE: 创建完头节点后记得初始化！！！
-    HEAD->data = NULL; HEAD->next = NULL;
-    HEAD->child_team_head = NULL; HEAD->child_team_tail = NULL;
+    Depart *HEAD = createDepartHead();
 
     // first node creation demo
     // modifyDepart(HEAD, initDepartData());   // 向第一节点写入数据用modify
@@ -173,9 +176,23 @@ void main(void) {
 
     /**** POST | DELETE | PUT ****/
 
+Depart *createDepartHead(void) {
+    Depart *HEAD = (Depart *)malloc(sizeof(Depart));
+    if (HEAD == NULL) {
+        #if defined(DEBUG)
+        puts("[LOG] Error in createDepartHead():\n\tfailed to malloc for depart (head)");
+        #endif
+        return NULL;
+    }
+    // NOTE: 创建完头节点后记得初始化！！！
+    HEAD->data = NULL; HEAD->next = NULL;
+    HEAD->child_team_head = NULL; HEAD->child_team_tail = NULL;
+    return HEAD;
+}
+
+
 DepartData initDepartData(void) {
     // TODO: 增加图形界面后记得修改数据来源
-    // NOTE: 载入内存
     DepartData Computer;
     printf("depart.name = "); scanf("%s", Computer.name);
     printf("depart.manager = "); scanf("%s", Computer.manager);

@@ -29,6 +29,12 @@ extern int removeTeam(Team **phead, Team *tgt);
  *  RETN:   success code
  */
 
+extern Team *createTeamHead(void);
+/*  创建并初始化头节点
+ *  ARGS:   void
+ *  RETN:   头节点地址 || NULL
+ */
+
 
     /**** SELECT ****/
 

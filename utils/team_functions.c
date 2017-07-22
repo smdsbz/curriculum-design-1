@@ -83,6 +83,12 @@ int removeTeam(Team **phead, Team *tgt);
  *  RETN:   success code
  */
 
+Team *createTeamHead(void);
+/*  创建并初始化头节点
+ *  ARGS:   void
+ *  RETN:   头节点地址 || NULL
+ */
+
 
     /**** SELECT ****/
 
@@ -125,6 +131,22 @@ void cleanupTeam(Team *start);
 /************ Function Realizations *************/
 
     /**** POST | DELETE | PUT ****/
+
+Team *createTeamHead(void) {
+    Team *Team_HEAD = (Team *)malloc(sizeof(Team));
+    if (Team_HEAD == NULL) {
+        #if defined(DEBUG)
+        puts("[LOG] Error in createTeamHead():\n\tfailed to malloc for team (head)");
+        #endif
+        return NULL;
+    }
+    Team_HEAD->data = NULL; Team_HEAD->next = NULL;
+    Team_HEAD->parent_depart = NULL;
+    Team_HEAD->child_project_head = NULL;
+    Team_HEAD->child_project_tail = NULL;
+    return Team_HEAD;
+}
+
 
 TeamData initTeamData(void) {
     TeamData VirtusPro;
@@ -595,11 +617,7 @@ void main(void) {
     depart_1.next = &depart_2;
     Depart *Depart_HEAD = &depart_1;
 
-    Team *Team_HEAD = (Team *)malloc(sizeof(Team));
-    Team_HEAD->data = NULL; Team_HEAD->next = NULL;
-    Team_HEAD->parent_depart = NULL;
-    Team_HEAD->child_project_head = NULL;
-    Team_HEAD->child_project_tail = NULL;
+    Team *Team_HEAD = createTeamHead();
 
     TeamData team_data_1 = {
         "火箭队", "武藏", 1, 2, "计算机"

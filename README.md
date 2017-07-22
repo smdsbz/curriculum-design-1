@@ -110,6 +110,12 @@ DepartData initDepartData(void);
  *  NOTE:   will trigger input action
  */
 
+Depart *createDepartHead(void);
+/*  创建并初始化头节点
+ *  ARGS:   void
+ *  RETN:   头节点地址 || NULL
+ */
+
 
     /**** SELECT ****/
 
@@ -199,6 +205,13 @@ int removeTeam(Team **phead, Team *tgt);
  *  ARGS:   指向团队链表头节点地址的指针，目标地址 | NULL
  *  RETN:   success code
  */
+
+Team *createTeamHead(void);
+/*  创建并初始化头节点
+ *  ARGS:   void
+ *  RETN:   头节点地址 || NULL
+ */
+
 
 
     /**** SELECT ****/
