@@ -55,10 +55,14 @@ int _saveProjectData(Project *, const char *);
 
 int saveData(MountPoint , const char *);
 /*  打包保存方法
+ *  ARGS:   数据挂载点。储存数据文件的目标文件夹
+ *  RETN:   success code
  */
 
 MountPoint loadData(const char *);
 /*  打包载入数据方法
+ *  ARGS:   储存数据文件的文件夹
+ *  RETN:   院系链表、团队链表、项目链表的挂载点
  */
 
 
@@ -209,9 +213,9 @@ MountPoint loadData(const char *TGT_PATH) {
     char filename[100];
     FILE *fp;
 
-    DepartData *depart_data_buf;
-    TeamData *team_data_buf;
-    ProjectData *project_data_buf;
+    DepartData depart_data_buf;
+    TeamData team_data_buf;
+    ProjectData project_data_buf;
 
     size_t counter = 0;
     // ptrdiff_t file_size = 0;
@@ -233,13 +237,12 @@ MountPoint loadData(const char *TGT_PATH) {
     }
     // loadDepartData - 读取数据
     counter = 0;
-    while (fread(depart_data_buf, sizeof(DepartData), 1, fp) == 1) {
+    while (fread(&depart_data_buf, sizeof(DepartData), 1, fp) == 1) {
         #if defined(DEBUG)
         printf("[LOG] loadData()::loadDepartData: reading %s to memory\n",
-               depart_data_buf->name);
+               depart_data_buf.name);
         #endif
-        appendDepart(mp.depart_head, *depart_data_buf);
-        free(depart_data_buf);
+        appendDepart(mp.depart_head, depart_data_buf);
         ++counter;
     }
     // loadDepartData - 验证数据是否全部读入
@@ -252,7 +255,7 @@ MountPoint loadData(const char *TGT_PATH) {
         mp.depart_head = NULL;
         return mp;
     }
-
+    // free(&depart_data_buf);
     fclose(fp);
 
     // loadTeamData
@@ -272,13 +275,12 @@ MountPoint loadData(const char *TGT_PATH) {
     }
     // loadTeamData - 读取数据
     counter = 0;
-    while (fread(team_data_buf, sizeof(TeamData), 1, fp) == 1) {
+    while (fread(&team_data_buf, sizeof(TeamData), 1, fp) == 1) {
         #if defined(DEBUG)
         printf("[LOG] loadData()::loadTeamData: reading %s to memory\n",
-               team_data_buf->name);
+               team_data_buf.name);
         #endif
-        appendTeam(mp.team_head, *team_data_buf, mp.depart_head);
-        free(team_data_buf);
+        appendTeam(mp.team_head, team_data_buf, mp.depart_head);
         ++counter;
     }
     // loadTeamData - 验证数据是否全部读入
@@ -291,7 +293,7 @@ MountPoint loadData(const char *TGT_PATH) {
         mp.team_head = NULL;
         return mp;
     }
-
+    // free(&team_data_buf);
     fclose(fp);
 
 
@@ -312,13 +314,12 @@ MountPoint loadData(const char *TGT_PATH) {
     }
     // loadProjectData - 读取数据
     counter = 0;
-    while (fread(project_data_buf, sizeof(ProjectData), 1, fp) == 1) {
+    while (fread(&project_data_buf, sizeof(ProjectData), 1, fp) == 1) {
         #if defined(DEBUG)
         printf("[LOG] loadData()::loadProjectData: reading %s to memory\n",
-               project_data_buf->id);
+               project_data_buf.id);
         #endif
-        appendProject(mp.project_head, *project_data_buf, mp.team_head);
-        free(project_data_buf);
+        appendProject(mp.project_head, project_data_buf, mp.team_head);
         ++counter;
     }
     // loadProjectData - 验证数据是否全部读入
@@ -331,7 +332,7 @@ MountPoint loadData(const char *TGT_PATH) {
         mp.project_head = NULL;
         return mp;
     }
-
+    // free(&project_data_buf);
     fclose(fp);
 
 
@@ -396,11 +397,11 @@ void main(void) {
     mp = loadData(TGT_PATH);
     Depart *d; Team *t; Project *p;
     for (d = mp.depart_head; d != NULL; d = d->next) {
-        printf("<Depart %s @ 0x%p>", d->data->name, d);
-        for (t = d->child_team_head; t != d->child_team_tail; t = t->next) {
-            printf("    <Team %s @ 0x%p>", t->data->name, t);
-            for (p = t->child_project_head; p != t->child_project_tail; p = p->next) {
-                printf("        <Project %s @ 0x%p>", p->data->id, p);
+        printf("<Depart %s @ 0x%p>\n", d->data->name, d);
+        for (t = d->child_team_head; t != d->child_team_tail->next; t = t->next) {
+            printf("    <Team %s @ 0x%p>\n", t->data->name, t);
+            for (p = t->child_project_head; p != t->child_project_tail->next; p = p->next) {
+                printf("        <Project %s @ 0x%p>\n", p->data->id, p);
             }
         }
     }
