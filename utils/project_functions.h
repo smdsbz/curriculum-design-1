@@ -43,7 +43,7 @@ extern ProjectWrapper *getProjectById(Project *head, const char *id);
  *  RETN:   搜索结果挂载点 | NULL （没有搜索结果时也返回挂载点地址）
  */
 
-extern ProjectWrapper *getProjectByTeam(Team *parent_team) {
+extern ProjectWrapper *getProjectByTeam(Team *parent_team);
 /*  通过团队查找项目
  *  ARGS:   目标团队节点
  *  RETN:   搜索结果挂载点 || NULL （没有搜索结果也返回挂载点地址）

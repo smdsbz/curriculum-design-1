@@ -20,7 +20,7 @@
 #ifdef DEBUG
 #undef DEBUG
 #endif
-// #define DEBUG
+#define DEBUG
 
 
 
@@ -68,7 +68,7 @@ ProjectWrapper *getProjectById(Project *head, const char *id);
  *  RETN:   搜索结果挂载点 | NULL （没有搜索结果时也返回挂载点地址）
  */
 
-ProjectWrapper *getProjectByTeam(Team *parent_team) {
+ProjectWrapper *getProjectByTeam(Team *parent_team);
 /*  通过团队查找项目
  *  ARGS:   目标团队节点
  *  RETN:   搜索结果挂载点 || NULL （没有搜索结果也返回挂载点地址）
@@ -170,7 +170,9 @@ Project *appendProject(Project *head, ProjectData new_one, Team *team_chain) {
         // writing in
         *(tail->data) = new_one; tail->next = NULL;
         tail->parent_team = parent_team;
+        #if defined(CHILD_COUNTER)
         parent_team->data->project_num += 1;
+        #endif
         parent_team->child_project_head = tail;
         parent_team->child_project_tail = tail;
         return tail;
@@ -222,8 +224,10 @@ Project *appendProject(Project *head, ProjectData new_one, Team *team_chain) {
 
     // I/O - case 2 & 3
     *(tail->next->data) = new_one;
+    #if defined(CHILD_COUNTER)
     parent_team->data->project_num += 1;
-    if (parent_team->data->project_num == 1) {
+    #endif
+    if (parent_team->child_project_head == NULL) {
         parent_team->child_project_head = tail->next;
     }
     parent_team->child_project_tail = tail->next;
@@ -273,8 +277,10 @@ int removeProject(Project **phead, Project *tgt) {
         prev->next = tgt->next;
     }
 
+    #if defined(CHILD_COUNTER)
     tgt->parent_team->data->project_num -= 1;
-    if (tgt->parent_team->data->project_num == 0) {
+    #endif
+    if (tgt->parent_team->child_project_head == tgt->parent_team->child_project_tail) {
         tgt->parent_team->child_project_head = NULL;
         tgt->parent_team->child_project_tail = NULL;
     } else if (tgt->parent_team->child_project_head == tgt) {
@@ -468,8 +474,11 @@ void printProjectWrapperToConsole(ProjectWrapper *head) {
 void main(void) {
     // building test env
     DepartData depart_data_1 = {
-        "计算机", "张三", "13344445555", 0
+        "计算机", "张三", "13344445555"
     };
+    #if defined(CHILD_COUNTER)
+    depart_data_1.team_num = 0;
+    #endif
 
     TeamData team_data_1 = {
         "火箭队", "武藏", 2, 3, "计算机"

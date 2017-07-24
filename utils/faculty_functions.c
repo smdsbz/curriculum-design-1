@@ -10,7 +10,7 @@
 #ifdef DEBUG
 #undef DEBUG
 #endif
-// #define DEBUG
+#define DEBUG
 
 
 
@@ -105,7 +105,9 @@ void printDepartToConsole(Depart *Comp) {
     printf("\tthis.name = %s\n", Comp->data->name);
     printf("\tthis.manager = %s\n", Comp->data->manager);
     printf("\t\tthis.mobile = %s\n", Comp->data->mobile);
+    #if defined(CHILD_COUNTER)
     printf("\tthis.team_num = %d\n", Comp->data->team_num);
+    #endif
     printf("\n\tnext_node @ 0x%p\n", Comp->next);
     printf("\tteam from 0x%p to 0x%p\n", Comp->child_team_head, Comp->child_team_tail);
     putchar('\n'); putchar('\n');
@@ -197,7 +199,9 @@ DepartData initDepartData(void) {
     printf("depart.name = "); scanf("%s", Computer.name);
     printf("depart.manager = "); scanf("%s", Computer.manager);
     printf("depart.mobile = "); scanf("%s", Computer.mobile);
+    #if defined(CHILD_COUNTER)
     Computer.team_num = 0;
+    #endif
     return Computer;
 }
 
@@ -418,7 +422,7 @@ DepartWrapper *getDepartByName(Depart *start,
     while (1) {
         // NOTE: 和上一个函数唯一的不同
         if (strstr(start->data->name, name)) {  // 搜索内容是已保存内容的子串
-            #if defined(BUILDING)
+            #if defined(DEBUG)
             printf("[LOG] getDepartByName(): found %s @ 0x%p\n", start->data->name, start);
             #endif
             if (rtn_head->depart == NULL) {

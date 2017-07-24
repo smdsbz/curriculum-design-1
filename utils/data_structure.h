@@ -50,6 +50,9 @@ Project_HEAD -----> ... <--> Proj_1 <--> Proj_2 <--> ...
 // CON: 但是由于所有节点都是按录入时间排序的，除非对所有关键字hash转换成数字id，否则定义双向链表貌似意义不大。。。
 // 但是现在我懒得写hash，所以我拒绝，单向链表你慢慢找吧:triumph:
 
+// 链表结构辅助标识 - 子节点计数器
+// #define CHILD_COUNTER
+
 
 
 #include <stdio.h>
@@ -67,7 +70,9 @@ typedef struct _DepartData {
     char    manager[12];    // 负责人
     char    mobile[15];     // 负责人电话
     // added
+    #if defined(CHILD_COUNTER)
     int     team_num;       // 该院系团队总数
+    #endif
 } DepartData;
 
 
@@ -101,7 +106,9 @@ typedef struct _TeamData {
     int     teacher_num;    // 教师人数
     int     student_num;    // 研究生人数
     char    faculty[20];    // 所属院系
+    #if defined(CHILD_COUNTER)
     int     project_num;    // 该团队所管理的项目总数
+    #endif
 } TeamData;
 
 
@@ -162,10 +169,19 @@ typedef struct _ProjectWrapper {
 /**** Additional typdef: Search Condition ****/
 
 typedef struct _Where {
-char    direction[3];   // 查找条件 - ^[\>\<]=?|=$
-int     value;
+    char    direction[3];   // 查找条件 - ^[\>\<]=?|=$
+    int     value;
 } Where;
 
+
+
+/**** Additional typedef: Mounting Points ****/
+
+typedef struct _MountPoint {    // 用于返回一组指针
+    struct _Depart      *depart_head;       // 院系链表挂载点
+    struct _Team        *team_head;         // 团队链表挂载点
+    struct _Project     *project_head;      // 项目链表挂载点
+} MountPoint;
 
 
 /*********** Unit Test **************/

@@ -15,7 +15,7 @@
 #ifdef DEBUG
 #undef DEBUG
 #endif
-// #define DEBUG
+#define DEBUG
 
 
 // /**** Additional typdef: Search Condition ****/
@@ -155,7 +155,9 @@ TeamData initTeamData(void) {
     printf("team.teacher_num = "); scanf("%d", &(VirtusPro.teacher_num));
     printf("team.student_num = "); scanf("%d", &(VirtusPro.student_num));
     printf("team.faculty = "); scanf("%s", VirtusPro.faculty);
+    #if defined(CHILD_COUNTER)
     VirtusPro.project_num = 0;
+    #endif
     return VirtusPro;
 }
 
@@ -225,7 +227,9 @@ Team *appendTeam(Team *head, TeamData new_one, Depart *depart_chain) {
         tail->child_project_head = NULL; tail->child_project_tail = NULL;
         tail->parent_depart = parent_depart;
         // 母结点注册子节点
+        #if defined(CHILD_COUNTER)
         parent_depart->data->team_num += 1;
+        #endif
         parent_depart->child_team_head = tail;
         parent_depart->child_team_tail = tail;
         // 退出函数
@@ -291,9 +295,11 @@ Team *appendTeam(Team *head, TeamData new_one, Depart *depart_chain) {
     *(tail->next->data) = new_one;
     // 在母结点中注册
     //   注册团队数量
+    #if defined(CHILD_COUNTER)
     parent_depart->data->team_num += 1;
+    #endif
     //   注册指针指向
-    if (parent_depart->data->team_num == 1) {
+    if (parent_depart->child_team_head == NULL) {
     //     该团队为母结点的第一个子节点
         parent_depart->child_team_head = tail->next;
     }
@@ -368,9 +374,11 @@ int removeTeam(Team **phead, Team *tgt) {
     }
 
     // 在母结点数据域注册删除操作
+    #if defined(CHILD_COUNTER)
     tgt->parent_depart->data->team_num -= 1;
+    #endif
     // 在母结点的指针域注册
-    if (tgt->parent_depart->data->team_num == 0) {
+    if (tgt->parent_depart->child_team_head == tgt->parent_depart->child_team_tail) {
         // case 1: tgt 是母结点下最后一个子节点，现在母结点没有子节点了
         tgt->parent_depart->child_team_head = NULL;
         tgt->parent_depart->child_team_tail = NULL;
@@ -601,18 +609,22 @@ void printTeamWrapperToConsole(TeamWrapper *head) {
 void main(void) {
     // building test env
     DepartData depart_data_1 = {
-        "计算机", "张三", "13322224444", 0
+        "计算机", "张三", "13322224444"
     };
     Depart depart_1 = {
         &depart_data_1, NULL, NULL, NULL
     };
 
     DepartData depart_data_2 = {
-        "物理", "李四", "13344445555", 0
+        "物理", "李四", "13344445555"
     };
     Depart depart_2 = {
         &depart_data_2, NULL, NULL, NULL
     };
+    #if defined(CHILD_COUNTER)
+    depart_data_1.team_num = 0;
+    depart_data_2.team_num = 0;
+    #endif
 
     depart_1.next = &depart_2;
     Depart *Depart_HEAD = &depart_1;
