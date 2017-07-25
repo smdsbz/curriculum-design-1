@@ -70,25 +70,79 @@ _(院系负责人、科研团队不同名)_
 ### Start With Data
 ```
 ${PROGRAM_ROOT} → ./the_programme.exe ${DATA_FOLDER}
-
-\ +---------+  +---------+  +-------+    +---------+
- \|  +------+  |  +---+  |  |        \   |  +------+
-  |  |   \  /--|  |-\ |  |  |  ++  +  |  |  |       
---|  +------+--|  +---+  |  |  ||  |  |  |  +------+
-  +------+  |\ |  +------+  |  ||  |  |  +------+  |
---------\|  | \|  |         |  ||  |  |         |  |
-- +------+  |\ |  |         |  ||  |  |  +------+  |
- \+---------+ \+--+         +--++--+--+  +---------+
-
+========================================================
+  \ +---------+  +---------+  +-------+  \ +---------+
+   \|  +------+  |  +---+  |\ |        \  \|  +------+
+    |  |   \  /--|  |-\ |  | \|  ++  +  |  |  |       
+  --|  +------+--|  +---+  |  |  ||  |  |--|  +------+
+    +------+  |\ |  +------+  |  ||  |  |  +------+  |
+  --------\|  | \|  |      \  |  ||  |  |--------\|  |
+  \ +------+  |\ |  |       \ |  ||  |  |\ +------+  |
+   \+---------+ \+--+        \+--++--+--+ \+---------+    by smdsbz
+========================================================
 The Science Project Managing System
 Version: 0.1
 Author: smdsbz@GitHub.com (i.e. U201610136 朱晓光)
 Enjoy your ride!
 
-
 Loading data from ${DATA}...
 Successfully loaded all data!
->
+depart > help
+
+Operations Available:                               /* depart level */
+    ls      - list out all departments
+    tree    - list out all departments, teams and projects
+    select  - (sub-programme) focus on the node specified
+              usage:                                /* NOTE: universal */
+                select  -d | --depart    (-n --name | -m --manager)
+                        -t | --team      (-n --name | -t --teacher-number)
+                        -p | --project   (-i --id   | -t --team)
+    s save  - save all changes
+    q quit  - exit the system
+========================================================
+depart > ls
+
+    Name      16|   Manager   15|   Tele      15
+ ---------------|---------------|---------------
+__计算机学院      |__张三         |__13322224444
+__一个名字特别特别长的学院|__李四         |__13388883333
+
+depart > tree
+
+  计算机学院
+    火箭队
+      曼哈顿
+      登月
+    银河护卫队
+      学习雷锋
+  物理学院
+    IBPE
+      搞事情
+    瞎编的队名
+======================================================
+depart > select
+
+Do you mean one of these?
+select  - (sub-programme) focus on the node specified
+          usage:
+            select  -d | --depart    (-n --name | -m --manager)
+                    -t | --team      (-n --name | -t --teacher-number)
+                    -p | --project   (-i --id   | -t --team)
+======================================================
+depart > select --team --teacher-number
+select/team > help
+USAGE:
+    select/team > <= (direction)    4 (value)
+select/team > > 5
+
+____    Name          20|   Manager   15|   Tele      15
+____ -------------------|---------------|---------------
+   1__火箭队             |  张三         |  13322224444
+   2__xxx               |  xxx          |  xxxxxx
+
+select/team > 1
+=======================================================
+team/火箭队 > 
 ```
 
 
