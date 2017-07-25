@@ -142,7 +142,7 @@ ____ -------------------|---------------|---------------
 
 select/team > 1
 =======================================================
-team/火箭队 > 
+team/火箭队 >
 ```
 
 
@@ -200,18 +200,18 @@ Depart *createDepartHead(void);
 
     /**** SELECT ****/
 
-DepartWrapper *getDepartByManager(Depart *, const char *);
+DepartWrapper *getDepartByManager(Depart *, Depart *, const char *);
 /*  通过负责人姓名查找院系
- *  ARGS:   院系链表，院系负责人 char[12]
+ *  ARGS:   院系链表，搜索结束点，院系负责人 char[12]
  *  RETN:   搜索结果挂载点 | NULL （没有结果时也返回挂载点地址）
  *  NOTE:   院系负责人不同名，返回的是一个院系的数据，或者也可以像下面的这个函数一样，返回结果链
  *  NOTE:   只能在院系链有数据的情况下调用该函数！
  *  NOTE:   该函数会申请DepartWrapper占用空间，记得调用cleanupDepartWrapper()
  */
 
-DepartWrapper *getDepartByName(Depart *, const char *);
+DepartWrapper *getDepartByName(Depart *, Depart *, const char *);
 /*  通过院系名称查找院系
- *  ARGS:   院系链表，名称线索（不一定是全称）
+ *  ARGS:   院系链表，搜索结束点，名称线索（不一定是全称）
  *  RETN:   搜索结果挂载点 | NULL
  *  NOTE:   由于查找结果可能不只有一个，该操作会创建一个用于储存查询结果的新链表，返回链表的头节点地址
  *  NOTE:   该函数会申请DepartWrapper占用空间，记得调用cleanupDepartWrapper()
@@ -297,16 +297,16 @@ Team *createTeamHead(void);
 
     /**** SELECT ****/
 
-TeamWrapper *getTeamByTeacherNum(Team *, const Where cond);
+TeamWrapper *getTeamByTeacherNum(Team *, Team *, const Where cond);
 /*  通过教师数量查找团队
- *  ARGS:   团队链表，查找条件
+ *  ARGS:   团队链表，搜索结束点，查找条件
  *  RETN:   搜索结果挂载点 | NULL （没有结果时也返回挂载点地址）
  *  NOTE:   调用过程中会为TeamWrapper申请内存空间，使用完搜索结果后记得cleanup
  */
 
-TeamWrapper *getTeamByName(Team *, const char *);
+TeamWrapper *getTeamByName(Team *, Team *, const char *);
 /*  通过团队名称查找团队
- *  ARGS:   团队链表，团队名称线索（不一定是全称）
+ *  ARGS:   团队链表，搜索结束点，团队名称线索（不一定是全称）
  *  RETN:   搜索结果挂载点 | NULL
  *  NOTE:   调用过程中会为TeamWrapper申请内存空间，使用完搜索结果后记得cleanup
  */
@@ -383,9 +383,9 @@ Project *createProjectHead(void);
 
     /**** SELECT ****/
 
-ProjectWrapper *getProjectById(Project *head, const char *id);
+ProjectWrapper *getProjectById(Project *head, Project*, const char *id);
 /*  通过id查找项目
- *  ARGS:   项目链表，目标id
+ *  ARGS:   项目链表，搜索结束点，目标id
  *  RETN:   搜索结果挂载点 | NULL （没有搜索结果时也返回挂载点地址）
  */
 

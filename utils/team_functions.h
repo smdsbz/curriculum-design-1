@@ -38,16 +38,16 @@ extern Team *createTeamHead(void);
 
     /**** SELECT ****/
 
-extern TeamWrapper *getTeamByTeacherNum(Team *, const Where cond);
+extern TeamWrapper *getTeamByTeacherNum(Team *, Team *, const Where cond);
 /*  通过教师数量查找团队
- *  ARGS:   团队链表，查找条件
+ *  ARGS:   团队链表，搜索结束点，查找条件
  *  RETN:   搜索结果挂载点 | NULL （没有结果时也返回挂载点地址）
  *  NOTE:   调用过程中会为TeamWrapper申请内存空间，使用完搜索结果后记得cleanup
  */
 
-extern TeamWrapper *getTeamByName(Team *, const char *);
+extern TeamWrapper *getTeamByName(Team *, Team *, const char *);
 /*  通过团队名称查找团队
- *  ARGS:   团队链表，团队名称线索（不一定是全称）
+ *  ARGS:   团队链表，搜索结束点，团队名称线索（不一定是全称）
  *  RETN:   搜索结果挂载点 | NULL
  *  NOTE:   调用过程中会为TeamWrapper申请内存空间，使用完搜索结果后记得cleanup
  */

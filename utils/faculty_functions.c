@@ -54,18 +54,18 @@ Depart *createDepartHead(void);
 
     /**** SELECT ****/
 
-DepartWrapper *getDepartByManager(Depart *, const char *);
+DepartWrapper *getDepartByManager(Depart *, Depart *, const char *);
 /*  通过负责人姓名查找院系
- *  ARGS:   院系链表，院系负责人 char[12]
+ *  ARGS:   院系链表，搜索结束点，院系负责人 char[12]
  *  RETN:   搜索结果挂载点 | NULL （没有结果时也返回挂载点地址）
  *  NOTE:   院系负责人不同名，返回的是一个院系的数据，或者也可以像下面的这个函数一样，返回结果链
  *  NOTE:   只能在院系链有数据的情况下调用该函数！
  *  NOTE:   该函数会申请DepartWrapper占用空间，记得调用cleanupDepartWrapper()
  */
 
-DepartWrapper *getDepartByName(Depart *, const char *);
+DepartWrapper *getDepartByName(Depart *, Depart *, const char *);
 /*  通过院系名称查找院系
- *  ARGS:   院系链表，名称线索（不一定是全称）
+ *  ARGS:   院系链表，搜索结束点，名称线索（不一定是全称）
  *  RETN:   搜索结果挂载点 | NULL
  *  NOTE:   由于查找结果可能不只有一个，该操作会创建一个用于储存查询结果的新链表，返回链表的头节点地址
  *  NOTE:   该函数会申请DepartWrapper占用空间，记得调用cleanupDepartWrapper()
@@ -144,7 +144,7 @@ void main(void) {
     auto char buf[40] = {'\0'};
 
     printf("search by manager: "); scanf("%s", buf);
-    DepartWrapper *RST_LIST = getDepartByManager(HEAD, buf);
+    DepartWrapper *RST_LIST = getDepartByManager(HEAD, NULL, buf);
     printDepartWrapperToConsole(RST_LIST);
         // NOTE: DON'T FORGET THIS!!!
     cleanupDepartWrapper(RST_LIST);
@@ -152,7 +152,7 @@ void main(void) {
 
     // search demo
     printf("search by name: "); scanf("%s", buf);
-    RST_LIST = getDepartByName(HEAD, buf);
+    RST_LIST = getDepartByName(HEAD, NULL, buf);
     printDepartWrapperToConsole(RST_LIST);
     cleanupDepartWrapper(RST_LIST);
 
@@ -209,6 +209,14 @@ DepartData initDepartData(void) {
 
 
 Depart *appendDepart(Depart *head, DepartData new_one) {
+    DepartWrapper *depart_wrapper = getDepartByName(head, NULL, new_one.name);
+    if (depart_wrapper->depart != NULL) {
+        printf("The department, named %s, already exists!", new_one.name);
+        cleanupDepartWrapper(depart_wrapper);
+        return NULL;
+    }
+    cleanupDepartWrapper(depart_wrapper);
+
     Depart *tail = head;
     for (; tail->next; tail = tail->next) ;
 
@@ -270,7 +278,6 @@ Depart *appendDepart(Depart *head, DepartData new_one) {
 
 
 int modifyDepart(Depart *target, DepartData new_one) {
-
     /* 错误处理：链式调用时，防止前一级调用中产生的“错误”传递，如查找节点方法返回的NULL */
     if (target == NULL) {
         #if defined(DEBUG)
@@ -320,6 +327,12 @@ int removeDepart(Depart **phead, Depart *target) {
     /**** CLEANUPs ****/
 
 void cleanupDepartWrapper(DepartWrapper *prev) {
+    if (prev == NULL) {
+        #if defined(DEBUG)
+        puts("[LOG] cleanupDepartWrapper(): got NULL");
+        #endif
+        return;
+    }
     DepartWrapper *after = prev;
     while (1) {
         after = prev->next;   // 保存下一个节点位置
@@ -337,6 +350,12 @@ void cleanupDepartWrapper(DepartWrapper *prev) {
 
 
 void cleanupDepart(Depart *prev) {
+    if (prev == NULL) {
+        #if defined(DEBUG)
+        puts("[LOG] cleanupDepart(): got NULL");
+        #endif
+        return;
+    }
     Depart *after = prev;
     while (1) {
         after = prev->next;
@@ -353,12 +372,10 @@ void cleanupDepart(Depart *prev) {
 
     /**** SELECT ****/
 
-DepartWrapper *getDepartByManager(Depart *start,
-                                  const char *manager) {
+DepartWrapper *getDepartByManager(Depart *start, Depart *end, const char *manager) {
     /* NOTE: 这里还是按照有同名的情况来找，以后我就可以复制粘贴了 :doge: */
 
     // 创建搜索结果挂载点
-    // NOTE: 使用完搜索结果后记得free()
     DepartWrapper *rtn = (DepartWrapper *)malloc(sizeof(DepartWrapper));
     if (rtn == NULL) {
         #if defined(DEBUG)
@@ -370,8 +387,14 @@ DepartWrapper *getDepartByManager(Depart *start,
     DepartWrapper *rtn_head = rtn;  // 保存搜索结果链的头指针
     rtn_head->depart = NULL; rtn_head->next = NULL;   // 再次初始化
 
+    if (start->data == NULL) {
+        #if defined(DEBUG)
+        puts("[LOG] getDepartByManager(): searching an empty chain");
+        #endif
+        return rtn_head;
+    }
 
-    while (1) {     // using `break`
+    for (; start != end; start = start->next) {     // using `break`
         // NOTE: 只能在有数据的情况下调用该函数
 
         if (!strcmp(start->data->manager, manager)) {  // BINGO!
@@ -398,9 +421,6 @@ DepartWrapper *getDepartByManager(Depart *start,
             }
 
         }
-
-        start = start->next;     // 下一个院系（可以用for循环，懒得改了）
-        if (start == NULL) { break; }   // 完整遍历，收工了
     }
     return rtn_head;    // 不管有没有找到，都返回搜索结果链表头
 }
@@ -408,8 +428,7 @@ DepartWrapper *getDepartByManager(Depart *start,
 
 
 
-DepartWrapper *getDepartByName(Depart *start,
-                               const char *name) {
+DepartWrapper *getDepartByName(Depart *start, Depart *end, const char *name) {
     DepartWrapper *rtn = (DepartWrapper *)malloc(sizeof(DepartWrapper));
     if (rtn == NULL) {
         #if defined(DEBUG)
@@ -419,7 +438,13 @@ DepartWrapper *getDepartByName(Depart *start,
     }
     DepartWrapper *rtn_head = rtn;
     rtn_head->depart = NULL; rtn_head->next = NULL;
-    while (1) {
+    if (start->data == NULL) {
+        #if defined(DEBUG)
+        puts("[LOG] getDepartByName(): searching an empty chain");
+        #endif
+        return rtn_head;
+    }
+    for (; start != end; start = start->next) {
         // NOTE: 和上一个函数唯一的不同
         if (strstr(start->data->name, name)) {  // 搜索内容是已保存内容的子串
             #if defined(DEBUG)
@@ -441,8 +466,6 @@ DepartWrapper *getDepartByName(Depart *start,
             }
 
         }
-        start = start->next;
-        if (start == NULL) { break; }
     }
     return rtn_head;
 }

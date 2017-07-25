@@ -62,9 +62,9 @@ Project *createProjectHead(void);
 
     /**** SELECT ****/
 
-ProjectWrapper *getProjectById(Project *head, const char *id);
+ProjectWrapper *getProjectById(Project *head, Project *, const char *id);
 /*  通过id查找项目
- *  ARGS:   项目链表，目标id
+ *  ARGS:   项目链表，搜索结束点，目标id
  *  RETN:   搜索结果挂载点 | NULL （没有搜索结果时也返回挂载点地址）
  */
 
@@ -123,13 +123,21 @@ ProjectData initProjectData(void) {
 
 
 Project *appendProject(Project *head, ProjectData new_one, Team *team_chain) {
+    ProjectWrapper *project_wrapper = getProjectById(head, NULL, new_one.id);
+    if (project_wrapper->project != NULL) {
+        printf("The project, %s, already exists!", new_one.id);
+        cleanupProjectWrapper(project_wrapper);
+        return NULL;
+    }
+    cleanupProjectWrapper(project_wrapper);
+
     // get tail node
     Project *tail = head;
     for (; tail->next; tail = tail->next) ;
     // tail->next == NULL
 
     // get parent_team
-    TeamWrapper *parent_team_wrapper = getTeamByName(team_chain, new_one.team);
+    TeamWrapper *parent_team_wrapper = getTeamByName(team_chain, NULL, new_one.team);
     if (parent_team_wrapper == NULL) {
         #if defined(DEBUG)
         puts("[LOG] appendProject():\n\tgetTeamByName() failed");
@@ -302,7 +310,7 @@ int removeProject(Project **phead, Project *tgt) {
 
     /**** SELECT ****/
 
-ProjectWrapper *getProjectById(Project *start, const char *id) {
+ProjectWrapper *getProjectById(Project *start, Project *end, const char *id) {
     ProjectWrapper *rtn = (ProjectWrapper *)malloc(sizeof(ProjectWrapper));
     if (rtn == NULL) {
         #if defined(DEBUG)
@@ -313,8 +321,14 @@ ProjectWrapper *getProjectById(Project *start, const char *id) {
 
     ProjectWrapper *rtn_head = rtn;
     rtn_head->project = NULL; rtn_head->next = NULL;
+    if (start->data == NULL) {
+        #if defined(DEBUG)
+        puts("[LOG] getProjectById(): searching an empty chain");
+        #endif
+        return rtn_head;
+    }
 
-    for (; start; start = start->next) {
+    for (; start != end; start = start->next) {
         if (strstr(start->data->id, id) != NULL) {
             #if defined(BUILDING)
             printf("[LOG] getProjectById(): found %s @ 0x%p\n",
@@ -351,7 +365,6 @@ ProjectWrapper *getProjectByTeam(Team *parent_team) {
         return NULL;
     }
     rtn_head->project = NULL; rtn_head->next = NULL;
-
     // 母结点没有子节点
     if (parent_team->child_project_head == NULL) {
         return rtn_head;    // 返回空结果
@@ -532,7 +545,7 @@ void main(void) {
     // SELECT
     ProjectWrapper *project_wrapper;
     puts("[LOG] getting project \"123234\" via id");
-    project_wrapper = getProjectById(Project_HEAD, "123234");
+    project_wrapper = getProjectById(Project_HEAD, NULL, "123234");
     printProjectWrapperToConsole(project_wrapper);
     cleanupProjectWrapper(project_wrapper);
 

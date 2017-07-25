@@ -37,9 +37,9 @@ extern Project *createProjectHead(void);
 
     /**** SELECT ****/
 
-extern ProjectWrapper *getProjectById(Project *head, const char *id);
+extern ProjectWrapper *getProjectById(Project *head, Project *, const char *id);
 /*  通过id查找项目
- *  ARGS:   项目链表，目标id
+ *  ARGS:   项目链表，搜索结束点，目标id
  *  RETN:   搜索结果挂载点 | NULL （没有搜索结果时也返回挂载点地址）
  */
 

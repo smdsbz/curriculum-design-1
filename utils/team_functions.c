@@ -92,16 +92,16 @@ Team *createTeamHead(void);
 
     /**** SELECT ****/
 
-TeamWrapper *getTeamByTeacherNum(Team *, const Where cond);
+TeamWrapper *getTeamByTeacherNum(Team *, Team *, const Where cond);
 /*  通过教师数量查找团队
- *  ARGS:   团队链表，查找条件
+ *  ARGS:   团队链表，搜索结束点，查找条件
  *  RETN:   搜索结果挂载点 | NULL （没有结果时也返回挂载点地址）
  *  NOTE:   调用过程中会为TeamWrapper申请内存空间，使用完搜索结果后记得cleanup
  */
 
-TeamWrapper *getTeamByName(Team *, const char *);
+TeamWrapper *getTeamByName(Team *, Team *, const char *);
 /*  通过团队名称查找团队
- *  ARGS:   团队链表，团队名称线索（不一定是全称）
+ *  ARGS:   团队链表，搜索结束点，团队名称线索（不一定是全称）
  *  RETN:   搜索结果挂载点 | NULL
  *  NOTE:   调用过程中会为TeamWrapper申请内存空间，使用完搜索结果后记得cleanup
  */
@@ -164,6 +164,13 @@ TeamData initTeamData(void) {
 
 
 Team *appendTeam(Team *head, TeamData new_one, Depart *depart_chain) {
+    TeamWrapper *team_wrapper = getTeamByName(head, NULL, new_one.name);
+    if (team_wrapper->team != NULL) {
+        printf("The team, named %s, already exists!", new_one.name);
+        cleanupTeamWrapper(team_wrapper);
+        return NULL;
+    }
+    cleanupTeamWrapper(team_wrapper);
 
     // NOTE: 该函数遵循FILO顺序，因此最后生成的链表中节点的顺序与院系链表节点顺序不相关
     //       （但还是有按照院系分块的）
@@ -176,7 +183,7 @@ Team *appendTeam(Team *head, TeamData new_one, Depart *depart_chain) {
     // tail->next == NULL
 
     // 获取院系母结点
-    DepartWrapper *parent_depart_wrapper = getDepartByName(depart_chain, new_one.faculty);
+    DepartWrapper *parent_depart_wrapper = getDepartByName(depart_chain, NULL,  new_one.faculty);
     if (parent_depart_wrapper == NULL) {
         #if defined(DEBUG)
         puts("[LOG] appendTeam():\n\tgetDepartByName() failed");
@@ -403,7 +410,7 @@ int removeTeam(Team **phead, Team *tgt) {
 
     /**** SELECT ****/
 
-TeamWrapper *getTeamByTeacherNum(Team *start, const Where cond) {
+TeamWrapper *getTeamByTeacherNum(Team *start, Team *end, const Where cond) {
     // (auto-indent fixer)
     // TeamWrapper中会有多个结果
 
@@ -418,6 +425,12 @@ TeamWrapper *getTeamByTeacherNum(Team *start, const Where cond) {
 
     TeamWrapper *rtn_head = rtn;
     rtn_head->team = NULL; rtn_head->next = NULL;
+    if (start->data == NULL) {
+        #if defined(DEBUG)
+        puts("[LOG] getTeamByTeacherNum(): searching an empty chain");
+        #endif
+        return rtn_head;
+    }
 
     // set judger
     int (*judger)(int, int);
@@ -431,9 +444,8 @@ TeamWrapper *getTeamByTeacherNum(Team *start, const Where cond) {
     // #if defined(BUILDING)
     // puts("[LOG] getTeamByTeacherNum(): judger() set");
     // #endif
-
     // start finding matching nodes
-    while (1) {
+    for (; start != end; start = start->next) {
         if (judger(cond.value, start->data->teacher_num)) {
 
             #if defined(DEBUG)
@@ -459,11 +471,6 @@ TeamWrapper *getTeamByTeacherNum(Team *start, const Where cond) {
             }   // end of non-head node processing
 
         }   // finished judging current node
-
-        // move to next node
-        start = start->next;
-        // al done?
-        if (start == NULL) { break; }
         #if defined(BUILDING)
         puts("[LOG] getTeamByTeacherNum(): moving to next node");
         #endif
@@ -474,7 +481,7 @@ TeamWrapper *getTeamByTeacherNum(Team *start, const Where cond) {
 
 
 
-TeamWrapper *getTeamByName(Team *start, const char *hint) {
+TeamWrapper *getTeamByName(Team *start, Team *end, const char *hint) {
     TeamWrapper *rtn = (TeamWrapper *)malloc(sizeof(TeamWrapper));
     if (rtn == NULL) {
         #if defined(DEBUG)
@@ -485,8 +492,14 @@ TeamWrapper *getTeamByName(Team *start, const char *hint) {
 
     TeamWrapper *rtn_head = rtn;
     rtn_head->team = NULL; rtn_head->next = NULL;
+    if (start->data == NULL) {
+        #if defined(DEBUG)
+        puts("[LOG] getTeamByName(): searching an empty chain");
+        #endif
+        return rtn_head;
+    }
 
-    while (1) {
+    for (; start != end; start = start->next) {
         if (strstr(start->data->name, hint) != NULL) {
             #if defined(BUILDING)
             printf("[LOG] getTeamByName(): found %s @ 0x%p\n",
@@ -508,8 +521,6 @@ TeamWrapper *getTeamByName(Team *start, const char *hint) {
                 rtn->team = start;
             }
         }
-        start = start->next;
-        if (start == NULL) { break; }
     }
     return rtn_head;
 }
@@ -666,12 +677,12 @@ void main(void) {
     // getTeamByTeacherNum()
     TeamWrapper *Team_Wrapper_HEAD;
     Where cond = {">=", 2};
-    Team_Wrapper_HEAD = getTeamByTeacherNum(Team_HEAD, cond);
+    Team_Wrapper_HEAD = getTeamByTeacherNum(Team_HEAD, NULL, cond);
     printTeamWrapperToConsole(Team_Wrapper_HEAD);
     cleanupTeamWrapper(Team_Wrapper_HEAD);
 
     // getTeamByName()
-    Team_Wrapper_HEAD = getTeamByName(Team_HEAD, "火箭");
+    Team_Wrapper_HEAD = getTeamByName(Team_HEAD, NULL, "火箭");
     printTeamWrapperToConsole(Team_Wrapper_HEAD);
     cleanupTeamWrapper(Team_Wrapper_HEAD);
 
