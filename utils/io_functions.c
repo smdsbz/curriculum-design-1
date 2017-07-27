@@ -17,25 +17,17 @@ ${PROGRAMME_ROOT}
 #include <string.h>
 #include <direct.h>     // char *getcwd(char *buf, int len)
 
-#ifndef DATA_STRUCTURE
 #include "data_structure.h"
-#endif
-#ifndef FACULTY_FUNCTIONS
 #include "faculty_functions.h"
-#endif
-#ifndef TEAM_FUNCTIONS
 #include "team_functions.h"
-#endif
-#ifndef PROJECT_FUNCTIONS
 #include "project_functions.h"
-#endif
 
 /********** Controlers **********/
 
 #ifdef BUILDING
 #undef BUILDING
 #endif
-#define BUILDING
+// #define BUILDING
 
 #ifdef DEBUG
 #undef DEBUG
@@ -223,7 +215,7 @@ MountPoint loadData(const char *TGT_PATH) {
     // loadDepartData
 
     sprintf(filename, "%s\\%s", TGT_PATH, "DEPART.DAT");
-    #if defined(BUILDING)
+    #if defined(DEBUG)
     printf("[LOG] loadData()::loadDepartData: target URI is \"%s\"\n", filename);
     #endif
     fp = fopen(filename, "rb");
@@ -232,6 +224,7 @@ MountPoint loadData(const char *TGT_PATH) {
         puts("[LOG] Error in loadData()::loadDepartData:\n\tfailed to open file");
         #endif
         free(mp.depart_head);
+        // 找不到数据文件，不保留挂载点
         mp.depart_head = NULL;
         return mp;
     }
@@ -252,7 +245,8 @@ MountPoint loadData(const char *TGT_PATH) {
         puts("[LOG] Error in loadData()::loadDepartData:\n\tfailed to read al data");
         #endif
         cleanupDepart(mp.depart_head);
-        mp.depart_head = NULL;
+        // 存在同名的数据文件，保留挂载点
+        mp.depart_head = createDepartHead();
         return mp;
     }
     // free(&depart_data_buf);
@@ -261,7 +255,7 @@ MountPoint loadData(const char *TGT_PATH) {
     // loadTeamData
 
     sprintf(filename, "%s\\%s", TGT_PATH, "TEAM.DAT");
-    #if defined(BUILDING)
+    #if defined(DEBUG)
     printf("[LOG] loadData()::loadTeamData: target URI is \"%s\"\n", filename);
     #endif
     fp = fopen(filename, "rb");
@@ -290,7 +284,7 @@ MountPoint loadData(const char *TGT_PATH) {
         puts("[LOG] Error in loadData()::loadTeamData:\n\tfailed to read al data");
         #endif
         cleanupTeam(mp.team_head);
-        mp.team_head = NULL;
+        mp.team_head = createTeamHead();
         return mp;
     }
     // free(&team_data_buf);
@@ -329,7 +323,7 @@ MountPoint loadData(const char *TGT_PATH) {
         puts("[LOG] Error in loadData()::loadProjectData:\n\tfailed to read al data");
         #endif
         cleanupProject(mp.project_head);
-        mp.project_head = NULL;
+        mp.project_head = createProjectHead();
         return mp;
     }
     // free(&project_data_buf);

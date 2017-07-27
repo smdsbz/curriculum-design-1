@@ -67,11 +67,94 @@ _(院系负责人、科研团队不同名)_
 -------------------------------------------------------------
 
 ## User Manual
-### Start With Data
+
+### Cookbook
+
 ```
 ${PROGRAM_ROOT} → ./the_programme.exe ${DATA_FOLDER}
 ========================================================
-  \ +---------+  +---------+**+-------+**\ +---------+
+  \ +---------+--+---------+**+-------+**\ +---------+
+  *\|  +------+  |  +---+  |\*|        \**\|  +------+
+  **|  |   \**\--|  |-\ |  |*\|  ++  +  |**|  |       
+  --|  +------+--|  +---+  |**|  ||  |  |--|  +------+
+    +------+  |\ |  +------+**|  ||  |  |  +------+  |
+  --------\|  |*\|  |      \**|  ||  |  |--------\|  |
+  \*+------+  |\*|  |       \*|  ||  |  |\*+------+  |
+   \+---------+ \+--+        \+--++--+--+ \+---------+    by smdsbz
+========================================================
+The Science Project Managing System
+Version: 0.1
+Author: smdsbz@GitHub.com (i.e. U201610136 朱晓光)
+Enjoy your ride!
+
+/* if data folder is unspecified */
+Data folder unspecified!
+Finding data files in program root...
+
+/** if not found **/
+Data not found!
+Create data file in program root? [Y/N]:
+
+/*** Y ***/
+Creating data files...
+Data files found, loading...
+Successfully loaded all data!
+
+/*** N ***/
+No data available!
+exit
+
+/* if data found */
+Data files found, loading...
+Successfully loaded all data!
+
+Operations Available:
+     0) Quit
+-->| 1) List out all records
+     2) Query utilities
+     3) Statistics utilities
+
+========================================================
+/* Query utils */
+> 2
+Query Objects:
+     0) Go back
+     1) Departments
+     2) Teams
+     3) Projects
+
+/** Query departments **/
+query > 1
+Query Methods:
+     0) Go back
+     1) By name
+     2) By manager
+
+query/department >
+========================================================
+/* Statistics utils */
+> 3
+Statistics Catalogue:
+     0) Go back
+     1) Department
+     2) Team
+     3) Project
+     4) Other
+
+stat > 1
+Department Statistics Catalogue:
+     0) Go back
+     1) Total teacher number
+     2) Total master student number
+     3) Master-teacher ratio
+     4) Project number and funding
+```
+
+### Start With Data (GG)
+```
+${PROGRAM_ROOT} → ./the_programme.exe ${DATA_FOLDER}
+========================================================
+  \ +---------+--+---------+**+-------+**\ +---------+
   *\|  +------+  |  +---+  |\*|        \**\|  +------+
   **|  |   \**\--|  |-\ |  |*\|  ++  +  |**|  |       
   --|  +------+--|  +---+  |**|  ||  |  |--|  +------+
