@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "./utils/__init__.h"
+#include "./views.h"
 #include "./doc_strings.h"
 
 // setting data mounting points
@@ -26,8 +27,47 @@ void listAllNodes(void) {
 }
 
 void selectQueryObjects(void) {
-    int oper_code = 0;
-    // TODO
+    while (1) {
+        puts(DOC_QUERY_OBJ);
+        int oper_code = 0;
+        printf("query > "); scanf("%d", &oper_code);
+        switch (oper_code) {
+            case 1: {
+                selectQueryDepartMethod();
+                break;
+            }
+            case 2: {
+                // selectQueryTeamMethod();
+                break;
+            }
+            case 3: {
+                // selectQueryProjectMethod();
+                break;
+            }
+            case 0: default: { break; }
+        }
+        if (oper_code == 0) {
+            break;
+        }
+    }   // input loop
+}
+
+void selectQueryDepartMethod(void) {
+    while (1) {
+        puts(DOC_QUERY_DEPART_METHOD);
+        int oper_code = 0;
+        printf("query/depart > "); scanf("%d", &oper_code);
+        switch(oper_code) {
+            case 1: {
+                // TODO
+            }
+            case 2: {
+                // TODO
+            }
+            case 0: default: { break; }
+        }
+        if (oper_code == 0) { break; }
+    }   // input loop
 }
 
 void selectStatObjects(void) {
@@ -89,9 +129,9 @@ int main(int argc, char const *argv[]) {
     puts("Successfullly linked all data!");
     putchar('\n');
 
-    puts(DOC_ROOT);
     // Operations Available
     while (1) {
+        puts(DOC_ROOT);
         int oper_code = 0;
         printf("> "); scanf("%d", &oper_code);
         switch (oper_code) {

@@ -24,5 +24,17 @@ char *DOC_ROOT = "Operations Available:\n\
      3) Statistics utilities\n\
 ";
 
+char *DOC_QUERY_OBJ = "Query Objects:\n\
+     0) Go back\n\
+     1) Departments\n\
+     2) Teams\n\
+     3) Projects\n\
+";
+
+char *DOC_QUERY_DEPART_METHOD = "Query Methods:\n\
+     0) Go back\n\
+     1) By name\n\
+     2) By manager\n\
+";
 
 #endif

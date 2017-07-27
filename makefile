@@ -1,5 +1,5 @@
 main:
-	gcc -o a.exe ./utils/*?.c main.c
+	gcc -o a.exe ./utils/*?.c ./*?.c
 
 run:
 	chcp 65001
