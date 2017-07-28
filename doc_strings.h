@@ -22,6 +22,7 @@ char *DOC_ROOT = "Operations Available:\n\
      1) List out all records\n\
      2) Query utilities\n\
      3) Statistics utilities\n\
+     4) Add a new record\n\
 ";
 
 char *DOC_QUERY_OBJ = "Query Objects:\n\
@@ -35,6 +36,19 @@ char *DOC_QUERY_DEPART_METHOD = "Query Methods:\n\
      0) Go back\n\
      1) By name\n\
      2) By manager\n\
+";
+
+char *DOC_QUERY_TEAM_METHOD = "Query Methods:\n\
+     0) Go back\n\
+     1) By name\n\
+     2) By teacher number\n\
+";
+
+char *DOC_ADD_TYPE = "Add object:\n\
+     0) Go back\n\
+     1) Department\n\
+     2) Team\n\
+     3) Project\n\
 ";
 
 #endif

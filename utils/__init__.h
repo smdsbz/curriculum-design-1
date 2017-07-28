@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <direct.h>
 
 #include "data_structure.h"
 #include "faculty_functions.h"

@@ -15,7 +15,7 @@ ${PROGRAMME_ROOT}
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <direct.h>     // char *getcwd(char *buf, int len)
+// #include <direct.h>     // char *getcwd(char *buf, int len)
 
 #include "data_structure.h"
 #include "faculty_functions.h"
@@ -63,7 +63,7 @@ MountPoint loadData(const char *);
 int _saveDepartData(Depart *depart, const char *CUR_DIR) {
     // get target end-point
     char filename[100];
-    sprintf(filename, "%s\\%s", CUR_DIR, "DEPART.DAT");
+    sprintf(filename, "%s/%s", CUR_DIR, "DEPART.DAT");
     #if defined(BUILDING)
     printf("[LOG] _saveDepartData(): target URI is \"%s\"\n", filename);
     #endif
@@ -100,7 +100,7 @@ int _saveDepartData(Depart *depart, const char *CUR_DIR) {
 int _saveTeamData(Team *depart, const char *CUR_DIR) {
     // get target end-point
     char filename[100];
-    sprintf(filename, "%s\\%s", CUR_DIR, "TEAM.DAT");
+    sprintf(filename, "%s/%s", CUR_DIR, "TEAM.DAT");
     #if defined(BUILDING)
     printf("[LOG] _saveTeamData(): target URI is \"%s\"\n", filename);
     #endif
@@ -138,7 +138,7 @@ int _saveTeamData(Team *depart, const char *CUR_DIR) {
 int _saveProjectData(Project *depart, const char *CUR_DIR) {
     // get target end-point
     char filename[100];
-    sprintf(filename, "%s\\%s", CUR_DIR, "PROJECT.DAT");
+    sprintf(filename, "%s/%s", CUR_DIR, "PROJECT.DAT");
     #if defined(BUILDING)
     printf("[LOG] _saveProjectData(): target URI is \"%s\"\n", filename);
     #endif
@@ -214,7 +214,7 @@ MountPoint loadData(const char *TGT_PATH) {
 
     // loadDepartData
 
-    sprintf(filename, "%s\\%s", TGT_PATH, "DEPART.DAT");
+    sprintf(filename, "%s/%s", TGT_PATH, "DEPART.DAT");
     #if defined(DEBUG)
     printf("[LOG] loadData()::loadDepartData: target URI is \"%s\"\n", filename);
     #endif
@@ -254,7 +254,7 @@ MountPoint loadData(const char *TGT_PATH) {
 
     // loadTeamData
 
-    sprintf(filename, "%s\\%s", TGT_PATH, "TEAM.DAT");
+    sprintf(filename, "%s/%s", TGT_PATH, "TEAM.DAT");
     #if defined(DEBUG)
     printf("[LOG] loadData()::loadTeamData: target URI is \"%s\"\n", filename);
     #endif
@@ -293,7 +293,7 @@ MountPoint loadData(const char *TGT_PATH) {
 
     // loadProjectData
 
-    sprintf(filename, "%s\\%s", TGT_PATH, "PROJECT.DAT");
+    sprintf(filename, "%s/%s", TGT_PATH, "PROJECT.DAT");
     #if defined(BUILDING)
     printf("[LOG] loadData()::loadProjectData: target URI is \"%s\"\n", filename);
     #endif
@@ -340,51 +340,50 @@ MountPoint loadData(const char *TGT_PATH) {
 #if defined(BUILDING)
 
 void main(void) {
-    // // building test env
-    // DepartData depart_data_1 = {
-    //     "计算机", "张三", "13344445555"
-    // };
-    // #if defined(CHILD_COUNTER)
-    // depart_data_1.team_num = 0;
-    // #endif
-    // TeamData team_data_1 = {
-    //     "火箭队", "武藏", 2, 3, "计算机"
-    // };
-    // TeamData team_data_2 = {
-    //     "银河队", "小次郎", 3, 4, "计算机"
-    // };
-    // ProjectData project_data_1 = {
-    //     "123456", '1', "1970/01", 1.2, "王五", "火箭队"
-    // };
-    // ProjectData project_data_2 = {
-    //     "123345", '2', "1980/01", 2.3, "赵六", "银河队"
-    // };
-    // ProjectData project_data_3 = {
-    //     "123234", '3', "1990/01", 3.4, "李四", "火箭队"
-    // };
-    // Depart *Depart_HEAD = createDepartHead();
-    // Team *Team_HEAD = createTeamHead();
-    // Project *Project_HEAD = createProjectHead();
-    // appendDepart(Depart_HEAD, depart_data_1);
-    // appendTeam(Team_HEAD, team_data_1, Depart_HEAD);
-    // appendTeam(Team_HEAD, team_data_2, Depart_HEAD);
-    // appendProject(Project_HEAD, project_data_1, Team_HEAD);
-    // appendProject(Project_HEAD, project_data_2, Team_HEAD);
-    // appendProject(Project_HEAD, project_data_3, Team_HEAD);
+    // building test env
+    DepartData depart_data_1 = {
+        "Computer", "Zhang3", "13344445555"
+    };
+    #if defined(CHILD_COUNTER)
+    depart_data_1.team_num = 0;
+    #endif
+    TeamData team_data_1 = {
+        "Rocket", "Hanzo", 2, 3, "Computer"
+    };
+    TeamData team_data_2 = {
+        "MilkyWay", "Genji", 3, 4, "Computer"
+    };
+    ProjectData project_data_1 = {
+        "123456", '1', "1970/01", 1.2, "Wang5", "Rocket"
+    };
+    ProjectData project_data_2 = {
+        "123345", '2', "1980/01", 2.3, "Zhao6", "MilkyWay"
+    };
+    ProjectData project_data_3 = {
+        "123234", '3', "1990/01", 3.4, "Lee4", "Rocket"
+    };
+    Depart *Depart_HEAD = createDepartHead();
+    Team *Team_HEAD = createTeamHead();
+    Project *Project_HEAD = createProjectHead();
+    appendDepart(Depart_HEAD, depart_data_1);
+    appendTeam(Team_HEAD, team_data_1, Depart_HEAD);
+    appendTeam(Team_HEAD, team_data_2, Depart_HEAD);
+    appendProject(Project_HEAD, project_data_1, Team_HEAD);
+    appendProject(Project_HEAD, project_data_2, Team_HEAD);
+    appendProject(Project_HEAD, project_data_3, Team_HEAD);
 
     MountPoint mp;
-    // mp.depart_head = Depart_HEAD;
-    // mp.team_head = Team_HEAD;
-    // mp.project_head = Project_HEAD;
+    mp.depart_head = Depart_HEAD;
+    mp.team_head = Team_HEAD;
+    mp.project_head = Project_HEAD;
 
     // specifying path
-    char *TGT_PATH = ".\\data";
+    char *TGT_PATH = "./data";
 
-    // _saveDepartData()
     // _saveDepartData(Depart_HEAD, TGT_PATH);
     // _saveTeamData(Team_HEAD, TGT_PATH);
     // _saveProjectData(Project_HEAD, TGT_PATH);
-    // saveData(mp, TGT_PATH);
+    saveData(mp, TGT_PATH);
 
 
     // MountPoint loadData(const char *TGT_PATH) {

@@ -5,26 +5,54 @@
 #include "./views.h"
 #include "./doc_strings.h"
 
-// setting data mounting points
+// setting env
 MountPoint mp;
-char TGT_PATH[100] = ".\\";
+char TGT_PATH[100] = "./";
+Cursor cursor = {0, NULL};
 
 
 /********** Views **********/
 
 void listAllNodes(void) {
+    if (mp.depart_head == NULL) {
+        puts("No data!");
+        return;
+    }
     Depart *d; Team *t; Project *p;
     for (d = mp.depart_head; d != NULL; d = d->next) {
         printf("%s\n", d->data->name);
-        for (t = d->child_team_head; t != d->child_team_tail->next; t = t->next) {
-            printf("    %s\n", t->data->name);
-            for (p = t->child_project_head; p != t->child_project_tail->next; p = p->next) {
-                printf("        %s\n", p->data->id);
+        if (d->child_team_head) {
+            for (t = d->child_team_head; t != d->child_team_tail->next; t = t->next) {
+                printf("    %s\n", t->data->name);
+                if (t->child_project_head) {
+                    for (p = t->child_project_head; p != t->child_project_tail->next; p = p->next) {
+                        printf("        %s\n", p->data->id);
+                    }
+                }
             }
         }
     }
     putchar('\n');
 }
+
+void listDepartWrapper(DepartWrapper *head) {
+    if (head->depart == NULL) {
+        puts("No record found!");
+        return;
+    }
+    puts("        Name            |   Manager     |   Telephone\n\
+     -------------------|---------------|---------------");
+    int num = 1;
+    for (; head; head = head->next, ++num) {
+        printf("%4d  %-18s|  %-13s|  %s\n",
+               num, head->depart->data->name,
+               head->depart->data->manager,
+               head->depart->data->mobile);
+        // indent-fixer
+    }
+    putchar('\n');
+}
+
 
 void selectQueryObjects(void) {
     while (1) {
@@ -34,7 +62,7 @@ void selectQueryObjects(void) {
         switch (oper_code) {
             case 1: {
                 selectQueryDepartMethod();
-                break;
+                return;
             }
             case 2: {
                 // selectQueryTeamMethod();
@@ -59,10 +87,12 @@ void selectQueryDepartMethod(void) {
         printf("query/depart > "); scanf("%d", &oper_code);
         switch(oper_code) {
             case 1: {
-                // TODO
+                queryDepartByName();
+                return;
             }
             case 2: {
-                // TODO
+                queryDepartByManager();
+                return;
             }
             case 0: default: { break; }
         }
@@ -70,10 +100,82 @@ void selectQueryDepartMethod(void) {
     }   // input loop
 }
 
-void selectStatObjects(void) {
-    int oper_code = 0;
-    // TODO
+// void selectQueryTeamMethod(void) {
+//     while (1) {
+//         puts(DOC_QUERY_TEAM_METHOD);
+//         int oper_code = 0;
+//         printf("query/team > "); scanf("%d", &oper_code);
+//         switch(oper_code) {
+//             case 1: {
+//                 queryTeamByName();
+//                 return;
+//             }
+//             case 2: {
+//                 // TODO
+//             }
+//             case 0: default: { break; }
+//         }
+//         if (oper_code == 0) { break; }
+//     }   // input loop
+// }
+
+
+void queryDepartByName(void) {
+    char depart_name[20];
+    printf("query/depart::name > "); scanf("%s", depart_name);
+    DepartWrapper *depart_wrapper = getDepartByName(mp.depart_head, NULL, depart_name);
+    listDepartWrapper(depart_wrapper);
+    if (depart_wrapper->depart != NULL) {
+        int oper_code;
+        printf("Set cursor to department: "); scanf("%d", &oper_code);
+        DepartWrapper *cur = depart_wrapper;
+        for (; oper_code != 1 && cur; cur = cur->next, --oper_code) ;
+        if (cur == NULL) {
+            puts("Out of range!");
+            cleanupDepartWrapper(depart_wrapper);
+            return;
+        }
+        cursor.type = 1; cursor.val = (void *)cur->depart;
+    }
+    cleanupDepartWrapper(depart_wrapper);
 }
+
+void queryDepartByManager(void) {
+    char depart_manager[20];
+    printf("query/depart::manager > "); scanf("%s", depart_manager);
+    DepartWrapper *depart_wrapper = getDepartByManager(mp.depart_head, NULL, depart_manager);
+    listDepartWrapper(depart_wrapper);
+    if (depart_wrapper->depart != NULL) {
+        int oper_code;
+        printf("Set cursor to department: "); scanf("%d", &oper_code);
+        DepartWrapper *cur = depart_wrapper;
+        for (; oper_code != 1 && cur; cur = cur->next, --oper_code) ;
+        if (cur == NULL) {
+            puts("Out of range!");
+            cleanupDepartWrapper(depart_wrapper);
+            return;
+        }
+        cursor.type = 1; cursor.val = (void *)cur->depart;
+    }
+    cleanupDepartWrapper(depart_wrapper);
+}
+
+void selectAddObjectType(void) {
+    while (1) {
+        puts(DOC_ADD_TYPE);
+        int oper_code = 0;
+        printf("> "); scanf("%d", &oper_code);
+        switch (oper_code) {
+            case 1: {
+                appendDepart(mp.depart_head, initDepartData());
+                return;
+            }
+            case 0: default: { break; }
+        }
+        if (oper_code == 0) { break; }
+    }
+}
+
 
 /*********  Main Bone **********/
 
@@ -87,8 +189,8 @@ int main(int argc, char const *argv[]) {
         puts("Data folder unspecified!");
         puts("Finding data files in program root...");
     } else if (argc == 2) {
-        printf("Loading data from folder \"%s\"...\n", TGT_PATH);
         strcpy(TGT_PATH, argv[1]);
+        printf("Loading data from folder \"%s\"...\n", TGT_PATH);
     }
 
     // loading data
@@ -133,7 +235,15 @@ int main(int argc, char const *argv[]) {
     while (1) {
         puts(DOC_ROOT);
         int oper_code = 0;
-        printf("> "); scanf("%d", &oper_code);
+        switch (cursor.type) {
+            case 0: { printf("> "); break; }
+            case 1: {
+                printf("depart/%s >",
+                       ((Depart *)cursor.val)->data->name);
+                // indent-fixer
+                break; }
+        }
+        scanf("%d", &oper_code);
         switch (oper_code) {
             case 1: {
                 listAllNodes();
@@ -144,14 +254,21 @@ int main(int argc, char const *argv[]) {
                 break;
             }
             case 3: {
-                selectStatObjects();
+                // selectStatObjects();
                 break;
+            }
+            case 4: {
+                selectAddObjectType();
             }
             case 0: default: {
                 break;
             }
         }
         if (oper_code == 0) {
+            if (saveData(mp, TGT_PATH) == 0) {
+                puts("Seems like some unexpected happened while saving...");
+                puts("GG! MY FRIEND!!!");
+            }
             break;
         }
     }
