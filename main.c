@@ -40,7 +40,7 @@ void listDepartWrapper(DepartWrapper *head) {
         puts("No record found!");
         return;
     }
-    puts("        Name            |   Manager     |   Telephone\n\
+    puts("        Name            |    Manager    |    Telephone\n\
      -------------------|---------------|---------------");
     int num = 1;
     for (; head; head = head->next, ++num) {
@@ -53,6 +53,54 @@ void listDepartWrapper(DepartWrapper *head) {
     putchar('\n');
 }
 
+void listTeamWrapper(TeamWrapper *head) {
+    if (head->team == NULL) {
+        puts("No record found!");
+        return;
+    }
+    puts("        Name            |    Manager    |    Faculty\n\
+     -------------------|---------------|---------------");
+    int num = 1;
+    for (; head; head = head->next, ++num) {
+        printf("%4d  %-18s|  %-13s|  %s\n",
+               num, head->team->data->name,
+               head->team->data->manager,
+               head->team->data->faculty);
+        // indent-fixer
+    }
+    putchar('\n');
+}
+
+void listProjectWrapper(ProjectWrapper *head) {
+    if (head->project == NULL) {
+        puts("No record found!");
+        return;
+    }
+    puts("        ID              |    Manager    |    Type\n\
+     -------------------|---------------|---------------");
+    int num = 1;
+    char type_str[40];
+    for (; head; head = head->next, ++num) {
+        printf("%4d  %-18s|  %-13s|  %s\n",
+               num, head->project->data->id,
+               head->project->data->manager,
+               parseTypeCodeToString(type_str, head->project->data->type));
+        // indent-fixer
+    }
+    putchar('\n');
+}
+
+char *parseTypeCodeToString(char *to, const char from) {
+    switch (from) {
+        case '1': { strcpy(to, "973 Program"); break; }
+        case '2': { strcpy(to, "NSFC"); break; }
+        case '3': { strcpy(to, "863 Program"); break; }
+        case '4': { strcpy(to, "International Cooperation"); break; }
+        case '5': { strcpy(to, "Transverse"); break; }
+        default: { strcpy(to, "---"); break; }
+    }
+    return to;
+}
 
 void selectQueryObjects(void) {
     while (1) {
@@ -65,12 +113,14 @@ void selectQueryObjects(void) {
                 return;
             }
             case 2: {
-                // selectQueryTeamMethod();
-                break;
+                selectQueryTeamMethod();
+                return;
             }
             case 3: {
                 // selectQueryProjectMethod();
-                break;
+                // NOTE: 根据团队查找项目整合到团队节点操作中去
+                queryProjectById();
+                return;
             }
             case 0: default: { break; }
         }
@@ -100,24 +150,25 @@ void selectQueryDepartMethod(void) {
     }   // input loop
 }
 
-// void selectQueryTeamMethod(void) {
-//     while (1) {
-//         puts(DOC_QUERY_TEAM_METHOD);
-//         int oper_code = 0;
-//         printf("query/team > "); scanf("%d", &oper_code);
-//         switch(oper_code) {
-//             case 1: {
-//                 queryTeamByName();
-//                 return;
-//             }
-//             case 2: {
-//                 // TODO
-//             }
-//             case 0: default: { break; }
-//         }
-//         if (oper_code == 0) { break; }
-//     }   // input loop
-// }
+void selectQueryTeamMethod(void) {
+    while (1) {
+        puts(DOC_QUERY_TEAM_METHOD);
+        int oper_code = 0;
+        printf("query/team > "); scanf("%d", &oper_code);
+        switch(oper_code) {
+            case 1: {
+                queryTeamByName();
+                return;
+            }
+            case 2: {
+                queryTeamByTeacherNum();
+                return;
+            }
+            case 0: default: { break; }
+        }
+        if (oper_code == 0) { break; }
+    }   // input loop
+}
 
 
 void queryDepartByName(void) {
@@ -129,8 +180,8 @@ void queryDepartByName(void) {
         int oper_code;
         printf("Set cursor to department: "); scanf("%d", &oper_code);
         DepartWrapper *cur = depart_wrapper;
-        for (; oper_code != 1 && cur; cur = cur->next, --oper_code) ;
-        if (cur == NULL) {
+        for (; oper_code > 1 && cur; cur = cur->next, --oper_code) ;
+        if (cur == NULL || oper_code == 0) {
             puts("Out of range!");
             cleanupDepartWrapper(depart_wrapper);
             return;
@@ -149,8 +200,8 @@ void queryDepartByManager(void) {
         int oper_code;
         printf("Set cursor to department: "); scanf("%d", &oper_code);
         DepartWrapper *cur = depart_wrapper;
-        for (; oper_code != 1 && cur; cur = cur->next, --oper_code) ;
-        if (cur == NULL) {
+        for (; oper_code > 1 && cur; cur = cur->next, --oper_code) ;
+        if (cur == NULL || oper_code == 0) {
             puts("Out of range!");
             cleanupDepartWrapper(depart_wrapper);
             return;
@@ -158,6 +209,68 @@ void queryDepartByManager(void) {
         cursor.type = 1; cursor.val = (void *)cur->depart;
     }
     cleanupDepartWrapper(depart_wrapper);
+}
+
+void queryTeamByName(void) {
+    char team_name[30];
+    printf("query/team::name > "); scanf("%s", team_name);
+    TeamWrapper *team_wrapper = getTeamByName(mp.team_head, NULL, team_name);
+    listTeamWrapper(team_wrapper);
+    if (team_wrapper->team != NULL) {
+        int oper_code;
+        printf("Set cursor to team: "); scanf("%d", &oper_code);
+        TeamWrapper *cur = team_wrapper;
+        for (; oper_code > 1 && cur; cur = cur->next, --oper_code) ;
+        if (cur == NULL || oper_code == 0) {
+            puts("Out of range!");
+            cleanupTeamWrapper(team_wrapper);
+            return;
+        }
+        cursor.type = 2; cursor.val = (void *)cur->team;
+    }
+    cleanupTeamWrapper(team_wrapper);
+}
+
+void queryTeamByTeacherNum(void) {
+    Where cond;
+    printf("query/team::condition > "); scanf("%s %d",
+           &(cond.direction), &(cond.value));
+    // indent-fixer
+    TeamWrapper *team_wrapper = getTeamByTeacherNum(mp.team_head, NULL, cond);
+    listTeamWrapper(team_wrapper);
+    if (team_wrapper->team != NULL) {
+        int oper_code;
+        printf("Set cursor to team: "); scanf("%d", &oper_code);
+        TeamWrapper *cur = team_wrapper;
+        for (; oper_code > 1 && cur; cur = cur->next, --oper_code) ;
+        if (cur == NULL || oper_code == 0) {
+            puts("Out of range!");
+            cleanupTeamWrapper(team_wrapper);
+            return;
+        }
+        cursor.type = 2; cursor.val = (void *)cur->team;
+    }
+    cleanupTeamWrapper(team_wrapper);
+}
+
+void queryProjectById(void) {
+    char project_id[15];
+    printf("query/project::ID > "); scanf("%s", project_id);
+    ProjectWrapper *project_wrapper = getProjectById(mp.project_head, NULL, project_id);
+    listProjectWrapper(project_wrapper);
+    if (project_wrapper->project != NULL) {
+        int oper_code;
+        printf("Set cursor to project: "); scanf("%d", &oper_code);
+        ProjectWrapper *cur = project_wrapper;
+        for (; oper_code > 1 && cur; cur = cur->next, --oper_code) ;
+        if (cur == NULL || oper_code == 0) {
+            puts("Out of range!");
+            cleanupProjectWrapper(project_wrapper);
+            return;
+        }
+        cursor.type = 3; cursor.val = (void *)cur->project;
+    }
+    cleanupProjectWrapper(project_wrapper);
 }
 
 void selectAddObjectType(void) {
@@ -238,11 +351,33 @@ int main(int argc, char const *argv[]) {
         switch (cursor.type) {
             case 0: { printf("> "); break; }
             case 1: {
-                printf("depart/%s >",
+                printf("depart/%s > ",
                        ((Depart *)cursor.val)->data->name);
                 // indent-fixer
-                break; }
+                // TODO
+                break;
+            }
+            case 2: {
+                printf("team/%s > ",
+                       ((Team *)cursor.val)->data->name);
+                // indent-fixer
+                // TODO
+                break;
+            }
+            case 3: {
+                printf("project/%s > ",
+                       ((Project *)cursor.val)->data->id);
+                // indent-fixer
+                // TODO
+                break;
+            }
+            default: {
+                printf("ERR > ");
+                break;
+            }
         }
+        // cleanup cursor
+        cursor.type = 0; cursor.val = NULL;
         scanf("%d", &oper_code);
         switch (oper_code) {
             case 1: {

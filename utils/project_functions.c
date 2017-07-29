@@ -329,7 +329,7 @@ ProjectWrapper *getProjectById(Project *start, Project *end, const char *id) {
     }
 
     for (; start != end; start = start->next) {
-        if (strstr(start->data->id, id) != NULL) {
+        if (strcmp(start->data->id, id) == 0) {
             #if defined(BUILDING)
             printf("[LOG] getProjectById(): found %s @ 0x%p\n",
                    start->data->id, start);

@@ -5,6 +5,8 @@
 
 extern void listAllNodes(void);
 extern void listDepartWrapper(DepartWrapper *);
+extern void listTeamWrapper(TeamWrapper *);
+extern char *parseTypeCodeToString(char *, const char);
 
 /**** query ****/
 
@@ -14,13 +16,16 @@ extern void selectQueryObjects(void);
 /****** query method ******/
 
 extern void selectQueryDepartMethod(void);
-// extern void selectQueryTeamMethod(void);
+extern void selectQueryTeamMethod(void);
 // extern void selectQueryProjectMethod(void);
 
-/****** query deoart ******/
+/******** query final ********/
 
 extern void queryDepartByName(void);
 extern void queryDepartByManager(void);
+extern void queryTeamByName(void);
+extern void queryTeamByTeacherNum(void);
+extern void queryProjectById(void);
 
 /**** stat ****/
 
