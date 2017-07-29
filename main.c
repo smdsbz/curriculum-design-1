@@ -122,10 +122,8 @@ void selectQueryObjects(void) {
                 queryProjectById();
                 return;
             }
-            case 0: default: { break; }
-        }
-        if (oper_code == 0) {
-            break;
+            case 0: { return; }
+            default: { break; }
         }
     }   // input loop
 }
@@ -144,9 +142,9 @@ void selectQueryDepartMethod(void) {
                 queryDepartByManager();
                 return;
             }
-            case 0: default: { break; }
+            case 0: { return; }
+            default: { break; }
         }
-        if (oper_code == 0) { break; }
     }   // input loop
 }
 
@@ -164,9 +162,9 @@ void selectQueryTeamMethod(void) {
                 queryTeamByTeacherNum();
                 return;
             }
-            case 0: default: { break; }
+            case 0: { return; }
+            default: { break; }
         }
-        if (oper_code == 0) { break; }
     }   // input loop
 }
 
@@ -283,9 +281,9 @@ void selectAddObjectType(void) {
                 appendDepart(mp.depart_head, initDepartData());
                 return;
             }
-            case 0: default: { break; }
+            case 0: { return; }
+            default: { break; }
         }
-        if (oper_code == 0) { break; }
     }
 }
 
@@ -349,12 +347,13 @@ int main(int argc, char const *argv[]) {
         puts(DOC_ROOT);
         int oper_code = 0;
         switch (cursor.type) {
-            case 0: { printf("> "); break; }
+            case 0: { break; }
             case 1: {
                 printf("depart/%s > ",
                        ((Depart *)cursor.val)->data->name);
                 // indent-fixer
                 // TODO
+                selectDepartOperation();
                 break;
             }
             case 2: {
@@ -378,6 +377,7 @@ int main(int argc, char const *argv[]) {
         }
         // cleanup cursor
         cursor.type = 0; cursor.val = NULL;
+        printf("> ");
         scanf("%d", &oper_code);
         switch (oper_code) {
             case 1: {

@@ -6,6 +6,7 @@
 extern void listAllNodes(void);
 extern void listDepartWrapper(DepartWrapper *);
 extern void listTeamWrapper(TeamWrapper *);
+extern void listProjectWrapper(ProjectWrapper *);
 extern char *parseTypeCodeToString(char *, const char);
 
 /**** query ****/

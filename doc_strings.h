@@ -51,4 +51,11 @@ char *DOC_ADD_TYPE = "Add object:\n\
      3) Project\n\
 ";
 
+char *DOC_DEPART = "Operations Available:\n\
+     0) Unfocus
+     1) Modify
+     2) Delete
+     3) List teams
+";
+
 #endif
