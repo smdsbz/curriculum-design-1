@@ -525,6 +525,46 @@ TeamWrapper *getTeamByName(Team *start, Team *end, const char *hint) {
     return rtn_head;
 }
 
+TeamWrapper *getTeamByDepart(Depart *parent_depart) {
+    // 创建结果挂载点
+    TeamWrapper *rtn_head = (TeamWrapper *)malloc(sizeof(TeamWrapper));
+    if (rtn_head == NULL) {
+        #if defined(DEBUG)
+        puts("[LOG] Error in getTeamByDepart():\n\tfailed to malloc for result maunting point");
+        #endif
+        return NULL;
+    }
+    rtn_head->team = NULL; rtn_head->next = NULL;
+    // 母结点没有子节点
+    if (parent_depart->child_team_head == NULL) {
+        return rtn_head;    // 返回空结果
+    }
+    // 母结点下有子节点
+    Team *cur = parent_depart->child_team_head;
+    TeamWrapper *rtn = rtn_head;
+    for (; cur != parent_depart->child_team_tail->next; cur = cur->next) {
+        #if defined(DEBUG)
+        printf("[LOG] getTeamByDepart(): reached %s @ 0x%p\n",
+               cur->data->name, cur);
+        #endif
+        if (rtn_head->team == NULL) {
+            rtn->team = cur;
+        } else {
+            rtn->next = (TeamWrapper *)malloc(sizeof(TeamWrapper));
+            if (rtn->next == NULL) {
+                #if defined(DEBUG)
+                puts("[LOG] Error in getTeamByDepart():\n\tfailed to malloc for result container");
+                #endif
+                cleanupTeamWrapper(rtn_head);
+                return NULL;
+            }
+            rtn = rtn->next;
+            rtn->team = cur; rtn->next = NULL;
+        }
+    }
+    return rtn_head;
+}
+
 
 
     /**** CLEANUPs ****/

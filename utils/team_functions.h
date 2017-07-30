@@ -52,6 +52,11 @@ extern TeamWrapper *getTeamByName(Team *, Team *, const char *);
  *  NOTE:   调用过程中会为TeamWrapper申请内存空间，使用完搜索结果后记得cleanup
  */
 
+extern TeamWrapper *getTeamByDepart(Depart *);
+/*  通过院系查找团队
+ *  ARGS:   目标院系节点
+ *  RETN:   搜索结果挂载点 || NULL
+ */
 
     /**** CLEANUPs ****/
 

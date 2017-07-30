@@ -52,10 +52,17 @@ char *DOC_ADD_TYPE = "Add object:\n\
 ";
 
 char *DOC_DEPART = "Operations Available:\n\
-     0) Unfocus
-     1) Modify
-     2) Delete
-     3) List teams
+     0) Unfocus\n\
+     1) List info\n\
+     2) Modify\n\
+     3) Delete\n\
+     4) List teams\n\
+";
+
+char *DOC_DEPART_MODIFY = "Modify Attribute:\n\
+     0) Go back\n\
+     1) Manager\n\
+     2) Tele\n\
 ";
 
 #endif

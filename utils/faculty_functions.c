@@ -194,11 +194,10 @@ Depart *createDepartHead(void) {
 
 
 DepartData initDepartData(void) {
-    // TODO: 增加图形界面后记得修改数据来源
     DepartData Computer;
-    printf("depart::name > "); scanf("%s", Computer.name);
-    printf("depart::manager > "); scanf("%s", Computer.manager);
-    printf("depart::mobile > "); scanf("%s", Computer.mobile);
+    printf("add/depart::name > "); scanf("%s", Computer.name);
+    printf("add/depart::manager > "); scanf("%s", Computer.manager);
+    printf("add/depart::mobile > "); scanf("%s", Computer.mobile);
     #if defined(CHILD_COUNTER)
     Computer.team_num = 0;
     #endif
