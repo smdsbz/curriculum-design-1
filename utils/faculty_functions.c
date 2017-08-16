@@ -347,6 +347,27 @@ void cleanupDepartWrapper(DepartWrapper *prev) {
     // NOTE: 此时，你传进来的DepartWrapper头节点也没了。。。
 }
 
+void cleanupDepartStatWrapper(DepartStatWrapper *prev) {
+    if (prev == NULL) {
+        #if defined(DEBUG)
+        puts("[LOG] cleanupDepartStatWrapper(): got NULL");
+        #endif
+        return;
+    }
+    DepartStatWrapper *after = prev;
+    while (1) {
+        after = prev->next;   // 保存下一个节点位置
+        free(prev);
+        #if defined(DEBUG)
+        printf("[LOG] cleanupDepartStatWrapper(): freed 0x%p\n", prev);
+        #endif
+        prev = after;
+        if (prev == NULL) { break; }   // 全部清空
+    }
+    // prev & after will be NULL hence
+    return;
+}
+
 
 void cleanupDepart(Depart *prev) {
     if (prev == NULL) {
@@ -470,23 +491,73 @@ DepartWrapper *getDepartByName(Depart *start, Depart *end, const char *name) {
 }
 
 
-DepartWrapper *getDepartOrderedByMasterTeacherRatio(Depart *start, Depart *end) {
-    DepartWrapper *rtn = (DepartWrapper *)malloc(sizeof(DepartWrapper));
+DepartStatWrapper *getDepartOrderedByMasterTeacherRatio(Depart *start, Depart *end) {
+    DepartStatWrapper *unordered = (DepartStatWrapper *)malloc(sizeof(DepartStatWrapper));
+    if (unordered == NULL) { return NULL;}
+    Depart *start_bak = start;
+    for (; start_bak; start_bak = start_bak->next) {
+        // TODO
+        // IDEA: 先遍历生成未排序的链，然后再排序该链
+    }
+
+    DepartStatWrapper *rtn = (DepartStatWrapper *)malloc(sizeof(DepartStatWrapper));
     if (rtn == NULL) {
         #if defined(DEBUG)
         puts("[LOG] Error in getDepartOrderedByMasterTeacherRatio():\n\tfailed to malloc for mounting point");
         #endif
         return NULL;
     }
-    DepartWrapper *rtn_head = rtn;
-    rtn_head->depart = NULL; rtn_head->next = NULL;
+    rtn->depart = NULL; rtn->next = NULL;
     if (start->data == NULL) {
         #if defined(DEBUG)
         puts("[LOG] Error in getDepartOrderedByMasterTeacherRatio(): searching an empty chain");
         #endif
-        return rtn_head;
-        // TODO
+        return rtn;
     }
+    rtn->depart = start;   // 读取第一个数据
+    // // TODO
+    // {
+    //     Team *child_team_head = rtn->depart->child_team_head;
+    //     for (rtn->student_num = 0, rtn->teacher_num = 0;
+    //             child_team_head != rtn->child_team_tail;
+    //             child_team_head = child_team_head->next) {
+    //         rtn->student_num += child_team_head->student_num;
+    //         rtn->teacher_num += child_team_head->teacher_num;
+    //     }
+    // }
+    start = start->next;
+    for (; start != end; start = start->next) {
+        DepartStatWrapper *cur = rtn;
+        for (; ((float)start->data->student_num / start->data->teacher_num) <= ((float)cur->depart->data->student_num / cur->depart->data->teacher_num)); cur = cur->next) ;
+        if (cur == rtn) {   // 当前即为最大学生-老师比
+            // 需要重新定位头指针
+            DepartStatWrapper *rtn_old = rtn;
+            rtn = (DepartStatWrapper *)malloc(sizeof(DepartStatWrapper));
+            if (rtn == NULL) {
+                #if defined(DEBUG)
+                puts("[LOG] Error in getDepartOrderedByMasterTeacherRatio():\n\tfailed to malloc for result container");
+                #endif
+                cleanupDepartStatWrapper(rtn);
+                return NULL;
+            }
+            rtn->depart = start;
+            rtn->next = rtn_old;  // 恢复连接
+        } else {
+            DepartStatWrapper *prev = rtn;
+            for (; prev->next != cur; prev = prev->next) ;
+            prev->next = (DepartStatWrapper *)malloc(sizeof(DepartStatWrapper));
+            if (prev->next == NULL) {
+                #if defined(DEBUG)
+                puts("[LOG] Error in getDepartOrderedByMasterTeacherRatio():\n\tfailed to malloc for result container");
+                #endif
+                cleanupDepartStatWrapper(rtn);
+                return NULL;
+            }
+            prev->depart = start;
+            prev->next->next = cur;
+        }
+    }   // endfor - finished reading al records
+    return rtn;
 }
 
 

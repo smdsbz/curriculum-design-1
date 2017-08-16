@@ -96,6 +96,13 @@ typedef struct _DepartWrapper {
     struct _DepartWrapper   *next;      // 指向下一个结果wrapper
 } DepartWrapper;
 
+typedef struct _DepartStatWrapper {
+    /* 用来储存人数统计信息 */
+    struct _Depart              *deapart;
+    int                         student_num;
+    int                         teacher_num;
+    struct _DepartStatWrapper   *next;
+} DepartStatWrapper;
 
     /**** Team ****/
 

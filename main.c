@@ -59,6 +59,27 @@ void listDepartWrapper(DepartWrapper *head) {
     putchar('\n');
 }
 
+void listDepartHRStat(void) {
+    DepartWrapper *rst = getDepartOrderedByMasterTeacherRatio(mp.depart_head, NULL);
+    if (rst == NULL) {
+        puts("RUNTIME ERROR!");
+        exit(-1);
+    }
+    puts("        Name            |    Teachers   |    Students   |   S/T Ratio\n\
+     -------------------|---------------|---------------|---------------");
+    DepartWrapper *head = rst; int counter = 1;
+    for (; head; head = head->next) {
+        printf("%4d  %-18s|  %-13d|  %-13d|  %-.2f",
+               counter, head->depart->data->name,
+               head->depart->data->teacher_num,
+               head->depart->data->student_num,
+               (float)head->depart->data->student_num / head->depart->data->teacher_num);
+        // indent-fixer
+    }
+    cleanupDepartWrapper(rst);
+    putchar('\n');
+}
+
 void listTeamWrapper(TeamWrapper *head) {
     if (head == NULL) {
         puts("RUNTIME ERROR!");
@@ -435,7 +456,7 @@ void listProjectAttr(void) {
     printf("\
       StartDate  |  %s\n", tgt->data->start_date);
     printf("\
-      Funding    |  %.2f *1000 CNY\n", tgt->data->funding);
+      Funding    |  %f *10000 CNY\n", tgt->data->funding);
     printf("\
       Manager    |  %s\n", tgt->data->manager);
     printf("\
@@ -573,7 +594,7 @@ void selectStatItem(void) {
         int oper_code = 0;
         printf("stat > "); scanf("%d", &oper_code);
         switch (oper_code) {
-            case 1: { break; }  // TODO
+            case 1: { listDepartHRStat(); break; }  // TODO
             case 0: { return; }
             default: { break; }
         }

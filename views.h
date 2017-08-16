@@ -31,7 +31,7 @@ extern void selectAddObjectType(void);
 
 /**** statistic ****/
 extern void selectStatObject(void);
-extern void statHumanResource(void);
+extern void listDepartHRStat(void);
 
 /******************************************************/
 
