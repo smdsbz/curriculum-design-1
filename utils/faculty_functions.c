@@ -470,6 +470,26 @@ DepartWrapper *getDepartByName(Depart *start, Depart *end, const char *name) {
 }
 
 
+DepartWrapper *getDepartOrderedByMasterTeacherRatio(Depart *start, Depart *end) {
+    DepartWrapper *rtn = (DepartWrapper *)malloc(sizeof(DepartWrapper));
+    if (rtn == NULL) {
+        #if defined(DEBUG)
+        puts("[LOG] Error in getDepartOrderedByMasterTeacherRatio():\n\tfailed to malloc for mounting point");
+        #endif
+        return NULL;
+    }
+    DepartWrapper *rtn_head = rtn;
+    rtn_head->depart = NULL; rtn_head->next = NULL;
+    if (start->data == NULL) {
+        #if defined(DEBUG)
+        puts("[LOG] Error in getDepartOrderedByMasterTeacherRatio(): searching an empty chain");
+        #endif
+        return rtn_head;
+        // TODO
+    }
+}
+
+
 Depart *getPrevDepart(Depart *cur, Depart *head) {
     for (;
          head->next != cur

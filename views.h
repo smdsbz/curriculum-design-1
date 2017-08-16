@@ -8,9 +8,9 @@ extern void listTeamWrapper(TeamWrapper *);
 extern void listProjectWrapper(ProjectWrapper *);
 extern char *parseTypeCodeToString(char *, const char);
 
+
 /**** query ****/
 extern void selectQueryObjects(void);
-
 
 /****** query method ******/
 extern void selectQueryDepartMethod(void);
@@ -24,11 +24,14 @@ extern void queryTeamByName(void);
 extern void queryTeamByTeacherNum(void);
 extern void queryProjectById(void);
 
-/**** stat ****/
-// extern void selectStatObjects(void);
 
 /**** add ****/
 extern void selectAddObjectType(void);
+
+
+/**** statistic ****/
+extern void selectStatObject(void);
+extern void statHumanResource(void);
 
 /******************************************************/
 

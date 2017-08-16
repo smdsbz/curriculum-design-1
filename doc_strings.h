@@ -94,4 +94,13 @@ char *DOC_PROJECT_MODIFY = "Modify Attribute:\n\
      3) Manager\n\
 ";
 
+char *DOC_STAT = "Statistics Tools Available:\n\
+     0) Go back\n\
+     1) Human Resource\n\
+     2) Project Overview\n\
+     3) Top 10 NSFC Teams\n\
+     4) Top 5 Project Number Teams\n\
+     5) Top 5 Teacher Number Teams\n\
+";
+
 #endif

@@ -11,7 +11,9 @@ char TGT_PATH[100] = "./";
 Cursor cursor = {0, NULL};
 
 
-/********** Views **********/
+/********** Data **********/
+
+/**** Listing ****/
 
 void listAllNodes(void) {
     if (mp.depart_head == NULL) {
@@ -113,6 +115,8 @@ char *parseTypeCodeToString(char *to, const char from) {
     }
     return to;
 }
+
+/**** Querying ****/
 
 void selectQueryObjects(void) {
     while (1) {
@@ -283,6 +287,8 @@ void queryProjectById(void) {
     cleanupProjectWrapper(project_wrapper);
 }
 
+/**** Adding ****/
+
 void selectAddObjectType(void) {
     while (1) {
         puts(DOC_ADD_TYPE);
@@ -306,6 +312,10 @@ void selectAddObjectType(void) {
         }
     }
 }
+
+/**** Endpoint ****/
+
+/** Routing **/
 
 void selectDepartOperation(void) {
     while (1) {
@@ -378,6 +388,8 @@ void selectProjectOperation(void) {
     }
 }
 
+/** Listing info **/
+
 void listDepartAttr(void) {
     Depart *tgt = (Depart *)cursor.val;
     puts("\
@@ -430,6 +442,8 @@ void listProjectAttr(void) {
       Team       |  %s\n", tgt->data->team);
     putchar('\n');
 }
+
+/** Modifying **/
 
 void selectDepartModifyAttr(void) {
     Depart *tgt = (Depart *)cursor.val;
@@ -511,6 +525,8 @@ void selectProjectModifyAttr(void) {
     }
 }
 
+/** Listing Child **/
+
 void listDepartChildTeam(void) {
     Depart *tgt = (Depart *)cursor.val;
     TeamWrapper *child_team = getTeamByDepart(tgt);
@@ -549,6 +565,20 @@ void listTeamChildProject(void) {
     cleanupProjectWrapper(child_project);
 }
 
+/******** Stat ********/
+
+void selectStatItem(void) {
+    while (1) {
+        puts(DOC_STAT);
+        int oper_code = 0;
+        printf("stat > "); scanf("%d", &oper_code);
+        switch (oper_code) {
+            case 1: { break; }  // TODO
+            case 0: { return; }
+            default: { break; }
+        }
+    }
+}
 
 /*********  Main Bone **********/
 
@@ -621,7 +651,7 @@ int main(int argc, char const *argv[]) {
                         break;
                     }
                     case 3: {
-                        // selectStatObjects();
+                        selectStatItem();
                         break;
                     }
                     case 4: {
