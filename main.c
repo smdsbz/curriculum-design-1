@@ -293,6 +293,14 @@ void selectAddObjectType(void) {
                 appendDepart(mp.depart_head, initDepartData());
                 return;
             }
+            case 2: {
+                appendTeam(mp.team_head, initTeamData(), mp.depart_head);
+                return;
+            }
+            case 3: {
+                appendProject(mp.project_head, initProjectData(), mp.team_head);
+                return;
+            }
             case 0: { return; }
             default: { break; }
         }
@@ -306,23 +314,14 @@ void selectDepartOperation(void) {
         printf("depart/%s > ", ((Depart *)cursor.val)->data->name);
         scanf("%d", &oper_code);
         switch (oper_code) {
-            case 1: {
-                listDepartAttr();
-                break;
-            }
-            case 2: {
-                selectDepartModifyAttr();
-                break;
-            }
+            case 1: { listDepartAttr(); break; }
+            case 2: { selectDepartModifyAttr(); break; }
             case 3: {
                 removeDepart(&(mp.depart_head), (Depart *)cursor.val);
                 cursor.type = 0; cursor.val = NULL;
                 return;
             }
-            case 4: {
-                listDepartChildTeam();
-                return;
-            }
+            case 4: { listDepartChildTeam(); return; }
             case 0: {
                 cursor.type = 0; cursor.val = NULL;
                 return;
@@ -331,6 +330,32 @@ void selectDepartOperation(void) {
         }
     }
 }
+
+void selectTeamOperation(void) {
+    while (1) {
+        puts(DOC_TEAM);
+        int oper_code = 0;
+        printf("team/%s > ", ((Team *)cursor.val)->data->name);
+        scanf("%d", &oper_code);
+        switch (oper_code) {
+            case 1: { listTeamAttr(); break; }
+            case 2: { selectTeamModifyAttr(); break; }
+            case 3: {
+                removeTeam(&(mp.team_head), (Team *)cursor.val);
+                cursor.type = 0; cursor.val = NULL;
+                return;
+            }
+            case 4: { listTeamChildProject(); return; }
+            case 0: {
+                cursor.type = 0; cursor.val = NULL;
+                return;
+            }
+            default: { break; }
+        }
+    }
+}
+
+// void select
 
 void listDepartAttr(void) {
     Depart *tgt = (Depart *)cursor.val;
@@ -346,6 +371,24 @@ void listDepartAttr(void) {
     putchar('\n');
 }
 
+void listTeamAttr(void) {
+    Team *tgt = (Team *)cursor.val;
+    puts("\
+        ATTR     |    VALUE\n\
+     ------------|-------------------");
+    printf("\
+      Name       |  %s\n", tgt->data->name);
+    printf("\
+      Manager    |  %s\n", tgt->data->manager);
+    printf("\
+      Faculty    |  %s\n", tgt->data->faculty);
+    printf("\
+      TeacherNum |  %d\n", tgt->data->teacher_num);
+    printf("\
+      StudentNum |  %d\n", tgt->data->student_num);
+    putchar('\n');
+}
+
 void selectDepartModifyAttr(void) {
     Depart *tgt = (Depart *)cursor.val;
     while (1) {
@@ -355,13 +398,41 @@ void selectDepartModifyAttr(void) {
         switch (oper_code) {
             case 1: {
                 printf("depart/%s::manager > ", tgt->data->name);
-                scanf("%s", tgt->data->name);
-                break;
+                scanf("%s", tgt->data->manager);
+                return;
             }
             case 2: {
                 printf("depart/%s::tele > ", tgt->data->name);
                 scanf("%s", tgt->data->mobile);
-                break;
+                return;
+            }
+            case 0: { return; }
+            default: { break; }
+        }
+    }
+}
+
+void selectTeamModifyAttr(void) {
+    Team *tgt = (Team *)cursor.val;
+    while (1) {
+        puts(DOC_TEAM_MODIFY);
+        int oper_code = 0;
+        printf("team/%s > ", tgt->data->name); scanf("%d", &oper_code);
+        switch (oper_code) {
+            case 1: {
+                printf("team/%s::manager > ", tgt->data->name);
+                scanf("%s", tgt->data->manager);
+                return;
+            }
+            case 2: {
+                printf("team/%s::teacher_num > ", tgt->data->name);
+                scanf("%d", &(tgt->data->teacher_num));
+                return;
+            }
+            case 3: {
+                printf("team/%s::student_num > ", tgt->data->name);
+                scanf("%d", &(tgt->data->student_num));
+                return;
             }
             case 0: { return; }
             default: { break; }
@@ -387,6 +458,26 @@ void listDepartChildTeam(void) {
     }
     cleanupTeamWrapper(child_team);
 }
+
+void listTeamChildProject(void) {
+    Team *tgt = (Team *)cursor.val;
+    ProjectWrapper *child_project = getProjectByTeam(tgt);
+    listProjectWrapper(child_project);
+    if (child_project->project != NULL) {
+        int oper_code;
+        printf("Set cursor to project: "); scanf("%d", &oper_code);
+        ProjectWrapper *cur = child_project;
+        for (; oper_code > 1 && cur; cur = cur->next, --oper_code) ;
+        if (cur == NULL || oper_code == 0) {
+            puts("Out of range!");
+            cleanupProjectWrapper(child_project);
+            return;
+        }
+        cursor.type = 3; cursor.val = (void *)cur->project;
+    }
+    cleanupProjectWrapper(child_project);
+}
+
 
 /*********  Main Bone **********/
 
@@ -483,11 +574,7 @@ int main(int argc, char const *argv[]) {
                 break;
             }
             case 2: {
-                printf("team/%s > ",
-                       ((Team *)cursor.val)->data->name);
-                // indent-fixer
-                // TODO
-                getchar();
+                selectTeamOperation();
                 break;
             }
             case 3: {

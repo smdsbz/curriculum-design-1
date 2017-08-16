@@ -38,6 +38,15 @@ extern void listDepartAttr(void);
 extern void selectDepartModifyAttr(void);
 extern void listDepartChildTeam(void);
 
+/** endpoint - team **/
+extern void selectTeamOperation(void);
+extern void listTeamAttr(void);
+extern void selectTeamModifyAttr(void);
+extern void listTeamChildProject(void);
+
+/** endpoint - project **/
+
+
 /******************************************************/
 
 /** Additional typedef: Cursor **/

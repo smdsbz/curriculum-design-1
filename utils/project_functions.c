@@ -111,12 +111,15 @@ Project *createProjectHead(void) {
 
 ProjectData initProjectData(void) {
     ProjectData Manhatan;
-    printf("project.id = "); scanf("%s", Manhatan.id);
-    printf("project.type = "); scanf("%c", &(Manhatan.type));
-    printf("project.start_date = "); scanf("%s", Manhatan.start_date);
-    printf("project.funding = "); scanf("%f", &(Manhatan.funding));
-    printf("project.manager = "); scanf("%s", Manhatan.manager);
-    printf("project.team = "); scanf("%s", Manhatan.team);
+    Manhatan.type = '\0';
+    printf("add/project::id > "); scanf("%s", Manhatan.id);
+    printf("add/project::type > ");
+    do {scanf("%c", &(Manhatan.type)); }
+    while (Manhatan.type < '1' || Manhatan.type > '5');
+    printf("add/project::start_date > "); scanf("%s", Manhatan.start_date);
+    printf("add/project::funding > "); scanf("%f", &(Manhatan.funding));
+    printf("add/project::manager > "); scanf("%s", Manhatan.manager);
+    printf("add/project::team > "); scanf("%s", Manhatan.team);
     return Manhatan;
 }
 
@@ -125,7 +128,7 @@ ProjectData initProjectData(void) {
 Project *appendProject(Project *head, ProjectData new_one, Team *team_chain) {
     ProjectWrapper *project_wrapper = getProjectById(head, NULL, new_one.id);
     if (project_wrapper->project != NULL) {
-        printf("The project, %s, already exists!", new_one.id);
+        printf("Record for project %s already exists!\n", new_one.id);
         cleanupProjectWrapper(project_wrapper);
         return NULL;
     }

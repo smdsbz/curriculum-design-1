@@ -62,7 +62,22 @@ char *DOC_DEPART = "Operations Available:\n\
 char *DOC_DEPART_MODIFY = "Modify Attribute:\n\
      0) Go back\n\
      1) Manager\n\
-     2) Tele\n\
+     2) Telephone\n\
+";
+
+char *DOC_TEAM = "Operations Available:\n\
+     0) Unfocus\n\
+     1) List info\n\
+     2) Modify\n\
+     3) Delete\n\
+     4) List projects\n\
+";
+
+char *DOC_TEAM_MODIFY = "Modify Attribute:\n\
+     0) Go back\n\
+     1) Manager\n\
+     2) Teacher number\n\
+     3) Student number\n\
 ";
 
 #endif

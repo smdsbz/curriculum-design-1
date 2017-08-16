@@ -150,11 +150,11 @@ Team *createTeamHead(void) {
 
 TeamData initTeamData(void) {
     TeamData VirtusPro;
-    printf("team.name = "); scanf("%s", VirtusPro.name);
-    printf("team.manager = "); scanf("%s", VirtusPro.manager);
-    printf("team.teacher_num = "); scanf("%d", &(VirtusPro.teacher_num));
-    printf("team.student_num = "); scanf("%d", &(VirtusPro.student_num));
-    printf("team.faculty = "); scanf("%s", VirtusPro.faculty);
+    printf("add/team::name > "); scanf("%s", VirtusPro.name);
+    printf("add/team::manager > "); scanf("%s", VirtusPro.manager);
+    printf("add/team::teacher_num > "); scanf("%d", &(VirtusPro.teacher_num));
+    printf("add/team::student_num > "); scanf("%d", &(VirtusPro.student_num));
+    printf("add/team::faculty > "); scanf("%s", VirtusPro.faculty);
     #if defined(CHILD_COUNTER)
     VirtusPro.project_num = 0;
     #endif
@@ -166,7 +166,7 @@ TeamData initTeamData(void) {
 Team *appendTeam(Team *head, TeamData new_one, Depart *depart_chain) {
     TeamWrapper *team_wrapper = getTeamByName(head, NULL, new_one.name);
     if (team_wrapper->team != NULL) {
-        printf("The team, named %s, already exists!", new_one.name);
+        printf("Record for %s team already exists!\n", new_one.name);
         cleanupTeamWrapper(team_wrapper);
         return NULL;
     }

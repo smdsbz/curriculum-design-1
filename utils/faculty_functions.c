@@ -210,7 +210,7 @@ DepartData initDepartData(void) {
 Depart *appendDepart(Depart *head, DepartData new_one) {
     DepartWrapper *depart_wrapper = getDepartByName(head, NULL, new_one.name);
     if (depart_wrapper->depart != NULL) {
-        printf("The department, named %s, already exists!", new_one.name);
+        printf("Record for %s department already exists!\n", new_one.name);
         cleanupDepartWrapper(depart_wrapper);
         return NULL;
     }
