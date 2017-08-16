@@ -129,7 +129,6 @@ void selectQueryObjects(void) {
                 return;
             }
             case 3: {
-                // selectQueryProjectMethod();
                 // NOTE: 根据团队查找项目整合到团队节点操作中去
                 queryProjectById();
                 return;
@@ -267,18 +266,19 @@ void queryProjectById(void) {
     char project_id[15];
     printf("query/project::ID > "); scanf("%s", project_id);
     ProjectWrapper *project_wrapper = getProjectById(mp.project_head, NULL, project_id);
-    listProjectWrapper(project_wrapper);
+    // listProjectWrapper(project_wrapper);
     if (project_wrapper->project != NULL) {
-        int oper_code;
-        printf("Set cursor to project: "); scanf("%d", &oper_code);
-        ProjectWrapper *cur = project_wrapper;
-        for (; oper_code > 1 && cur; cur = cur->next, --oper_code) ;
-        if (cur == NULL || oper_code == 0) {
-            puts("Out of range!");
-            cleanupProjectWrapper(project_wrapper);
-            return;
-        }
-        cursor.type = 3; cursor.val = (void *)cur->project;
+        // int oper_code;
+        // printf("Set cursor to project: "); scanf("%d", &oper_code);
+        // ProjectWrapper *cur = project_wrapper;
+        // for (; oper_code > 1 && cur; cur = cur->next, --oper_code) ;
+        // if (cur == NULL || oper_code == 0) {
+        //     puts("Out of range!");
+        //     cleanupProjectWrapper(project_wrapper);
+        //     return;
+        // }
+        // cursor.type = 3; cursor.val = (void *)cur->project;
+        cursor.type = 3; cursor.val = (void *)project_wrapper->project;
     }
     cleanupProjectWrapper(project_wrapper);
 }
@@ -355,7 +355,28 @@ void selectTeamOperation(void) {
     }
 }
 
-// void select
+void selectProjectOperation(void) {
+    while (1) {
+        puts(DOC_PROJECT);
+        int oper_code = 0;
+        printf("project/%s > ", ((Project *)cursor.val)->data->id);
+        scanf("%d", &oper_code);
+        switch (oper_code) {
+            case 1: { listProjectAttr(); break; }
+            case 2: { selectProjectModifyAttr(); break; }
+            case 3: {
+                removeProject(&(mp.project_head), (Project *)cursor.val);
+                cursor.type = 0; cursor.val = NULL;
+                return;
+            }
+            case 0: {
+                cursor.type = 0; cursor.val = NULL;
+                return;
+            }
+            default: { break; }
+        }
+    }
+}
 
 void listDepartAttr(void) {
     Depart *tgt = (Depart *)cursor.val;
@@ -386,6 +407,27 @@ void listTeamAttr(void) {
       TeacherNum |  %d\n", tgt->data->teacher_num);
     printf("\
       StudentNum |  %d\n", tgt->data->student_num);
+    putchar('\n');
+}
+
+void listProjectAttr(void) {
+    Project *tgt = (Project *)cursor.val;
+    puts("\
+        ATTR     |    VALUE\n\
+     ------------|-------------------");
+    printf("\
+      ID         |  %s\n", tgt->data->id);
+    char type_str[20] = {'\0'};
+    printf("\
+      Type       |  %s\n", parseTypeCodeToString(type_str, tgt->data->type));
+    printf("\
+      StartDate  |  %s\n", tgt->data->start_date);
+    printf("\
+      Funding    |  %.2f *1000 CNY\n", tgt->data->funding);
+    printf("\
+      Manager    |  %s\n", tgt->data->manager);
+    printf("\
+      Team       |  %s\n", tgt->data->team);
     putchar('\n');
 }
 
@@ -432,6 +474,35 @@ void selectTeamModifyAttr(void) {
             case 3: {
                 printf("team/%s::student_num > ", tgt->data->name);
                 scanf("%d", &(tgt->data->student_num));
+                return;
+            }
+            case 0: { return; }
+            default: { break; }
+        }
+    }
+}
+
+void selectProjectModifyAttr(void) {
+    Project *tgt = (Project *)cursor.val;
+    while (1) {
+        puts(DOC_PROJECT_MODIFY);
+        int oper_code = 0;
+        printf("project/%s > ", tgt->data->id); scanf("%d", &oper_code);
+        switch (oper_code) {
+            case 1: {
+                printf("project/%s::type > ", tgt->data->id);
+                do { scanf("%c", &(tgt->data->type)); }
+                while (tgt->data->type < '1' || tgt->data->type > '5');
+                return;
+            }
+            case 2: {
+                printf("project/%s::funding > ", tgt->data->id);
+                scanf("%f", &(tgt->data->funding));
+                return;
+            }
+            case 3: {
+                printf("project/%s::manager > ", tgt->data->id);
+                scanf("%s", tgt->data->manager);
                 return;
             }
             case 0: { return; }
@@ -578,11 +649,7 @@ int main(int argc, char const *argv[]) {
                 break;
             }
             case 3: {
-                printf("project/%s > ",
-                       ((Project *)cursor.val)->data->id);
-                // indent-fixer
-                // TODO
-                getchar();
+                selectProjectOperation();
                 break;
             }
             default: {

@@ -45,7 +45,9 @@ extern void selectTeamModifyAttr(void);
 extern void listTeamChildProject(void);
 
 /** endpoint - project **/
-
+extern void selectProjectOperation(void);
+extern void listProjectAttr(void);
+extern void selectProjectModifyAttr(void);
 
 /******************************************************/
 

@@ -80,4 +80,18 @@ char *DOC_TEAM_MODIFY = "Modify Attribute:\n\
      3) Student number\n\
 ";
 
+char *DOC_PROJECT = "Operations Available:\n\
+     0) Unfocus\n\
+     1) List info\n\
+     2) Modify\n\
+     3) Delete\n\
+";
+
+char *DOC_PROJECT_MODIFY = "Modify Attribute:\n\
+     0) Go back\n\
+     1) Type\n\
+     2) Funding\n\
+     3) Manager\n\
+";
+
 #endif
