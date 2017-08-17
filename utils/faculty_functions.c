@@ -491,73 +491,103 @@ DepartWrapper *getDepartByName(Depart *start, Depart *end, const char *name) {
 }
 
 
-DepartStatWrapper *getDepartOrderedByMasterTeacherRatio(Depart *start, Depart *end) {
+DepartStatWrapper *buildDepartStatChainUnordered(Depart *start, Depart *end) {
     DepartStatWrapper *unordered = (DepartStatWrapper *)malloc(sizeof(DepartStatWrapper));
-    if (unordered == NULL) { return NULL;}
-    Depart *start_bak = start;
-    for (; start_bak; start_bak = start_bak->next) {
-        // TODO
-        // IDEA: 先遍历生成未排序的链，然后再排序该链
-    }
-
-    DepartStatWrapper *rtn = (DepartStatWrapper *)malloc(sizeof(DepartStatWrapper));
-    if (rtn == NULL) {
-        #if defined(DEBUG)
-        puts("[LOG] Error in getDepartOrderedByMasterTeacherRatio():\n\tfailed to malloc for mounting point");
-        #endif
-        return NULL;
-    }
-    rtn->depart = NULL; rtn->next = NULL;
+    if (unordered == NULL) { return NULL; }
     if (start->data == NULL) {
         #if defined(DEBUG)
-        puts("[LOG] Error in getDepartOrderedByMasterTeacherRatio(): searching an empty chain");
+        puts("[LOG] Error in getDepartOrderedByMasterTeacherRatio(): building with an empty chain");
         #endif
-        return rtn;
+        unordered->depart = NULL; unordered->next = NULL;
+        return unordered;
     }
-    rtn->depart = start;   // 读取第一个数据
-    // // TODO
-    // {
-    //     Team *child_team_head = rtn->depart->child_team_head;
-    //     for (rtn->student_num = 0, rtn->teacher_num = 0;
-    //             child_team_head != rtn->child_team_tail;
-    //             child_team_head = child_team_head->next) {
-    //         rtn->student_num += child_team_head->student_num;
-    //         rtn->teacher_num += child_team_head->teacher_num;
-    //     }
-    // }
-    start = start->next;
-    for (; start != end; start = start->next) {
-        DepartStatWrapper *cur = rtn;
-        for (; ((float)start->data->student_num / start->data->teacher_num) <= ((float)cur->depart->data->student_num / cur->depart->data->teacher_num)); cur = cur->next) ;
-        if (cur == rtn) {   // 当前即为最大学生-老师比
-            // 需要重新定位头指针
-            DepartStatWrapper *rtn_old = rtn;
-            rtn = (DepartStatWrapper *)malloc(sizeof(DepartStatWrapper));
-            if (rtn == NULL) {
-                #if defined(DEBUG)
-                puts("[LOG] Error in getDepartOrderedByMasterTeacherRatio():\n\tfailed to malloc for result container");
-                #endif
-                cleanupDepartStatWrapper(rtn);
-                return NULL;
+    // constructing unordered chain
+    Depart *start_bak = start; DepartStatWrapper *unordered_bak = unordered;
+    {
+        unordered_bak->depart = start_bak; unordered_bak->next = NULL;
+        unordered_bak->stat.student_num = 0; unordered_bak->stat.teacher_num = 0;
+        unordered_bak->stat.project_total = 0; unordered_bak->stat.project_973 = 0;
+        unordered_bak->stat.project_863 = 0; unordered_bak->stat.funding = 0;
+        // Team
+        Team *child_team = start_bak->child_team_head;
+        if (child_team != NULL) {
+            for (; child_team != start_bak->child_team_tail->next; child_team = child_team->next) {
+                unordered_bak->stat.student_num += child_team->data->student_num;
+                unordered_bak->stat.teacher_num += child_team->data->teacher_num;
+                {   // project
+                    Project *child_project = child_team->child_project_head;
+                    if (child_project != NULL) {
+                        for (; child_project != child_team->child_project_tail; child_project = child_project->next) {
+                            unordered_bak->stat.project_total += 1;
+                            if (child_project->data->type == '1') { unordered_bak->stat.project_973 += 1; }
+                            if (child_project->data->type == '3') { unordered_bak->stat.project_973 += 1; }
+                            unordered_bak->stat.funding += child_project->data->funding;
+                        }
+                    }
+                }
             }
-            rtn->depart = start;
-            rtn->next = rtn_old;  // 恢复连接
-        } else {
-            DepartStatWrapper *prev = rtn;
-            for (; prev->next != cur; prev = prev->next) ;
-            prev->next = (DepartStatWrapper *)malloc(sizeof(DepartStatWrapper));
-            if (prev->next == NULL) {
-                #if defined(DEBUG)
-                puts("[LOG] Error in getDepartOrderedByMasterTeacherRatio():\n\tfailed to malloc for result container");
-                #endif
-                cleanupDepartStatWrapper(rtn);
-                return NULL;
-            }
-            prev->depart = start;
-            prev->next->next = cur;
         }
-    }   // endfor - finished reading al records
-    return rtn;
+        if (unordered_bak->stat.teacher_num == 0) { unordered_bak->stat.st_ratio = 0; }
+        else {
+            unordered->stat.st_ratio = (float)unordered->stat.student_num / unordered->stat.teacher_num; }
+    } for (; start_bak; start_bak = start_bak->next) {
+        // IDEA: 先遍历生成未排序的链，然后再排序该链
+        unordered_bak->next = (DepartStatWrapper *)malloc(sizeof(DepartStatWrapper));
+        if (unordered_bak->next == NULL) { return NULL; }
+        unordered_bak = unordered_bak->next;
+        {
+            unordered_bak->depart = start_bak; unordered_bak->next = NULL;
+            unordered_bak->stat.student_num = 0; unordered_bak->stat.teacher_num = 0;
+            unordered_bak->stat.project_total = 0; unordered_bak->stat.project_973 = 0;
+            unordered_bak->stat.project_863 = 0; unordered_bak->stat.funding = 0;
+            // Team
+            Team *child_team = start_bak->child_team_head;
+            if (child_team != NULL) {
+                for (; child_team != start_bak->child_team_tail->next; child_team = child_team->next) {
+                    unordered_bak->stat.student_num += child_team->data->student_num;
+                    unordered_bak->stat.teacher_num += child_team->data->teacher_num;
+                    {   // project
+                        Project *child_project = child_team->child_project_head;
+                        if (child_project != NULL) {
+                            for (; child_project != child_team->child_project_tail; child_project = child_project->next) {
+                                unordered_bak->stat.project_total += 1;
+                                if (child_project->data->type == '1') { unordered_bak->stat.project_973 += 1; }
+                                if (child_project->data->type == '3') { unordered_bak->stat.project_973 += 1; }
+                                unordered_bak->stat.funding += child_project->data->funding;
+                            }
+                        }
+                    }
+                }
+            }
+            if (unordered_bak->stat.teacher_num == 0) { unordered_bak->stat.st_ratio = 0; }
+            else {
+                unordered->stat.st_ratio = (float)unordered->stat.student_num / unordered->stat.teacher_num; }
+        }
+    }
+    // start_bak = start; unordered_bak = unordered;
+    return unordered;
+}
+
+DepartStatWrapper *orderDepartStatWrapperBySTRatio(DepartStatWrapper *start) {
+    if (start == NULL) { return NULL; }
+    DepartStatWrapper *start_bak = start;
+    DepartStatWrapper *cur = start;
+    Depart *Depart_tmp; DepartStatData DepartStatData_tmp;
+    for (; start_bak->next; start_bak = start_bak->next) {
+        for (cur = start; cur->next; cur = cur->next) {     // 少写点代码，这里就牺牲点效率了
+            if (cur->stat.st_ratio < cur->next->stat.st_ratio) {
+                // swap depart
+                Depart_tmp = cur->next->depart;
+                cur->next->depart = cur->depart;
+                cur->depart = Depart_tmp;
+                // swap stat
+                DepartStatData_tmp = cur->next->stat;
+                cur->next->stat = cur->stat;
+                cur->stat = DepartStatData_tmp;
+            }
+        }
+    }
+    return start;
 }
 
 

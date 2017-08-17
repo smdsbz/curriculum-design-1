@@ -60,23 +60,22 @@ void listDepartWrapper(DepartWrapper *head) {
 }
 
 void listDepartHRStat(void) {
-    DepartWrapper *rst = getDepartOrderedByMasterTeacherRatio(mp.depart_head, NULL);
+    DepartStatWrapper *rst = buildDepartStatChainUnordered(mp.depart_head, NULL);
     if (rst == NULL) {
         puts("RUNTIME ERROR!");
         exit(-1);
     }
+    rst = orderDepartStatWrapperBySTRatio(rst);
     puts("        Name            |    Teachers   |    Students   |   S/T Ratio\n\
      -------------------|---------------|---------------|---------------");
-    DepartWrapper *head = rst; int counter = 1;
+    DepartStatWrapper *head = rst; int counter = 1;
     for (; head; head = head->next) {
-        printf("%4d  %-18s|  %-13d|  %-13d|  %-.2f",
-               counter, head->depart->data->name,
-               head->depart->data->teacher_num,
-               head->depart->data->student_num,
-               (float)head->depart->data->student_num / head->depart->data->teacher_num);
+        printf("%4d  %-18s|  %-13d|  %-13d|  %-.2f\n",
+               counter, head->depart->data->name, head->stat.teacher_num,
+               head->stat.student_num, head->stat.st_ratio);
         // indent-fixer
     }
-    cleanupDepartWrapper(rst);
+    cleanupDepartStatWrapper(rst);
     putchar('\n');
 }
 
@@ -594,7 +593,7 @@ void selectStatItem(void) {
         int oper_code = 0;
         printf("stat > "); scanf("%d", &oper_code);
         switch (oper_code) {
-            case 1: { listDepartHRStat(); break; }  // TODO
+            case 1: { listDepartHRStat(); return; }  // TODO
             case 0: { return; }
             default: { break; }
         }

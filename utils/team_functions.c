@@ -191,11 +191,16 @@ Team *appendTeam(Team *head, TeamData new_one, Depart *depart_chain) {
         return NULL;
     }
     if (parent_depart_wrapper->depart == NULL) {
-        puts("target parent department not found\n");
+        puts("Target parent department not found!\n");
         return NULL;
     }
     if (parent_depart_wrapper->next != NULL) {
-        puts("multiple parent departments found\n");
+        puts("Multiple parent departments found!\n");
+        return NULL;
+    }
+    if (strcmp(parent_depart_wrapper->depart->data->name, new_one.faculty)) {
+        printf("Department named %s not found, do you mean %s instead?\n",
+               new_one.faculty, parent_depart_wrapper->depart->data->name);
         return NULL;
     }
 

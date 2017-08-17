@@ -148,11 +148,16 @@ Project *appendProject(Project *head, ProjectData new_one, Team *team_chain) {
         return NULL;
     }
     if (parent_team_wrapper->team == NULL) {
-        puts("target parent team not found\n");
+        puts("Target parent team not found!\n");
         return NULL;
     }
     if (parent_team_wrapper->next != NULL) {
-        puts("multiple parent teams found\n");
+        puts("Multiple parent teams found!\n");
+        return NULL;
+    }
+    if (strcmp(parent_team_wrapper->team->data->name, new_one.team)) {
+        printf("Team named %s not found, do you mean %s instead?\n",
+               new_one.team, parent_team_wrapper->team->data->name);
         return NULL;
     }
 

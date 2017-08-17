@@ -56,11 +56,14 @@ extern DepartWrapper *getDepartByName(Depart *, Depart *, const char *);
  *  NOTE:   该函数会申请DepartWrapper占用空间，记得调用cleanupDepartWrapper()
  */
 
-extern DepartStatWrapper *getDepartOrderedByMasterTeacherRatio(Depart *, Depart *);
-/*  获取按照学生-老师比例排序的院系链
- *  ARGS:   院系链表，搜索边界
- *  RETN:   统计结果链挂载点
- */
+// extern DepartStatWrapper *getDepartOrderedByMasterTeacherRatio(Depart *, Depart *);
+// /*  获取按照学生-老师比例排序的院系链
+//  *  ARGS:   院系链表，搜索边界
+//  *  RETN:   统计结果链挂载点
+//  */
+
+extern DepartStatWrapper *buildDepartStatChainUnordered(Depart *, Depart *);
+extern DepartStatWrapper *orderDepartStatWrapperBySTRatio(DepartStatWrapper *);
 
 extern Depart *getPrevDepart(Depart *cur, Depart *head);
 /*  获得当前院系节点的前一个节点
@@ -84,6 +87,8 @@ extern void cleanupDepart(Depart *start);
  *  ARGS:   头节点地址
  *  RETN:   void
  */
+
+extern void cleanupDepartStatWrapper(DepartStatWrapper *);
 
 
 #endif

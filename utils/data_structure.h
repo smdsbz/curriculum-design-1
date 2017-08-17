@@ -73,6 +73,13 @@ typedef struct _DepartData {
     #if defined(CHILD_COUNTER)
     int     team_num;       // 该院系团队总数
     #endif
+    // stat
+    // int     student_num;
+    // int     teacher_num;
+    // int     project_total;
+    // int     project_973;
+    // int     project_863;
+    // float   funding;
 } DepartData;
 
 
@@ -96,12 +103,21 @@ typedef struct _DepartWrapper {
     struct _DepartWrapper   *next;      // 指向下一个结果wrapper
 } DepartWrapper;
 
+typedef struct _DepartStatData {
+    int                         student_num;    // 该院系下学生总数
+    int                         teacher_num;    // 该院系下教师总数
+    float                       st_ratio;       // 该院系学生/教师比例
+    int                         project_total;
+    int                         project_973;
+    int                         project_863;
+    float                       funding;
+} DepartStatData;
+
 typedef struct _DepartStatWrapper {
     /* 用来储存人数统计信息 */
-    struct _Depart              *deapart;
-    int                         student_num;
-    int                         teacher_num;
-    struct _DepartStatWrapper   *next;
+    struct _Depart              *depart;       // 指向源数据节点
+    struct _DepartStatData      stat;
+    struct _DepartStatWrapper   *next;          // 下一个节点
 } DepartStatWrapper;
 
     /**** Team ****/
@@ -116,6 +132,10 @@ typedef struct _TeamData {
     #if defined(CHILD_COUNTER)
     int     project_num;    // 该团队所管理的项目总数
     #endif
+    // stat
+    // int     project_total;
+    // int     project_NSFC;
+    // float   funding;
 } TeamData;
 
 
