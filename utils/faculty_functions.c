@@ -517,7 +517,7 @@ DepartStatWrapper *buildDepartStatChainUnordered(Depart *start, Depart *end) {
                 {   // project
                     Project *child_project = child_team->child_project_head;
                     if (child_project != NULL) {
-                        for (; child_project != child_team->child_project_tail; child_project = child_project->next) {
+                        for (; child_project != child_team->child_project_tail->next; child_project = child_project->next) {
                             unordered_bak->stat.project_total += 1;
                             if (child_project->data->type == '1') { unordered_bak->stat.project_973 += 1; }
                             if (child_project->data->type == '3') { unordered_bak->stat.project_973 += 1; }
@@ -551,7 +551,7 @@ DepartStatWrapper *buildDepartStatChainUnordered(Depart *start, Depart *end) {
                     {   // project
                         Project *child_project = child_team->child_project_head;
                         if (child_project != NULL) {
-                            for (; child_project != child_team->child_project_tail; child_project = child_project->next) {
+                            for (; child_project != child_team->child_project_tail->next; child_project = child_project->next) {
                                 unordered_bak->stat.project_total += 1;
                                 if (child_project->data->type == '1') { unordered_bak->stat.project_973 += 1; }
                                 if (child_project->data->type == '3') { unordered_bak->stat.project_973 += 1; }
@@ -592,6 +592,27 @@ DepartStatWrapper *orderDepartStatWrapperBySTRatio(DepartStatWrapper *start) {
     return start;
 }
 
+DepartStatWrapper *orderDepartStatWrapperByProjectTotal(DepartStatWrapper *start) {
+    if (start == NULL) { return NULL; }
+    DepartStatWrapper *start_bak = start;
+    DepartStatWrapper *cur = start;
+    Depart *Depart_tmp; DepartStatData DepartStatData_tmp;
+    for (; start_bak->next; start_bak = start_bak->next) {
+        for (cur = start; cur->next; cur = cur->next) {
+            if (cur->stat.project_total < cur->next->stat.project_total) {
+                // swap depart
+                Depart_tmp = cur->next->depart;
+                cur->next->depart = cur->depart;
+                cur->depart = Depart_tmp;
+                // swap stat
+                DepartStatData_tmp = cur->next->stat;
+                cur->next->stat = cur->stat;
+                cur->stat = DepartStatData_tmp;
+            }
+        }
+    }
+    return start;
+}
 
 Depart *getPrevDepart(Depart *cur, Depart *head) {
     for (;
