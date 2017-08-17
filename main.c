@@ -69,7 +69,7 @@ void listDepartHRStat(void) {
     puts("        Name            |    Teachers   |    Students   |   S/T Ratio\n\
      -------------------|---------------|---------------|---------------");
     DepartStatWrapper *head = rst; int counter = 1;
-    for (; head; head = head->next) {
+    for (; head; head = head->next, ++counter) {
         printf("%4d  %-18s|  %-13d|  %-13d|  %-.2f\n",
                counter, head->depart->data->name, head->stat.teacher_num,
                head->stat.student_num, head->stat.st_ratio);
