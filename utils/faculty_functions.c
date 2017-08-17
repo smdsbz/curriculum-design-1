@@ -531,8 +531,7 @@ DepartStatWrapper *buildDepartStatChainUnordered(Depart *start, Depart *end) {
         else {
             unordered_bak->stat.st_ratio = (float)unordered->stat.student_num / unordered_bak->stat.teacher_num; }
     }
-    for (start_bak = start_bak->next; start_bak; start_bak = start_bak->next) {
-        // TODO: issue here
+    for (start_bak = start_bak->next; start_bak != end; start_bak = start_bak->next) {
         unordered_bak->next = (DepartStatWrapper *)malloc(sizeof(DepartStatWrapper));
         if (unordered_bak->next == NULL) { return NULL; }
         unordered_bak = unordered_bak->next;
