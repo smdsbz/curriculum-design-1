@@ -106,7 +106,7 @@ TeamWrapper *getTeamByName(Team *, Team *, const char *);
  *  NOTE:   调用过程中会为TeamWrapper申请内存空间，使用完搜索结果后记得cleanup
  */
 
-TeamStatWrapper *buildTeamStatChainUnordered(Team *, Team *);
+TeamStatWrapper *buildTeamStatChainUnordered(Team *, Team *, char);
 TeamStatWrapper *orderTeamStatWrapperByNSFCProject(TeamStatWrapper *);
 // TeamStatWrapper *orderTeamStatWrapperByProjectTotal(TeamStatWrapper *);
 TeamStatWrapper *orderTeamStatWrapperByPTRatio(TeamStatWrapper *);
@@ -577,7 +577,7 @@ TeamWrapper *getTeamByDepart(Depart *parent_depart) {
 
     /**** Stat ****/
 
-TeamStatWrapper *buildTeamStatChainUnordered(Team *start, Team *end) {
+TeamStatWrapper *buildTeamStatChainUnordered(Team *start, Team *end, char NSFC_flag) {
     TeamStatWrapper *unordered = (TeamStatWrapper *)malloc(sizeof(TeamStatWrapper));
     if (unordered == NULL) { return NULL; }
     if (start->data == NULL) {
@@ -590,7 +590,6 @@ TeamStatWrapper *buildTeamStatChainUnordered(Team *start, Team *end) {
     // constructing unordered chain
     Team *start_bak = start; TeamStatWrapper *unordered_bak = unordered;
     {
-        // TODO
         unordered_bak->team = start_bak; unordered_bak->next = NULL;
         unordered_bak->stat.project_total = 0; unordered_bak->stat.project_NSFC = 0;
         unordered_bak->stat.funding = 0;
@@ -599,7 +598,8 @@ TeamStatWrapper *buildTeamStatChainUnordered(Team *start, Team *end) {
         if (child_project != NULL) {
             for (; child_project != start_bak->child_project_tail->next; child_project = child_project->next) {
                 unordered_bak->stat.project_total += 1;
-                unordered_bak->stat.funding += child_project->data->funding;
+                if ((!NSFC_flag) || (NSFC_flag && child_project->data->type=='2'))
+                    { unordered_bak->stat.funding += child_project->data->funding; }
                 if (child_project->data->type == '2') { unordered_bak->stat.project_NSFC += 1; }
             }
         }
@@ -617,7 +617,8 @@ TeamStatWrapper *buildTeamStatChainUnordered(Team *start, Team *end) {
             if (child_project != NULL) {
                 for (; child_project != start_bak->child_project_tail->next; child_project = child_project->next) {
                     unordered_bak->stat.project_total += 1;
-                    unordered_bak->stat.funding += child_project->data->funding;
+                    if ((!NSFC_flag) || (NSFC_flag && child_project->data->type=='2'))
+                        { unordered_bak->stat.funding += child_project->data->funding; }
                     if (child_project->data->type == '2') { unordered_bak->stat.project_NSFC += 1; }
                 }
             }

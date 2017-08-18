@@ -100,6 +100,7 @@ char *DOC_STAT = "Statistics Tools Available:\n\
      2) Project Overview\n\
      3) Top 10 NSFC Teams\n\
      4) Top 5 Project/Teacher Ratio Teams\n\
+     5) Top 5 Average Project Funding Departments\n\
 ";
 
 #endif

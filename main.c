@@ -115,7 +115,7 @@ void listDepartFundingStat(void) {
         Name            |    Projects   |    Funding    |    Fund/Proj.\n\
      -------------------|---------------|---------------|---------------");
     DepartStatWrapper *head = rst; int counter = 1;
-    for (; head; head = head->next, ++counter) {
+    for (; head && counter <= 5; head = head->next, ++counter) {
         printf("%4d  %-18s|  %-13d|  %-13.2f|  ",
                counter, head->depart->data->name,
                head->stat.project_total,
@@ -155,7 +155,7 @@ void listTeamWrapper(TeamWrapper *head) {
 }
 
 void listTeamNSFCProjectStat(void) {    // Top 10
-    TeamStatWrapper *rst = buildTeamStatChainUnordered(mp.team_head, NULL);
+    TeamStatWrapper *rst = buildTeamStatChainUnordered(mp.team_head, NULL, 1);
     if (rst == NULL) {
         puts("RUNTIME ERROR!");
         exit(-1);
@@ -177,7 +177,7 @@ void listTeamNSFCProjectStat(void) {    // Top 10
 }
 
 void listTeamProjectStat(void) {
-    TeamStatWrapper *rst = buildTeamStatChainUnordered(mp.team_head, NULL);
+    TeamStatWrapper *rst = buildTeamStatChainUnordered(mp.team_head, NULL, 0);
     if (rst == NULL) {
         puts("RUNTIME ERROR!");
         exit(-1);

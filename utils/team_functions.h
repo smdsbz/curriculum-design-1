@@ -60,7 +60,7 @@ extern TeamWrapper *getTeamByDepart(Depart *);
 
     /**** Stat ****/
 
-extern TeamStatWrapper *buildTeamStatChainUnordered(Team *, Team *);
+extern TeamStatWrapper *buildTeamStatChainUnordered(Team *, Team *, char);
 extern TeamStatWrapper *orderTeamStatWrapperByNSFCProject(TeamStatWrapper *);
 extern TeamStatWrapper *orderTeamStatWrapperByPTRatio(TeamStatWrapper *);
 
