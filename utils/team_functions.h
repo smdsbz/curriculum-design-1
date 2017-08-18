@@ -61,6 +61,7 @@ extern TeamWrapper *getTeamByDepart(Depart *);
     /**** Stat ****/
 
 extern TeamStatWrapper *buildTeamStatChainUnordered(Team *, Team *);
+extern TeamStatWrapper *orderTeamStatWrapperByNSFCProject(TeamStatWrapper *);
 
     /**** CLEANUPs ****/
 

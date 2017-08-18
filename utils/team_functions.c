@@ -106,6 +106,9 @@ TeamWrapper *getTeamByName(Team *, Team *, const char *);
  *  NOTE:   调用过程中会为TeamWrapper申请内存空间，使用完搜索结果后记得cleanup
  */
 
+TeamStatWrapper *buildTeamStatChainUnordered(Team *, Team *);
+
+TeamStatWrapper *orderTeamStatWrapperByNSFCProject(TeamStatWrapper *);
 
     /**** CLEANUPs ****/
 
@@ -623,6 +626,49 @@ TeamStatWrapper *buildTeamStatChainUnordered(Team *start, Team *end) {
     return unordered;
 }
 
+// DepartStatWrapper *orderDepartStatWrapperBySTRatio(DepartStatWrapper *start) {
+//     if (start == NULL) { return NULL; }
+//     DepartStatWrapper *start_bak = start;
+//     DepartStatWrapper *cur = start;
+//     Depart *Depart_tmp; DepartStatData DepartStatData_tmp;
+//     for (; start_bak->next; start_bak = start_bak->next) {
+//         for (cur = start; cur->next; cur = cur->next) {     // 少写点代码，这里就牺牲点效率了
+//             if (cur->stat.st_ratio < cur->next->stat.st_ratio) {
+//                 // swap depart
+//                 Depart_tmp = cur->next->depart;
+//                 cur->next->depart = cur->depart;
+//                 cur->depart = Depart_tmp;
+//                 // swap stat
+//                 DepartStatData_tmp = cur->next->stat;
+//                 cur->next->stat = cur->stat;
+//                 cur->stat = DepartStatData_tmp;
+//             }
+//         }
+//     }
+//     return start;
+// }
+
+TeamStatWrapper *orderTeamStatWrapperByNSFCProject(TeamStatWrapper *start) {
+    if (start == NULL) { return NULL; }
+    TeamStatWrapper *start_bak = start;
+    TeamStatWrapper *cur = start;
+    Team *Team_tmp; TeamStatData TeamStatData_tmp;
+    for (; start_bak->next; start_bak = start_bak->next) {
+        for (cur = start; cur->next; cur = cur->next) {     // 少写点代码，这里就牺牲点效率了
+            if (cur->stat.project_NSFC < cur->next->stat.project_NSFC) {
+                // swap team
+                Team_tmp = cur->next->team;
+                cur->next->team = cur->team;
+                cur->team = Team_tmp;
+                // swap stat
+                TeamStatData_tmp = cur->next->stat;
+                cur->next->stat = cur->stat;
+                cur->stat = TeamStatData_tmp;
+            }
+        }
+    }
+    return start;
+}
 
     /**** CLEANUPs ****/
 

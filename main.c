@@ -131,7 +131,7 @@ void listTeamNSFCProjectStat(void) {
         puts("RUNTIME ERROR!");
         exit(-1);
     }
-    // TODO: order things up
+    rst = orderTeamStatWrapperByNSFCProject(rst);
     puts("\
         Name            |    NSFC Proj. |  Funding\n\
      -------------------|---------------|---------------");
