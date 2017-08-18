@@ -35,6 +35,7 @@ extern void listDepartHRStat(void);
 extern void listDepartProjectStat(void);
 extern void listTeamNSFCProjectStat(void);
 extern void listTeamProjectStat(void);
+extern void listDepartFundingStat(void);
 
 /******************************************************/
 

@@ -102,6 +102,33 @@ void listDepartProjectStat(void) {
     putchar('\n');
 }
 
+void listDepartFundingStat(void) {
+    DepartStatWrapper *rst = buildDepartStatChainUnordered(mp.depart_head, NULL);
+    if (rst == NULL) {
+        puts("RUNTIME ERROR!");
+        exit(-1);
+    }
+    orderDepartStatWrapperByAvgFunding(rst);
+    puts("\
+        Name            |    Projects   |    Funding    |    Fund/Proj.\n\
+     -------------------|---------------|---------------|---------------");
+    DepartStatWrapper *head = rst; int counter = 1;
+    for (; head; head = head->next, ++counter) {
+        printf("%4d  %-18s|  %-13d|  %-13.2f|  ",
+               counter, head->depart->data->name,
+               head->stat.project_total,
+               head->stat.funding);
+        // indent-fixer
+        if (head->stat.project_total) {
+            printf("%.2f\n", (float)head->stat.funding / head->stat.project_total);
+        } else {
+            puts("---");
+        }
+    }
+    cleanupDepartStatWrapper(rst);
+    putchar('\n');
+}
+
 void listTeamWrapper(TeamWrapper *head) {
     if (head == NULL) {
         puts("RUNTIME ERROR!");
@@ -668,6 +695,7 @@ void selectStatItem(void) {
             case 2: { listDepartProjectStat(); return; }
             case 3: { listTeamNSFCProjectStat(); return; }
             case 4: { listTeamProjectStat(); return; }
+            case 5: { listDepartFundingStat(); return; }
             case 0: { return; }
             default: { break; }
         }

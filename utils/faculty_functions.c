@@ -71,6 +71,11 @@ DepartWrapper *getDepartByName(Depart *, Depart *, const char *);
  *  NOTE:   该函数会申请DepartWrapper占用空间，记得调用cleanupDepartWrapper()
  */
 
+DepartStatWrapper *buildDepartStatChainUnordered(Depart *start, Depart *end);
+DepartStatWrapper *orderDepartStatWrapperBySTRatio(DepartStatWrapper *start);
+DepartStatWrapper *orderDepartStatWrapperByProjectTotal(DepartStatWrapper *start);
+DepartStatWrapper *orderDepartStatWrapperByAvgFunding(DepartStatWrapper *start);
+
 Depart *getPrevDepart(Depart *cur, Depart *head);
 /*  获得当前院系节点的前一个节点
  *  ARGS:   当前节点，院系链表头
@@ -612,6 +617,29 @@ DepartStatWrapper *orderDepartStatWrapperByProjectTotal(DepartStatWrapper *start
     }
     return start;
 }
+
+DepartStatWrapper *orderDepartStatWrapperByAvgFunding(DepartStatWrapper *start) {
+    if (start == NULL) { return NULL; }
+    DepartStatWrapper *start_bak = start;
+    DepartStatWrapper *cur = start;
+    Depart *Depart_tmp; DepartStatData DepartStatData_tmp;
+    for (; start_bak->next; start_bak = start_bak->next) {
+        for (cur = start; cur->next; cur = cur->next) {
+            if (((float)cur->stat.funding / cur->stat.project_total) < ((float)cur->next->stat.funding / cur->next->stat.project_total)) {
+                // swap depart
+                Depart_tmp = cur->next->depart;
+                cur->next->depart = cur->depart;
+                cur->depart = Depart_tmp;
+                // swap stat
+                DepartStatData_tmp = cur->next->stat;
+                cur->next->stat = cur->stat;
+                cur->stat = DepartStatData_tmp;
+            }
+        }
+    }
+    return start;
+}
+
 
 Depart *getPrevDepart(Depart *cur, Depart *head) {
     for (;

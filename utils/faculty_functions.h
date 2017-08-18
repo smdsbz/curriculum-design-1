@@ -65,6 +65,7 @@ extern DepartWrapper *getDepartByName(Depart *, Depart *, const char *);
 extern DepartStatWrapper *buildDepartStatChainUnordered(Depart *, Depart *);
 extern DepartStatWrapper *orderDepartStatWrapperBySTRatio(DepartStatWrapper *);
 extern DepartStatWrapper *orderDepartStatWrapperByProjectTotal(DepartStatWrapper *);
+extern DepartStatWrapper *orderDepartStatWrapperByAvgFunding(DepartStatWrapper *);
 
 extern Depart *getPrevDepart(Depart *cur, Depart *head);
 /*  获得当前院系节点的前一个节点
