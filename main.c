@@ -82,7 +82,6 @@ void listDepartHRStat(void) {
 }
 
 void listDepartProjectStat(void) {
-    // TODO: specify year of search
     printf("stat/project_overview::year (0 for all) > ");
     int year; scanf("%d", &year);
     DepartStatWrapper *rst = buildDepartStatChainUnordered(mp.depart_head, NULL, year);

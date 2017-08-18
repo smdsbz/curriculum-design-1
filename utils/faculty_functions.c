@@ -524,7 +524,7 @@ DepartStatWrapper *buildDepartStatChainUnordered(Depart *start, Depart *end, int
                     Project *child_project = child_team->child_project_head;
                     if (child_project != NULL) {
                         for (; child_project != child_team->child_project_tail->next; child_project = child_project->next) {
-                            if (strstr(child_project->data->start_date, itoa(year, year_str, 10)) == 0 || year == 0) {
+                            if (strstr(child_project->data->start_date, itoa(year, year_str, 10)) != NULL || year == 0) {   // 由于标识时间的字符串位数不多，所以直接判断输入年份是不是字串就行了
                                 unordered_bak->stat.project_total += 1;
                                 if (child_project->data->type == '1') { unordered_bak->stat.project_973 += 1; }
                                 if (child_project->data->type == '3') { unordered_bak->stat.project_973 += 1; }
@@ -558,7 +558,7 @@ DepartStatWrapper *buildDepartStatChainUnordered(Depart *start, Depart *end, int
                         Project *child_project = child_team->child_project_head;
                         if (child_project != NULL) {
                             for (; child_project != child_team->child_project_tail->next; child_project = child_project->next) {
-                                if (strstr(child_project->data->start_date, itoa(year, year_str, 10)) == 0 || year == 0) {
+                                if (strstr(child_project->data->start_date, itoa(year, year_str, 10)) != NULL || year == 0) {
                                     unordered_bak->stat.project_total += 1;
                                     if (child_project->data->type == '1') { unordered_bak->stat.project_973 += 1; }
                                     if (child_project->data->type == '3') { unordered_bak->stat.project_973 += 1; }
