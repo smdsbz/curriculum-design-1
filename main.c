@@ -153,7 +153,8 @@ void listTeamProjectStat(void) {
         puts("RUNTIME ERROR!");
         exit(-1);
     }
-    orderTeamStatWrapperByProjectTotal(rst);
+    // orderTeamStatWrapperByProjectTotal(rst);
+    orderTeamStatWrapperByPTRatio(rst);
     puts("\
         Name            |    Teachers   |    Projects   |    P/T Ratio\n\
      -------------------|---------------|---------------|---------------");
@@ -163,7 +164,7 @@ void listTeamProjectStat(void) {
                counter, head->team->data->name,
                head->team->data->teacher_num,
                head->stat.project_total,
-               (float)head->team->data->teacher_num / head->stat.project_total);
+               (float)head->stat.project_total / head->team->data->teacher_num);
         // indent-fixer
     }
     cleanupTeamStatWrapper(rst);

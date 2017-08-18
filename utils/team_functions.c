@@ -108,7 +108,8 @@ TeamWrapper *getTeamByName(Team *, Team *, const char *);
 
 TeamStatWrapper *buildTeamStatChainUnordered(Team *, Team *);
 TeamStatWrapper *orderTeamStatWrapperByNSFCProject(TeamStatWrapper *);
-TeamStatWrapper *orderTeamStatWrapperByProjectTotal(TeamStatWrapper *);
+// TeamStatWrapper *orderTeamStatWrapperByProjectTotal(TeamStatWrapper *);
+TeamStatWrapper *orderTeamStatWrapperByPTRatio(TeamStatWrapper *);
 
     /**** CLEANUPs ****/
 
@@ -626,28 +627,6 @@ TeamStatWrapper *buildTeamStatChainUnordered(Team *start, Team *end) {
     return unordered;
 }
 
-// DepartStatWrapper *orderDepartStatWrapperBySTRatio(DepartStatWrapper *start) {
-//     if (start == NULL) { return NULL; }
-//     DepartStatWrapper *start_bak = start;
-//     DepartStatWrapper *cur = start;
-//     Depart *Depart_tmp; DepartStatData DepartStatData_tmp;
-//     for (; start_bak->next; start_bak = start_bak->next) {
-//         for (cur = start; cur->next; cur = cur->next) {     // 少写点代码，这里就牺牲点效率了
-//             if (cur->stat.st_ratio < cur->next->stat.st_ratio) {
-//                 // swap depart
-//                 Depart_tmp = cur->next->depart;
-//                 cur->next->depart = cur->depart;
-//                 cur->depart = Depart_tmp;
-//                 // swap stat
-//                 DepartStatData_tmp = cur->next->stat;
-//                 cur->next->stat = cur->stat;
-//                 cur->stat = DepartStatData_tmp;
-//             }
-//         }
-//     }
-//     return start;
-// }
-
 TeamStatWrapper *orderTeamStatWrapperByNSFCProject(TeamStatWrapper *start) {
     if (start == NULL) { return NULL; }
     TeamStatWrapper *start_bak = start;
@@ -670,14 +649,36 @@ TeamStatWrapper *orderTeamStatWrapperByNSFCProject(TeamStatWrapper *start) {
     return start;
 }
 
-TeamStatWrapper *orderTeamStatWrapperByProjectTotal(TeamStatWrapper *start) {
+// TeamStatWrapper *orderTeamStatWrapperByProjectTotal(TeamStatWrapper *start) {
+//     if (start == NULL) { return NULL; }
+//     TeamStatWrapper *start_bak = start;
+//     TeamStatWrapper *cur = start;
+//     Team *Team_tmp; TeamStatData TeamStatData_tmp;
+//     for (; start_bak->next; start_bak = start_bak->next) {
+//         for (cur = start; cur->next; cur = cur->next) {     // 少写点代码，这里就牺牲点效率了
+//             if (cur->stat.project_total < cur->next->stat.project_total) {
+//                 // swap team
+//                 Team_tmp = cur->next->team;
+//                 cur->next->team = cur->team;
+//                 cur->team = Team_tmp;
+//                 // swap stat
+//                 TeamStatData_tmp = cur->next->stat;
+//                 cur->next->stat = cur->stat;
+//                 cur->stat = TeamStatData_tmp;
+//             }
+//         }
+//     }
+//     return start;
+// }
+
+TeamStatWrapper *orderTeamStatWrapperByPTRatio(TeamStatWrapper *start) {
     if (start == NULL) { return NULL; }
     TeamStatWrapper *start_bak = start;
     TeamStatWrapper *cur = start;
     Team *Team_tmp; TeamStatData TeamStatData_tmp;
     for (; start_bak->next; start_bak = start_bak->next) {
         for (cur = start; cur->next; cur = cur->next) {     // 少写点代码，这里就牺牲点效率了
-            if (cur->stat.project_total < cur->next->stat.project_total) {
+            if (((float)cur->stat.project_total / cur->team->data->teacher_num) < ((float)cur->next->stat.project_total / cur->next->team->data->teacher_num)) {
                 // swap team
                 Team_tmp = cur->next->team;
                 cur->next->team = cur->team;
@@ -691,6 +692,7 @@ TeamStatWrapper *orderTeamStatWrapperByProjectTotal(TeamStatWrapper *start) {
     }
     return start;
 }
+
 
     /**** CLEANUPs ****/
 
