@@ -71,7 +71,7 @@ DepartWrapper *getDepartByName(Depart *, Depart *, const char *);
  *  NOTE:   该函数会申请DepartWrapper占用空间，记得调用cleanupDepartWrapper()
  */
 
-DepartStatWrapper *buildDepartStatChainUnordered(Depart *start, Depart *end);
+DepartStatWrapper *buildDepartStatChainUnordered(Depart *start, Depart *end, int);
 DepartStatWrapper *orderDepartStatWrapperBySTRatio(DepartStatWrapper *start);
 DepartStatWrapper *orderDepartStatWrapperByProjectTotal(DepartStatWrapper *start);
 DepartStatWrapper *orderDepartStatWrapperByAvgFunding(DepartStatWrapper *start);
@@ -496,7 +496,7 @@ DepartWrapper *getDepartByName(Depart *start, Depart *end, const char *name) {
 }
 
 
-DepartStatWrapper *buildDepartStatChainUnordered(Depart *start, Depart *end) {
+DepartStatWrapper *buildDepartStatChainUnordered(Depart *start, Depart *end, int year) {
     DepartStatWrapper *unordered = (DepartStatWrapper *)malloc(sizeof(DepartStatWrapper));
     if (unordered == NULL) { return NULL; }
     if (start->data == NULL) {
@@ -508,6 +508,7 @@ DepartStatWrapper *buildDepartStatChainUnordered(Depart *start, Depart *end) {
     }
     // constructing unordered chain
     Depart *start_bak = start; DepartStatWrapper *unordered_bak = unordered;
+    char year_str[10];
     {
         unordered_bak->depart = start_bak; unordered_bak->next = NULL;
         unordered_bak->stat.student_num = 0; unordered_bak->stat.teacher_num = 0;
@@ -523,10 +524,12 @@ DepartStatWrapper *buildDepartStatChainUnordered(Depart *start, Depart *end) {
                     Project *child_project = child_team->child_project_head;
                     if (child_project != NULL) {
                         for (; child_project != child_team->child_project_tail->next; child_project = child_project->next) {
-                            unordered_bak->stat.project_total += 1;
-                            if (child_project->data->type == '1') { unordered_bak->stat.project_973 += 1; }
-                            if (child_project->data->type == '3') { unordered_bak->stat.project_973 += 1; }
-                            unordered_bak->stat.funding += child_project->data->funding;
+                            if (strstr(child_project->data->start_date, itoa(year, year_str, 10)) == 0 || year == 0) {
+                                unordered_bak->stat.project_total += 1;
+                                if (child_project->data->type == '1') { unordered_bak->stat.project_973 += 1; }
+                                if (child_project->data->type == '3') { unordered_bak->stat.project_973 += 1; }
+                                unordered_bak->stat.funding += child_project->data->funding;
+                            }
                         }
                     }
                 }
@@ -551,15 +554,16 @@ DepartStatWrapper *buildDepartStatChainUnordered(Depart *start, Depart *end) {
                 for (; child_team != start_bak->child_team_tail->next; child_team = child_team->next) {
                     unordered_bak->stat.student_num += child_team->data->student_num;
                     unordered_bak->stat.teacher_num += child_team->data->teacher_num;
-                    // printf("unordered_bak->stat.teacher_num = %d\n", unordered_bak->stat.teacher_num);
                     {   // project
                         Project *child_project = child_team->child_project_head;
                         if (child_project != NULL) {
                             for (; child_project != child_team->child_project_tail->next; child_project = child_project->next) {
-                                unordered_bak->stat.project_total += 1;
-                                if (child_project->data->type == '1') { unordered_bak->stat.project_973 += 1; }
-                                if (child_project->data->type == '3') { unordered_bak->stat.project_973 += 1; }
-                                unordered_bak->stat.funding += child_project->data->funding;
+                                if (strstr(child_project->data->start_date, itoa(year, year_str, 10)) == 0 || year == 0) {
+                                    unordered_bak->stat.project_total += 1;
+                                    if (child_project->data->type == '1') { unordered_bak->stat.project_973 += 1; }
+                                    if (child_project->data->type == '3') { unordered_bak->stat.project_973 += 1; }
+                                    unordered_bak->stat.funding += child_project->data->funding;
+                                }
                             }
                         }
                     }

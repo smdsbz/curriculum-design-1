@@ -61,7 +61,7 @@ void listDepartWrapper(DepartWrapper *head) {
 }
 
 void listDepartHRStat(void) {
-    DepartStatWrapper *rst = buildDepartStatChainUnordered(mp.depart_head, NULL);
+    DepartStatWrapper *rst = buildDepartStatChainUnordered(mp.depart_head, NULL, 0);
     if (rst == NULL) {
         puts("RUNTIME ERROR!");
         exit(-1);
@@ -82,7 +82,10 @@ void listDepartHRStat(void) {
 }
 
 void listDepartProjectStat(void) {
-    DepartStatWrapper *rst = buildDepartStatChainUnordered(mp.depart_head, NULL);
+    // TODO: specify year of search
+    printf("stat/project_overview::year (0 for all) > ");
+    int year; scanf("%d", &year);
+    DepartStatWrapper *rst = buildDepartStatChainUnordered(mp.depart_head, NULL, year);
     if (rst == NULL) {
         puts("RUNTIME ERROR!");
         exit(-1);
@@ -103,7 +106,7 @@ void listDepartProjectStat(void) {
 }
 
 void listDepartFundingStat(void) {
-    DepartStatWrapper *rst = buildDepartStatChainUnordered(mp.depart_head, NULL);
+    DepartStatWrapper *rst = buildDepartStatChainUnordered(mp.depart_head, NULL, 0);
     if (rst == NULL) {
         puts("RUNTIME ERROR!");
         exit(-1);

@@ -62,7 +62,7 @@ extern DepartWrapper *getDepartByName(Depart *, Depart *, const char *);
 //  *  RETN:   统计结果链挂载点
 //  */
 
-extern DepartStatWrapper *buildDepartStatChainUnordered(Depart *, Depart *);
+extern DepartStatWrapper *buildDepartStatChainUnordered(Depart *, Depart *, int);
 extern DepartStatWrapper *orderDepartStatWrapperBySTRatio(DepartStatWrapper *);
 extern DepartStatWrapper *orderDepartStatWrapperByProjectTotal(DepartStatWrapper *);
 extern DepartStatWrapper *orderDepartStatWrapperByAvgFunding(DepartStatWrapper *);
