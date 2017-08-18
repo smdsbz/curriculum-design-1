@@ -46,7 +46,8 @@ void listDepartWrapper(DepartWrapper *head) {
         puts("No record found!");
         return;
     }
-    puts("        Name            |    Manager    |    Telephone\n\
+    puts("\
+        Name            |    Manager    |    Telephone\n\
      -------------------|---------------|---------------");
     int num = 1;
     for (; head; head = head->next, ++num) {
@@ -66,7 +67,8 @@ void listDepartHRStat(void) {
         exit(-1);
     }
     rst = orderDepartStatWrapperBySTRatio(rst);
-    puts("        Name            |    Teachers   |    Students   |   S/T Ratio\n\
+    puts("\
+        Name            |    Teachers   |    Students   |   S/T Ratio\n\
      -------------------|---------------|---------------|---------------");
     DepartStatWrapper *head = rst; int counter = 1;
     for (; head; head = head->next, ++counter) {
@@ -100,7 +102,6 @@ void listDepartProjectStat(void) {
     putchar('\n');
 }
 
-
 void listTeamWrapper(TeamWrapper *head) {
     if (head == NULL) {
         puts("RUNTIME ERROR!");
@@ -110,7 +111,8 @@ void listTeamWrapper(TeamWrapper *head) {
         puts("No record found!");
         return;
     }
-    puts("        Name            |    Manager    |    Faculty\n\
+    puts("\
+        Name            |    Manager    |    Faculty\n\
      -------------------|---------------|---------------");
     int num = 1;
     for (; head; head = head->next, ++num) {
@@ -120,6 +122,29 @@ void listTeamWrapper(TeamWrapper *head) {
                head->team->data->faculty);
         // indent-fixer
     }
+    putchar('\n');
+}
+
+void listTeamNSFCProjectStat(void) {
+    TeamStatWrapper *rst = buildTeamStatChainUnordered(mp.team_head, NULL);
+    if (rst == NULL) {
+        puts("RUNTIME ERROR!");
+        exit(-1);
+    }
+    // TODO: order things up
+    puts("\
+        Name            |    NSFC Proj. |  Funding\n\
+     -------------------|---------------|---------------");
+    TeamStatWrapper *head = rst; int counter = 1;
+    for (; head; head = head->next, ++counter) {
+        // puts("here!!!");
+        printf("%4d  %-18s|  %-13d|  %.2f\n",
+               counter, head->team->data->name,
+               head->stat.project_NSFC,
+               head->stat.funding);
+        // indent-fixer
+    }
+    cleanupTeamStatWrapper(rst);
     putchar('\n');
 }
 
@@ -617,6 +642,7 @@ void selectStatItem(void) {
         switch (oper_code) {
             case 1: { listDepartHRStat(); return; }
             case 2: { listDepartProjectStat(); return; }
+            case 3: { listTeamNSFCProjectStat(); return; }
             case 0: { return; }
             default: { break; }
         }

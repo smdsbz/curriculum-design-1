@@ -58,6 +58,10 @@ extern TeamWrapper *getTeamByDepart(Depart *);
  *  RETN:   搜索结果挂载点 || NULL
  */
 
+    /**** Stat ****/
+
+extern TeamStatWrapper *buildTeamStatChainUnordered(Team *, Team *);
+
     /**** CLEANUPs ****/
 
 extern void cleanupTeamWrapper(TeamWrapper *start);
@@ -67,6 +71,8 @@ extern void cleanupTeamWrapper(TeamWrapper *start);
  *  NOTE:   每次搜完了记得调一次啊。。。
  *  NOTE:   调用后传进来的那个节点也没了！
  */
+
+extern void cleanupTeamStatWrapper(TeamStatWrapper *);
 
 extern void cleanupTeam(Team *start);
 /*  释放Team链所占用的内存空间

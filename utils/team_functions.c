@@ -571,6 +571,58 @@ TeamWrapper *getTeamByDepart(Depart *parent_depart) {
 }
 
 
+    /**** Stat ****/
+
+TeamStatWrapper *buildTeamStatChainUnordered(Team *start, Team *end) {
+    TeamStatWrapper *unordered = (TeamStatWrapper *)malloc(sizeof(TeamStatWrapper));
+    if (unordered == NULL) { return NULL; }
+    if (start->data == NULL) {
+        #if defined(DEBUG)
+        puts("[LOG] Error in getTeamOrderedByMasterTeacherRatio(): building with an empty chain");
+        #endif
+        unordered->team = NULL; unordered->next = NULL;
+        return unordered;
+    }
+    // constructing unordered chain
+    Team *start_bak = start; TeamStatWrapper *unordered_bak = unordered;
+    {
+        // TODO
+        unordered_bak->team = start_bak; unordered_bak->next = NULL;
+        unordered_bak->stat.project_total = 0; unordered_bak->stat.project_NSFC = 0;
+        unordered_bak->stat.funding = 0;
+        // Project
+        Project *child_project = start_bak->child_project_head;
+        if (child_project != NULL) {
+            for (; child_project != start_bak->child_project_tail->next; child_project = child_project->next) {
+                unordered_bak->stat.project_total += 1;
+                unordered_bak->stat.funding += child_project->data->funding;
+                if (child_project->data->type == '2') { unordered_bak->stat.project_NSFC += 1; }
+            }
+        }
+    }
+    for (start_bak = start_bak->next; start_bak != end; start_bak = start_bak->next) {
+        unordered_bak->next = (TeamStatWrapper *)malloc(sizeof(TeamStatWrapper));
+        if (unordered_bak->next == NULL) { return NULL; }
+        unordered_bak = unordered_bak->next;
+        {
+            unordered_bak->team = start_bak; unordered_bak->next = NULL;
+            unordered_bak->stat.project_total = 0; unordered_bak->stat.project_NSFC = 0;
+            unordered_bak->stat.funding = 0;
+            // Project
+            Project *child_project = start_bak->child_project_head;
+            if (child_project != NULL) {
+                for (; child_project != start_bak->child_project_tail->next; child_project = child_project->next) {
+                    unordered_bak->stat.project_total += 1;
+                    unordered_bak->stat.funding += child_project->data->funding;
+                    if (child_project->data->type == '2') { unordered_bak->stat.project_NSFC += 1; }
+                }
+            }
+        }
+    }
+    // start_bak = start; unordered_bak = unordered;
+    return unordered;
+}
+
 
     /**** CLEANUPs ****/
 
@@ -594,7 +646,25 @@ void cleanupTeamWrapper(TeamWrapper *prev) {
     return;
 }
 
-
+void cleanupTeamStatWrapper(TeamStatWrapper *prev) {
+    if (prev == NULL) {
+        #if defined(DEBUG)
+        puts("Nothing left to be cleaned");
+        #endif
+        return;
+    }
+    TeamStatWrapper *after = prev;
+    while (1) {
+        after = prev->next;
+        free(prev);
+        #if defined(BUILDING)
+        printf("[LOG] cleanupTeamWrapper(): freed 0x%p\n", prev);
+        #endif
+        prev = after;
+        if (prev == NULL) { break; }
+    }
+    return;
+}
 
 void cleanupTeam(Team *prev) {
     // puts("[LOG] cleanupTeam(): entered");

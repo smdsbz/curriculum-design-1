@@ -132,10 +132,6 @@ typedef struct _TeamData {
     #if defined(CHILD_COUNTER)
     int     project_num;    // 该团队所管理的项目总数
     #endif
-    // stat
-    // int     project_total;
-    // int     project_NSFC;
-    // float   funding;
 } TeamData;
 
 
@@ -160,6 +156,17 @@ typedef struct _TeamWrapper {
 } TeamWrapper;
 
 
+typedef struct _TeamStatData {
+    int     project_total;
+    int     project_NSFC;
+    float   funding;
+} TeamStatData;
+
+typedef struct _TeamStatWrapper {
+    struct _Team                *team;
+    struct _TeamStatData        stat;
+    struct _TeamStatWrapper     *next;
+} TeamStatWrapper;
 
     /**** Project ****/
 
