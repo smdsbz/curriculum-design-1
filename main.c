@@ -66,9 +66,9 @@ void listDepartHRStat(void) {
         puts("RUNTIME ERROR!");
         exit(-1);
     }
-    rst = orderDepartStatWrapperBySTRatio(rst);
+    orderDepartStatWrapperBySTRatio(rst);
     puts("\
-        Name            |    Teachers   |    Students   |   S/T Ratio\n\
+        Name            |    Teachers   |    Students   |    S/T Ratio\n\
      -------------------|---------------|---------------|---------------");
     DepartStatWrapper *head = rst; int counter = 1;
     for (; head; head = head->next, ++counter) {
@@ -87,9 +87,9 @@ void listDepartProjectStat(void) {
         puts("RUNTIME ERROR!");
         exit(-1);
     }
-    rst = orderDepartStatWrapperByProjectTotal(rst);
+    orderDepartStatWrapperByProjectTotal(rst);
     puts("\
-        Name            |    Projects   |    973 Proj.  |    863 Proj.  |  Funding\n\
+        Name            |    Projects   |    973 Proj.  |    863 Proj.  |    Funding\n\
      -------------------|---------------|---------------|---------------|---------------");
     DepartStatWrapper *head = rst; int counter = 1;
     for (; head; head = head->next, ++counter) {
@@ -125,23 +125,45 @@ void listTeamWrapper(TeamWrapper *head) {
     putchar('\n');
 }
 
-void listTeamNSFCProjectStat(void) {
+void listTeamNSFCProjectStat(void) {    // Top 10
     TeamStatWrapper *rst = buildTeamStatChainUnordered(mp.team_head, NULL);
     if (rst == NULL) {
         puts("RUNTIME ERROR!");
         exit(-1);
     }
-    rst = orderTeamStatWrapperByNSFCProject(rst);
+    orderTeamStatWrapperByNSFCProject(rst);
     puts("\
-        Name            |    NSFC Proj. |  Funding\n\
+        Name            |    NSFC Proj. |    Funding\n\
      -------------------|---------------|---------------");
     TeamStatWrapper *head = rst; int counter = 1;
-    for (; head; head = head->next, ++counter) {
-        // puts("here!!!");
+    for (; head && counter <= 10; head = head->next, ++counter) {
         printf("%4d  %-18s|  %-13d|  %.2f\n",
                counter, head->team->data->name,
                head->stat.project_NSFC,
                head->stat.funding);
+        // indent-fixer
+    }
+    cleanupTeamStatWrapper(rst);
+    putchar('\n');
+}
+
+void listTeamProjectStat(void) {
+    TeamStatWrapper *rst = buildTeamStatChainUnordered(mp.team_head, NULL);
+    if (rst == NULL) {
+        puts("RUNTIME ERROR!");
+        exit(-1);
+    }
+    orderTeamStatWrapperByProjectTotal(rst);
+    puts("\
+        Name            |    Teachers   |    Projects   |    P/T Ratio\n\
+     -------------------|---------------|---------------|---------------");
+    TeamStatWrapper *head = rst; int counter = 1;
+    for (; head && counter <= 5; head = head->next, ++counter) {
+        printf("%4d  %-18s|  %-13d|  %-13d|  %.2f\n",
+               counter, head->team->data->name,
+               head->team->data->teacher_num,
+               head->stat.project_total,
+               (float)head->team->data->teacher_num / head->stat.project_total);
         // indent-fixer
     }
     cleanupTeamStatWrapper(rst);
@@ -157,7 +179,8 @@ void listProjectWrapper(ProjectWrapper *head) {
         puts("No record found!");
         return;
     }
-    puts("        ID              |    Manager    |    Type\n\
+    puts("\
+        ID              |    Manager    |    Type\n\
      -------------------|---------------|---------------");
     int num = 1;
     char type_str[40];
@@ -643,6 +666,7 @@ void selectStatItem(void) {
             case 1: { listDepartHRStat(); return; }
             case 2: { listDepartProjectStat(); return; }
             case 3: { listTeamNSFCProjectStat(); return; }
+            case 4: { listTeamProjectStat(); return; }
             case 0: { return; }
             default: { break; }
         }

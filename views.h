@@ -33,6 +33,8 @@ extern void selectAddObjectType(void);
 extern void selectStatObject(void);
 extern void listDepartHRStat(void);
 extern void listDepartProjectStat(void);
+extern void listTeamNSFCProjectStat(void);
+extern void listTeamProjectStat(void);
 
 /******************************************************/
 
