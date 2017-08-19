@@ -72,10 +72,15 @@ void listDepartHRStat(void) {
      -------------------|---------------|---------------|---------------");
     DepartStatWrapper *head = rst; int counter = 1;
     for (; head; head = head->next, ++counter) {
-        printf("%4d  %-18s|  %-13d|  %-13d|  %-.2f\n",
+        printf("%4d  %-18s|  %-13d|  %-13d|  ",
                counter, head->depart->data->name, head->stat.teacher_num,
-               head->stat.student_num, head->stat.st_ratio);
+               head->stat.student_num);
         // indent-fixer
+        if (head->stat.teacher_num) {
+            printf("%.2f\n",
+                   (float)head->stat.student_num / head->stat.teacher_num);
+            // indent-fixer
+        } else { puts("---"); }
     }
     cleanupDepartStatWrapper(rst);
     putchar('\n');

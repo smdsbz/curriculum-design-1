@@ -539,9 +539,8 @@ DepartStatWrapper *buildDepartStatChainUnordered(Depart *start, Depart *end, int
                 }
             }
         }
-        if (unordered_bak->stat.teacher_num == 0) { unordered_bak->stat.st_ratio = 0; }
-        else {
-            unordered_bak->stat.st_ratio = (float)unordered->stat.student_num / unordered_bak->stat.teacher_num; }
+        // if (unordered_bak->stat.teacher_num == 0) { unordered_bak->stat.st_ratio = 0; }
+        // else { unordered_bak->stat.st_ratio = (float)unordered->stat.student_num / unordered_bak->stat.teacher_num; }
     }
     for (start_bak = start_bak->next; start_bak != end; start_bak = start_bak->next) {
         unordered_bak->next = (DepartStatWrapper *)malloc(sizeof(DepartStatWrapper));
@@ -573,9 +572,8 @@ DepartStatWrapper *buildDepartStatChainUnordered(Depart *start, Depart *end, int
                     }
                 }
             }
-            if (unordered_bak->stat.teacher_num == 0) { unordered_bak->stat.st_ratio = 0; }
-            else {
-                unordered_bak->stat.st_ratio = (float)unordered->stat.student_num / unordered_bak->stat.teacher_num; }
+            // if (unordered_bak->stat.teacher_num == 0) { unordered_bak->stat.st_ratio = 0; }
+            // else { unordered_bak->stat.st_ratio = (float)unordered->stat.student_num / unordered_bak->stat.teacher_num; }
         }
     }
     // start_bak = start; unordered_bak = unordered;
@@ -589,7 +587,7 @@ DepartStatWrapper *orderDepartStatWrapperBySTRatio(DepartStatWrapper *start) {
     Depart *Depart_tmp; DepartStatData DepartStatData_tmp;
     for (; start_bak->next; start_bak = start_bak->next) {
         for (cur = start; cur->next; cur = cur->next) {     // 少写点代码，这里就牺牲点效率了
-            if (cur->stat.st_ratio < cur->next->stat.st_ratio) {
+            if (((float)cur->stat.student_num / cur->stat.teacher_num) < ((float)cur->next->stat.student_num / cur->next->stat.teacher_num)) {
                 // swap depart
                 Depart_tmp = cur->next->depart;
                 cur->next->depart = cur->depart;

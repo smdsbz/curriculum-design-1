@@ -106,7 +106,7 @@ typedef struct _DepartWrapper {
 typedef struct _DepartStatData {
     int                         student_num;    // 该院系下学生总数
     int                         teacher_num;    // 该院系下教师总数
-    float                       st_ratio;       // 该院系学生/教师比例
+    // float                       st_ratio;       // 该院系学生/教师比例
     int                         project_total;
     int                         project_973;
     int                         project_863;
