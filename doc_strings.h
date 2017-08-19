@@ -71,6 +71,7 @@ char *DOC_TEAM = "Operations Available:\n\
      2) Modify\n\
      3) Delete\n\
      4) List projects\n\
+     5) Focus on parent department\n\
 ";
 
 char *DOC_TEAM_MODIFY = "Modify Attribute:\n\
@@ -85,6 +86,7 @@ char *DOC_PROJECT = "Operations Available:\n\
      1) List info\n\
      2) Modify\n\
      3) Delete\n\
+     4) Focus on parent team\n\
 ";
 
 char *DOC_PROJECT_MODIFY = "Modify Attribute:\n\

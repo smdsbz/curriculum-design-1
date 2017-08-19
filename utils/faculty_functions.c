@@ -308,6 +308,10 @@ int removeDepart(Depart **phead, Depart *target) {
         return 0;
     }
 
+    if (target->child_team_head) {
+        puts("The department you are deleting has affiliated teams!");
+        return 0;
+    }
 
     if (*phead == target) {     // 要删除的节点是头节点
         *phead = target->next;  // 头节点重新赋值

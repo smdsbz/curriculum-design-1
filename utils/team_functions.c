@@ -362,12 +362,12 @@ int removeTeam(Team **phead, Team *tgt) {
         return 0;
     }
     // TODO: 注销该组的时候，同时注销该组运营的所有项目
-    if (tgt->child_project_head
-            || tgt->child_project_tail) {
+    if (tgt->child_project_head) {
         // 该组有正在运行的项目，删除会导致项目信息失效
         #if defined(DEBUG)
         puts("[LOG] Error in removeTeam():\n\tteam has working porjects, can't move");
         #endif
+        puts("The team you are deleting has affiliated projects!");
         return 0;
     }
 

@@ -447,9 +447,10 @@ void selectDepartOperation(void) {
             case 1: { listDepartAttr(); break; }
             case 2: { selectDepartModifyAttr(); break; }
             case 3: {
-                removeDepart(&(mp.depart_head), (Depart *)cursor.val);
-                cursor.type = 0; cursor.val = NULL;
-                return;
+                if (removeDepart(&(mp.depart_head), (Depart *)cursor.val)) {
+                    cursor.type = 0; cursor.val = NULL;
+                    return;
+                } else { break; }
             }
             case 4: { listDepartChildTeam(); return; }
             case 0: {
@@ -471,11 +472,17 @@ void selectTeamOperation(void) {
             case 1: { listTeamAttr(); break; }
             case 2: { selectTeamModifyAttr(); break; }
             case 3: {
-                removeTeam(&(mp.team_head), (Team *)cursor.val);
-                cursor.type = 0; cursor.val = NULL;
-                return;
+                if (removeTeam(&(mp.team_head), (Team *)cursor.val)) {
+                    cursor.type = 0; cursor.val = NULL;
+                    return;
+                } else { break; }
             }
             case 4: { listTeamChildProject(); return; }
+            case 5: {
+                cursor.type = 1;
+                cursor.val = ((Team *)cursor.val)->parent_depart;
+                return;
+            }
             case 0: {
                 cursor.type = 0; cursor.val = NULL;
                 return;
@@ -495,8 +502,14 @@ void selectProjectOperation(void) {
             case 1: { listProjectAttr(); break; }
             case 2: { selectProjectModifyAttr(); break; }
             case 3: {
-                removeProject(&(mp.project_head), (Project *)cursor.val);
-                cursor.type = 0; cursor.val = NULL;
+                if (removeProject(&(mp.project_head), (Project *)cursor.val)) {
+                    cursor.type = 0; cursor.val = NULL;
+                    return;
+                } else { break; }
+            }
+            case 4: {
+                cursor.type = 2;
+                cursor.val = ((Project *)cursor.val)->parent_team;
                 return;
             }
             case 0: {
@@ -718,7 +731,7 @@ int main(int argc, char const *argv[]) {
     } else if (argc == 2) {
         strcpy(TGT_PATH, argv[1]);
         printf("Loading data from folder \"%s\"...\n", TGT_PATH);
-    }
+    } else { puts("Too many arguments!"); exit(0); }
 
     // loading data
     mp = loadData(TGT_PATH);
@@ -787,6 +800,10 @@ int main(int argc, char const *argv[]) {
                             puts("Seems like some unexpected happened while saving...");
                             puts("GG! MY FRIEND!!!");
                         }
+                        // cleanups
+                        cleanupDepart(mp.depart_head);
+                        cleanupTeam(mp.team_head);
+                        cleanupProject(mp.project_head);
                         puts("exit");
                         return 0;
                     }
