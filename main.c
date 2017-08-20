@@ -567,7 +567,7 @@ void listProjectAttr(void) {
      ------------|-------------------");
     printf("\
       ID         |  %s\n", tgt->data->id);
-    char type_str[20] = {'\0'};
+    char type_str[30] = {'\0'};
     printf("\
       Type       |  %s\n", parseTypeCodeToString(type_str, tgt->data->type));
     printf("\

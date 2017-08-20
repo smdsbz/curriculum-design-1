@@ -113,9 +113,20 @@ ProjectData initProjectData(void) {
     ProjectData Manhatan;
     Manhatan.type = '\0';
     printf("add/project::id > "); scanf("%s", Manhatan.id);
-    printf("add/project::type > ");
-    do {scanf("%c", &(Manhatan.type)); }
-    while (Manhatan.type < '1' || Manhatan.type > '5');
+    printf("\
+add/project::type \n\
+    1 - 973\n\
+    2 - NSFC\n\
+    3 - 863\n\
+    4 - International\n\
+    5 - Transverse\n\
+> ");
+    // do { scanf("%c", &(Manhatan.type)); }
+    // while (Manhatan.type < '1' || Manhatan.type > '5');
+    int type_dec;
+    do { scanf("%d", &type_dec); }
+    while (type_dec < 1 || type_dec > 5);
+    Manhatan.type = type_dec + '0';
     printf("add/project::start_date > "); scanf("%s", Manhatan.start_date);
     printf("add/project::funding > "); scanf("%f", &(Manhatan.funding));
     printf("add/project::manager > "); scanf("%s", Manhatan.manager);
