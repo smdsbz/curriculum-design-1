@@ -406,10 +406,6 @@ int removeTeam(Team **phead, Team *tgt) {
     /**** SELECT ****/
 
 TeamWrapper *getTeamByTeacherNum(Team *start, Team *end, const Where cond) {
-    // (auto-indent fixer)
-    // TeamWrapper中会有多个结果
-
-    // NOTE: 传进来的 start 只是别名，不要求有指向
     TeamWrapper *rtn = (TeamWrapper *)malloc(sizeof(TeamWrapper));
     if (rtn == NULL) {
         #if defined(DEBUG)
