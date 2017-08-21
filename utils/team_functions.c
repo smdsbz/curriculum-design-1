@@ -430,7 +430,7 @@ TeamWrapper *getTeamByTeacherNum(Team *start, Team *end, const Where cond) {
         #if defined(DEBUG)
         puts("[LOG] Error in getTeamByTeacherNum():\n\tunrecoginized condition");
         #endif
-        puts("Undefined query direction %s!", cond.direction);
+        printf("Undefined query direction %s!\n", cond.direction);
         return NULL;
     }
     // #if defined(BUILDING)
