@@ -513,7 +513,60 @@ DepartStatWrapper *buildDepartStatChainUnordered(Depart *start, Depart *end, int
     // constructing unordered chain
     Depart *start_bak = start; DepartStatWrapper *unordered_bak = unordered;
     char year_str[10];
-    {
+    // do-while
+    unordered_bak->depart = start_bak; unordered_bak->next = NULL;
+    unordered_bak->stat.student_num = 0; unordered_bak->stat.teacher_num = 0;
+    unordered_bak->stat.project_total = 0; unordered_bak->stat.project_973 = 0;
+    unordered_bak->stat.project_863 = 0; unordered_bak->stat.funding = 0;
+    // Team
+    Team *child_team = start_bak->child_team_head;
+    if (child_team != NULL) {
+        for (; child_team != start_bak->child_team_tail->next;
+               child_team = child_team->next) {
+            unordered_bak->stat.student_num += child_team->data->student_num;
+            unordered_bak->stat.teacher_num += child_team->data->teacher_num;
+            // Project
+            Project *child_project = child_team->child_project_head;
+            if (child_project != NULL) {
+                for (; child_project != child_team->child_project_tail->next;
+                       child_project = child_project->next) {
+                    if ((strstr(child_project->data->start_date,
+                                itoa(year, year_str, 10)) != NULL)
+                            || year == 0) {
+                        // 由于标识时间的字符串位数不多，所以直接判断输入年份是不是字串就行了
+                        unordered_bak->stat.project_total += 1;
+                        if (child_project->data->type == '1')
+                        { unordered_bak->stat.project_973 += 1; }
+                        if (child_project->data->type == '3')
+                        { unordered_bak->stat.project_973 += 1; }
+                        unordered_bak->stat.funding += child_project->data->funding;
+                    }
+                }
+            }
+        }
+    }
+    // 计算学生/教师人数比
+    if (unordered_bak->stat.teacher_num == 0)
+        { unordered_bak->stat.st_ratio = -1; }
+    else {
+        unordered_bak->stat.st_ratio = \
+            (float)unordered_bak->stat.student_num \
+            / unordered_bak->stat.teacher_num;
+    }
+    // 计算项目平均经费
+    if (unordered_bak->stat.project_total == 0)
+        { unordered_bak->stat.avg_funding = -1; }
+    else {
+        unordered_bak->stat.avg_funding = \
+            unordered_bak->stat.funding \
+            / unordered_bak->stat.project_total;
+    }
+    // do-while
+    for (start_bak = start_bak->next; start_bak != end; start_bak = start_bak->next) {
+        unordered_bak->next = (DepartStatWrapper *)malloc(sizeof(DepartStatWrapper));
+        if (unordered_bak->next == NULL) { return NULL; }
+        unordered_bak = unordered_bak->next;
+        // do-while
         unordered_bak->depart = start_bak; unordered_bak->next = NULL;
         unordered_bak->stat.student_num = 0; unordered_bak->stat.teacher_num = 0;
         unordered_bak->stat.project_total = 0; unordered_bak->stat.project_973 = 0;
@@ -521,60 +574,47 @@ DepartStatWrapper *buildDepartStatChainUnordered(Depart *start, Depart *end, int
         // Team
         Team *child_team = start_bak->child_team_head;
         if (child_team != NULL) {
-            for (; child_team != start_bak->child_team_tail->next; child_team = child_team->next) {
+            for (; child_team != start_bak->child_team_tail->next;
+                   child_team = child_team->next) {
                 unordered_bak->stat.student_num += child_team->data->student_num;
                 unordered_bak->stat.teacher_num += child_team->data->teacher_num;
-                {   // project
-                    Project *child_project = child_team->child_project_head;
-                    if (child_project != NULL) {
-                        for (; child_project != child_team->child_project_tail->next; child_project = child_project->next) {
-                            if (strstr(child_project->data->start_date, itoa(year, year_str, 10)) != NULL || year == 0) {   // 由于标识时间的字符串位数不多，所以直接判断输入年份是不是字串就行了
-                                unordered_bak->stat.project_total += 1;
-                                if (child_project->data->type == '1') { unordered_bak->stat.project_973 += 1; }
-                                if (child_project->data->type == '3') { unordered_bak->stat.project_973 += 1; }
-                                unordered_bak->stat.funding += child_project->data->funding;
-                            }
+                // Project
+                Project *child_project = child_team->child_project_head;
+                if (child_project != NULL) {
+                    for (; child_project != child_team->child_project_tail->next;
+                           child_project = child_project->next) {
+                        if ((strstr(child_project->data->start_date,
+                                    itoa(year, year_str, 10)) != NULL)
+                                || year == 0) {
+                            // 由于标识时间的字符串位数不多，所以直接判断输入年份是不是字串就行了
+                            unordered_bak->stat.project_total += 1;
+                            if (child_project->data->type == '1')
+                            { unordered_bak->stat.project_973 += 1; }
+                            if (child_project->data->type == '3')
+                            { unordered_bak->stat.project_973 += 1; }
+                            unordered_bak->stat.funding += child_project->data->funding;
                         }
                     }
                 }
             }
         }
-        // if (unordered_bak->stat.teacher_num == 0) { unordered_bak->stat.st_ratio = 0; }
-        // else { unordered_bak->stat.st_ratio = (float)unordered->stat.student_num / unordered_bak->stat.teacher_num; }
-    }
-    for (start_bak = start_bak->next; start_bak != end; start_bak = start_bak->next) {
-        unordered_bak->next = (DepartStatWrapper *)malloc(sizeof(DepartStatWrapper));
-        if (unordered_bak->next == NULL) { return NULL; }
-        unordered_bak = unordered_bak->next;
-        {
-            unordered_bak->depart = start_bak; unordered_bak->next = NULL;
-            unordered_bak->stat.student_num = 0; unordered_bak->stat.teacher_num = 0;
-            unordered_bak->stat.project_total = 0; unordered_bak->stat.project_973 = 0;
-            unordered_bak->stat.project_863 = 0; unordered_bak->stat.funding = 0;
-            // Team
-            Team *child_team = start_bak->child_team_head;
-            if (child_team != NULL) {
-                for (; child_team != start_bak->child_team_tail->next; child_team = child_team->next) {
-                    unordered_bak->stat.student_num += child_team->data->student_num;
-                    unordered_bak->stat.teacher_num += child_team->data->teacher_num;
-                    {   // project
-                        Project *child_project = child_team->child_project_head;
-                        if (child_project != NULL) {
-                            for (; child_project != child_team->child_project_tail->next; child_project = child_project->next) {
-                                if (strstr(child_project->data->start_date, itoa(year, year_str, 10)) != NULL || year == 0) {
-                                    unordered_bak->stat.project_total += 1;
-                                    if (child_project->data->type == '1') { unordered_bak->stat.project_973 += 1; }
-                                    if (child_project->data->type == '3') { unordered_bak->stat.project_973 += 1; }
-                                    unordered_bak->stat.funding += child_project->data->funding;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            // if (unordered_bak->stat.teacher_num == 0) { unordered_bak->stat.st_ratio = 0; }
-            // else { unordered_bak->stat.st_ratio = (float)unordered->stat.student_num / unordered_bak->stat.teacher_num; }
+        // 计算学生/教师人数比
+        if (unordered_bak->stat.teacher_num == 0)
+            { unordered_bak->stat.st_ratio = -1; }
+        else {
+            unordered_bak->stat.st_ratio = \
+                (float)unordered_bak->stat.student_num \
+                / unordered_bak->stat.teacher_num;
         }
+        // 计算项目平均经费
+        if (unordered_bak->stat.project_total == 0)
+            { unordered_bak->stat.avg_funding = -1; }
+        else {
+            unordered_bak->stat.avg_funding = \
+                unordered_bak->stat.funding \
+                / unordered_bak->stat.project_total;
+        }
+        // do-while
     }
     // start_bak = start; unordered_bak = unordered;
     return unordered;
@@ -586,8 +626,9 @@ DepartStatWrapper *orderDepartStatWrapperBySTRatio(DepartStatWrapper *start) {
     DepartStatWrapper *cur = start;
     Depart *Depart_tmp; DepartStatData DepartStatData_tmp;
     for (; start_bak->next; start_bak = start_bak->next) {
-        for (cur = start; cur->next; cur = cur->next) {     // 少写点代码，这里就牺牲点效率了
-            if (((float)cur->stat.student_num / cur->stat.teacher_num) < ((float)cur->next->stat.student_num / cur->next->stat.teacher_num)) {
+        for (cur = start; cur->next; cur = cur->next) {
+            // 少写点代码，这里就牺牲点效率了
+            if (cur->stat.st_ratio < cur->next->stat.st_ratio) {
                 // swap depart
                 Depart_tmp = cur->next->depart;
                 cur->next->depart = cur->depart;

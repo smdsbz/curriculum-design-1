@@ -572,40 +572,54 @@ TeamStatWrapper *buildTeamStatChainUnordered(Team *start, Team *end, char NSFC_f
     }
     // constructing unordered chain
     Team *start_bak = start; TeamStatWrapper *unordered_bak = unordered;
-    {
-        unordered_bak->team = start_bak; unordered_bak->next = NULL;
-        unordered_bak->stat.project_total = 0; unordered_bak->stat.project_NSFC = 0;
-        unordered_bak->stat.funding = 0;
-        // Project
-        Project *child_project = start_bak->child_project_head;
-        if (child_project != NULL) {
-            for (; child_project != start_bak->child_project_tail->next; child_project = child_project->next) {
-                unordered_bak->stat.project_total += 1;
-                if ((!NSFC_flag) || (NSFC_flag && child_project->data->type=='2'))
-                    { unordered_bak->stat.funding += child_project->data->funding; }
-                if (child_project->data->type == '2') { unordered_bak->stat.project_NSFC += 1; }
-            }
+    // do-while
+    unordered_bak->team = start_bak; unordered_bak->next = NULL;
+    unordered_bak->stat.project_total = 0;
+    unordered_bak->stat.project_NSFC = 0;
+    unordered_bak->stat.funding = 0;
+    // Project
+    Project *child_project = start_bak->child_project_head;
+    if (child_project != NULL) {
+        for (; child_project != start_bak->child_project_tail->next;
+               child_project = child_project->next) {
+            unordered_bak->stat.project_total += 1;
+            if ((!NSFC_flag) || (NSFC_flag && child_project->data->type=='2'))
+            { unordered_bak->stat.funding += child_project->data->funding; }
+            if (child_project->data->type == '2') { unordered_bak->stat.project_NSFC += 1; }
         }
     }
+    if (unordered_bak->team->data->teacher_num) {
+        unordered_bak->stat.pt_ratio = \
+            (float)unordered_bak->stat.project_total \
+                / unordered_bak->team->data->teacher_num;
+    } else { unordered_bak->stat.pt_ratio = -1; }
+    // do-while
     for (start_bak = start_bak->next; start_bak != end; start_bak = start_bak->next) {
         unordered_bak->next = (TeamStatWrapper *)malloc(sizeof(TeamStatWrapper));
         if (unordered_bak->next == NULL) { return NULL; }
         unordered_bak = unordered_bak->next;
-        {
-            unordered_bak->team = start_bak; unordered_bak->next = NULL;
-            unordered_bak->stat.project_total = 0; unordered_bak->stat.project_NSFC = 0;
-            unordered_bak->stat.funding = 0;
-            // Project
-            Project *child_project = start_bak->child_project_head;
-            if (child_project != NULL) {
-                for (; child_project != start_bak->child_project_tail->next; child_project = child_project->next) {
-                    unordered_bak->stat.project_total += 1;
-                    if ((!NSFC_flag) || (NSFC_flag && child_project->data->type=='2'))
-                        { unordered_bak->stat.funding += child_project->data->funding; }
-                    if (child_project->data->type == '2') { unordered_bak->stat.project_NSFC += 1; }
-                }
+        // do-while
+        unordered_bak->team = start_bak; unordered_bak->next = NULL;
+        unordered_bak->stat.project_total = 0;
+        unordered_bak->stat.project_NSFC = 0;
+        unordered_bak->stat.funding = 0;
+        // Project
+        Project *child_project = start_bak->child_project_head;
+        if (child_project != NULL) {
+            for (; child_project != start_bak->child_project_tail->next;
+                   child_project = child_project->next) {
+                unordered_bak->stat.project_total += 1;
+                if ((!NSFC_flag) || (NSFC_flag && child_project->data->type=='2'))
+                { unordered_bak->stat.funding += child_project->data->funding; }
+                if (child_project->data->type == '2') { unordered_bak->stat.project_NSFC += 1; }
             }
         }
+        if (unordered_bak->team->data->teacher_num) {
+            unordered_bak->stat.pt_ratio = \
+                (float)unordered_bak->stat.project_total \
+                    / unordered_bak->team->data->teacher_num;
+        } else { unordered_bak->stat.pt_ratio = -1; }
+        // do-while
     }
     // start_bak = start; unordered_bak = unordered;
     return unordered;
@@ -640,8 +654,7 @@ TeamStatWrapper *orderTeamStatWrapperByPTRatio(TeamStatWrapper *start) {
     Team *Team_tmp; TeamStatData TeamStatData_tmp;
     for (; start_bak->next; start_bak = start_bak->next) {
         for (cur = start; cur->next; cur = cur->next) {     // 少写点代码，这里就牺牲点效率了
-            // if (cur->stat.project_total < cur->next->stat.project_total) {
-            if (((float)cur->stat.project_total / cur->team->data->teacher_num) < ((float)cur->next->stat.project_total / cur->next->team->data->teacher_num)) {
+            if (cur->stat.pt_ratio < cur->next->stat.pt_ratio) {
                 // swap team
                 Team_tmp = cur->next->team;
                 cur->next->team = cur->team;

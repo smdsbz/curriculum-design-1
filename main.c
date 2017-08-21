@@ -97,8 +97,7 @@ void listDepartHRStat(void) {
                counter, head->depart->data->name, head->stat.teacher_num,
                head->stat.student_num);
         if (head->stat.teacher_num) {   // 除数可能是零
-            printf("%.2f\n",
-                   (float)head->stat.student_num / head->stat.teacher_num);
+            printf("%.2f\n", head->stat.st_ratio);
         } else { puts("---"); }
     }
     // 释放统计结果所占用的内存空间
@@ -152,8 +151,7 @@ void listDepartFundingStat(void) {
                head->stat.project_total,
                head->stat.funding);
         if (head->stat.project_total) {     // 除数可能为零
-            printf("%.2f\n",
-                   (float)head->stat.funding / head->stat.project_total);
+            printf("%.2f\n", head->stat.avg_funding);
         } else {
             puts("---");
         }
@@ -223,11 +221,13 @@ void listTeamProjectStat(void) {
      -------------------|---------------|---------------|---------------");
     TeamStatWrapper *head = rst; int counter = 1;
     for (; head && counter <= 5; head = head->next, ++counter) {
-        printf("%4d  %-18s|  %-13d|  %-13d|  %.2f\n",
+        printf("%4d  %-18s|  %-13d|  %-13d|  ",
                counter, head->team->data->name,
                head->team->data->teacher_num,
-               head->stat.project_total,
-               (float)head->stat.project_total / head->team->data->teacher_num);
+               head->stat.project_total);
+        if (head->team->data->teacher_num) {
+            printf("%.2f\n", head->stat.pt_ratio);
+        } else { puts("---"); }
     }
     cleanupTeamStatWrapper(rst);
     putchar('\n');
@@ -900,9 +900,9 @@ int main(int argc, char const *argv[]) {
             }
             case 1: { selectDepartOperation(); break; }     // 院系层
             case 2: { selectTeamOperation(); break; }       // 团队层
-            case 3: { selectProjectOperation(); break; }    // 项目曾
+            case 3: { selectProjectOperation(); break; }    // 项目层
             // 指向错误的层级 - 直接退出，不做内存清理
-            default: { printf("ERR > exit"); return; }
+            default: { printf("ERR > exit"); return -1; }
         }
     }
 }

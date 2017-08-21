@@ -65,6 +65,34 @@ _(院系负责人、科研团队不同名)_
 
 -------------------------------------------------------------
 
+## File Structure
+
+```
+./PROGRAM_ROOT
+    +-- utils/
+    |   +-- data/                   // 测试用数据文件夹
+    |   |   +-- DEPART.DAT
+    |   |   +-- TEAM.DAT
+    |   |   +-- PROJECT.DAT
+    |   +-- __init__.h              // 所有数据处理函数的申明
+    |   +-- data_structure.h        // 数据结构
+    |   +-- faculty_functions.h     // 院系函数
+    |   +-- faculty_functions.c
+    |   +-- team_functions.h        // 团队函数
+    |   +-- team_functions.c
+    |   +-- project_functions.h     // 项目函数
+    |   +-- project_functions.c
+    |   +-- io_functions.h          // 数据载入、存储函数
+    |   +-- io_functions.c
+    |   +-- makefile                // 单元测试用
+    +-- doc_strings.h               // 用户帮助提示
+    +-- views.h                     // 视图函数申明
+    +-- main.c                      // 编译起点
+    +-- makefile                    // 完整编译用
+```
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 ## User Manual
 
 ### Cookbook
