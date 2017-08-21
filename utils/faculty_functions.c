@@ -1,3 +1,7 @@
+/*  $PROGRAM_ROOT/utils/faculty_functions.c
+ *  院系方法定义与实现
+ */
+
 #ifndef DATA_STRUCTURE
 #include "data_structure.h"
 #endif
@@ -10,102 +14,37 @@
 #ifdef DEBUG
 #undef DEBUG
 #endif
+// 解注释以查看DEBUG信息
 // #define DEBUG
 
-
-
-
-
 /************ Declaration ************/
-
+// 函数调用说明见头文件
     /**** POST | DELETE | PUT ****/
-
 Depart *appendDepart(Depart *head, DepartData new_one);
-/*  录入院系
- *  ARGS:   链表头，已有数据的作为buffer的DepartData实例
- *  RETN:   新增节点的地址
- */
-
 int modifyDepart(Depart *target, DepartData new_one);
-/*  修改院系信息
- *  ARGS:   目标地址，已经修改数据的buffer
- *  RETN:   success code
- */
-
 int removeDepart(Depart **phead, Depart *target);
-/*  删除院系节点
- *  ARGS:   指向院系链表头节点地址的指针，目标地址 | NULL
- *  RETN:   success code
- */
-
 DepartData initDepartData(void);
-/*  创建一个院系数据的原型
- *  ARGS:   void
- *  RETN:   根据在该函数执行过程中输入的数据所创建出来的原型
- *  NOTE:   will trigger input action
- */
-
 Depart *createDepartHead(void);
-/*  创建并初始化头节点
- *  ARGS:   void
- *  RETN:   头节点地址 || NULL
- */
-
-
     /**** SELECT ****/
-
 DepartWrapper *getDepartByManager(Depart *, Depart *, const char *);
-/*  通过负责人姓名查找院系
- *  ARGS:   院系链表，搜索结束点，院系负责人 char[12]
- *  RETN:   搜索结果挂载点 | NULL （没有结果时也返回挂载点地址）
- *  NOTE:   院系负责人不同名，返回的是一个院系的数据，或者也可以像下面的这个函数一样，返回结果链
- *  NOTE:   只能在院系链有数据的情况下调用该函数！
- *  NOTE:   该函数会申请DepartWrapper占用空间，记得调用cleanupDepartWrapper()
- */
-
 DepartWrapper *getDepartByName(Depart *, Depart *, const char *);
-/*  通过院系名称查找院系
- *  ARGS:   院系链表，搜索结束点，名称线索（不一定是全称）
- *  RETN:   搜索结果挂载点 | NULL
- *  NOTE:   由于查找结果可能不只有一个，该操作会创建一个用于储存查询结果的新链表，返回链表的头节点地址
- *  NOTE:   该函数会申请DepartWrapper占用空间，记得调用cleanupDepartWrapper()
- */
-
 DepartStatWrapper *buildDepartStatChainUnordered(Depart *start, Depart *end, int);
 DepartStatWrapper *orderDepartStatWrapperBySTRatio(DepartStatWrapper *start);
 DepartStatWrapper *orderDepartStatWrapperByProjectTotal(DepartStatWrapper *start);
 DepartStatWrapper *orderDepartStatWrapperByAvgFunding(DepartStatWrapper *start);
-
 Depart *getPrevDepart(Depart *cur, Depart *head);
-/*  获得当前院系节点的前一个节点
- *  ARGS:   当前节点，院系链表头
- *  RETN:   前一个节点 || NULL
- */
-
     /**** CLEANUPs ****/
-
 void cleanupDepartWrapper(DepartWrapper *start);
-/*  清空搜索结果序列
- *  ARGS:   头节点地址
- *  RETN:   void
- *  NOTE:   每次搜完了记得调一次啊。。。
- *  NOTE:   调用后传进来的那个节点也没了！
- */
-
 void cleanupDepart(Depart *start);
-/*  释放Depart链所占用的内存空间
- *  ARGS:   头节点地址
- *  RETN:   void
- */
 
-
-
-
-#if defined(BUILDING)
 /*********** Unit Test **************/
+#if defined(BUILDING)
 
 void printDepartToConsole(Depart *Comp) {
-    /* 向终端打印院系信息 */
+/*  向终端打印院系信息
+ *  ARGS:   院系链表头
+ *  RETN:   void
+ */
     printf("<Department @ 0x%p>\n", Comp);
     printf("\tthis.name = %s\n", Comp->data->name);
     printf("\tthis.manager = %s\n", Comp->data->manager);
@@ -119,6 +58,10 @@ void printDepartToConsole(Depart *Comp) {
 }
 
 void printDepartWrapperToConsole(DepartWrapper *head) {
+/*  向终端打印院系搜索结果
+ *  ARGS:   院系搜索结果链表头
+ *  RETN:   void
+ */
     printf("<DepartWrapper @ 0x%p>\n", head);
     int counter = 0;
     while (head->depart != NULL) {
@@ -131,58 +74,41 @@ void printDepartWrapperToConsole(DepartWrapper *head) {
     putchar('\n'); putchar('\n');
 }
 
-
-
+// 单元测试
 void main(void) {
     Depart *HEAD = createDepartHead();
-
     // first node creation demo
-    // modifyDepart(HEAD, initDepartData());   // 向第一节点写入数据用modify
     appendDepart(HEAD, initDepartData());
     printDepartToConsole(HEAD);
-
     // second node creation demo
-    appendDepart(HEAD, initDepartData());   // 第一个节点的数据已经初始化了，则用添加节点
+    appendDepart(HEAD, initDepartData());
     printDepartToConsole(HEAD->next);
-
     // query demo
     auto char buf[40] = {'\0'};
-
     printf("search by manager: "); scanf("%s", buf);
     DepartWrapper *RST_LIST = getDepartByManager(HEAD, NULL, buf);
     printDepartWrapperToConsole(RST_LIST);
-        // NOTE: DON'T FORGET THIS!!!
     cleanupDepartWrapper(RST_LIST);
-        // NOTE: RST_LIST在清理之后也free掉了，需要重新申请搜索结果挂载点
-
     // search demo
     printf("search by name: "); scanf("%s", buf);
     RST_LIST = getDepartByName(HEAD, NULL, buf);
     printDepartWrapperToConsole(RST_LIST);
     cleanupDepartWrapper(RST_LIST);
-
     // remove demo
     puts("removing HEAD->next");
     removeDepart(&HEAD, HEAD->next);
     printDepartToConsole(HEAD);
-
-    // simple cleanup
-    // HACK: cleanupDepart() to simplify this process
+    // end of test
     free(HEAD->next);
     free(HEAD);
 }
 #endif
 
-
-
-
-
-
-
 /*************** Function Realizations ***************/
 
     /**** POST | DELETE | PUT ****/
 
+/* 创建并初始化头节点 */
 Depart *createDepartHead(void) {
     Depart *HEAD = (Depart *)malloc(sizeof(Depart));
     if (HEAD == NULL) {
@@ -191,13 +117,12 @@ Depart *createDepartHead(void) {
         #endif
         return NULL;
     }
-    // NOTE: 创建完头节点后记得初始化！！！
     HEAD->data = NULL; HEAD->next = NULL;
     HEAD->child_team_head = NULL; HEAD->child_team_tail = NULL;
     return HEAD;
 }
 
-
+/* 创建院系数据模板 */
 DepartData initDepartData(void) {
     DepartData Computer;
     printf("add/depart::name > "); scanf("%s", Computer.name);
@@ -209,34 +134,27 @@ DepartData initDepartData(void) {
     return Computer;
 }
 
-
-
-
+/* 添加院系数据 */
 Depart *appendDepart(Depart *head, DepartData new_one) {
-    DepartWrapper *depart_wrapper = getDepartByName(head, NULL, new_one.name);
+    // 检查是否已经有同名的院系存在
+    DepartWrapper *depart_wrapper = \
+        getDepartByName(head, NULL, new_one.name);
     if (depart_wrapper->depart != NULL) {
+        // NOTE: 这里实际上不是同名
+        // 若已经有Computer，则Comp也会在这里被拦截
         printf("Record for %s department already exists!\n", new_one.name);
         cleanupDepartWrapper(depart_wrapper);
         return NULL;
     }
     cleanupDepartWrapper(depart_wrapper);
-
+    // 获取院系链表尾节点
     Depart *tail = head;
     for (; tail->next; tail = tail->next) ;
-
-    // /* 错误处理：传入的节点地址不是最后一个节点的地址，防止数据丢失 */
-    // if (tail->next != NULL) {
-    //     #if defined(DEBUG)
-    //     puts("[LOG] Error in appendDepart():\n\ttail.next not pointing to NULL");
-    //     #endif
-    //     return NULL;
-    // }
-
-    /* 最后一个节点就是头节点，前面没了 - a brand-new chain */
-    if (head == tail
-            && tail->data == NULL) {
+    // 开始添加数据
+    // case 1 - 院系链表此时还没有任何记录
+    if (head == tail && tail->data == NULL) {
         // 只需要修改头节点的数据域
-        // NOTE: 此时头节点的数据域应该还没有创建
+        // NOTE: 此时头节点的数据域还没有内存空间
         tail->data = (DepartData *)malloc(sizeof(DepartData));
         if (tail->data == NULL) {
             #if defined(DEBUG)
@@ -244,20 +162,22 @@ Depart *appendDepart(Depart *head, DepartData new_one) {
             #endif
             return NULL;
         }
-        *(tail->data) = new_one;
-        tail->next = NULL; tail->child_team_head = NULL; tail->child_team_tail = NULL;
-        return tail;
+        // 院系数据赋值
+        *(tail->data) = new_one; tail->next = NULL;
+        tail->child_team_head = NULL; tail->child_team_tail = NULL;
+        return tail;    // 返回新添加的节点
     }
-
-    /* 一般意义上的最后一个节点 */
-    tail->next = (Depart *)malloc(sizeof(Depart));   // 在尾部链接新节点
-    if (tail->next == NULL) {    // 内存空间申请失败
+    // else { case 2 - 院系链表非空 }
+    // 在尾部链接新节点
+    // 为新节点申请内存空间
+    tail->next = (Depart *)malloc(sizeof(Depart));
+    if (tail->next == NULL) {
         #if defined(DEBUG)
         puts("[LOG] Error in appendDepart():\n\tfailed to alloc memory for container");
         #endif
         return NULL;
     }
-
+    // 为新节点的数据域申请内存空间
     tail->next->data = (DepartData *)malloc(sizeof(DepartData));
     if (tail->next->data == NULL) {
         #if defined(DEBUG)
@@ -265,77 +185,58 @@ Depart *appendDepart(Depart *head, DepartData new_one) {
         #endif
         return NULL;
     }
-
-    // all done
-
-    *(tail->next->data) = new_one;     // 直接用new_one作为模板，向新节点中写入数据
-
-    // new_one中所有指针都指向NULL
-    tail->next->next = NULL;
+    *(tail->next->data) = new_one; tail->next->next = NULL;
     tail->next->child_team_head = NULL;
     tail->next->child_team_tail = NULL;
-
     return tail->next;   // 返回新节点地址
 }
 
-
-
-
+/* 覆盖院系信息 - 未调用 */
 int modifyDepart(Depart *target, DepartData new_one) {
-    /* 错误处理：链式调用时，防止前一级调用中产生的“错误”传递，如查找节点方法返回的NULL */
-    if (target == NULL) {
+    if (target == NULL) {   // 输入检查
         #if defined(DEBUG)
         puts("[LOG] Error in modifyDepart():\n\ttarget is NULL");
         #endif
         return 0;   // error code
     }
-
+    // 数据覆盖
     *(target->data) = new_one;
-
     return 1;
 }
 
-
-
-
+/* 删除院系节点 */
 int removeDepart(Depart **phead, Depart *target) {
-
-    /* 错误处理：链式调用中找不到节点，抛出的NULL会被这个函数接到 */
-    if (target == NULL) {
+    if (target == NULL) {   // 输入检查
         #if defined(DEBUG)
         puts("[LOG] Error in removeDepart():\n\ttarget is NULL");
         #endif
         return 0;
     }
-
+    // 检查院系是否有团队，防止团队信息丢失
     if (target->child_team_head) {
         puts("The department you are deleting has affiliated teams!");
         return 0;
     }
-
+    // 使链表绕开要删除的节点
     if (*phead == target) {     // 要删除的节点是头节点
         *phead = target->next;  // 头节点重新赋值
-        // (*phead)->next = target->next->next;   // 链表重新链接 // 重言
     } else {    // 要删除的节点不是头节点
         Depart *phead_safe = *phead;
+        // 遍历找到目标节点之前的节点
         for (; phead_safe->next != target; phead_safe = phead_safe->next) ;
         phead_safe->next = phead_safe->next->next;
     }
-
-    // after all the routing things are done
-    free(target->data);
-    free(target);
-
+    // 删除节点
+    free(target->data); // 释放数据域
+    free(target);       // 释放节点本身占用的空间
     return 1;
 }
 
-
-
-
     /**** CLEANUPs ****/
 
+/* 清除搜索结果链表 */
 void cleanupDepartWrapper(DepartWrapper *prev) {
-    if (prev == NULL) {
+    if (prev == NULL) {     // 输入检查
         #if defined(DEBUG)
         puts("[LOG] cleanupDepartWrapper(): got NULL");
         #endif
@@ -343,19 +244,19 @@ void cleanupDepartWrapper(DepartWrapper *prev) {
     }
     DepartWrapper *after = prev;
     while (1) {
-        after = prev->next;   // 保存下一个节点位置
-        free(prev);
+        after = prev->next; // 备份下一个节点位置
+        free(prev);         // 释放当前节点
         #if defined(DEBUG)
         printf("[LOG] cleanupDepartWrapper(): freed 0x%p\n", prev);
         #endif
-        prev = after;
-        if (prev == NULL) { break; }   // 全部清空
+        prev = after;       // 准备删除下一个节点
+        if (prev == NULL) { break; }   // 已经全部清空
     }
-    // prev & after will be NULL hence
     return;
-    // NOTE: 此时，你传进来的DepartWrapper头节点也没了。。。
+    // NOTE: 此时，传进来的头节点也没了
 }
 
+/* 清除统计结果链表 */
 void cleanupDepartStatWrapper(DepartStatWrapper *prev) {
     if (prev == NULL) {
         #if defined(DEBUG)
@@ -365,19 +266,18 @@ void cleanupDepartStatWrapper(DepartStatWrapper *prev) {
     }
     DepartStatWrapper *after = prev;
     while (1) {
-        after = prev->next;   // 保存下一个节点位置
+        after = prev->next;
         free(prev);
         #if defined(DEBUG)
         printf("[LOG] cleanupDepartStatWrapper(): freed 0x%p\n", prev);
         #endif
         prev = after;
-        if (prev == NULL) { break; }   // 全部清空
+        if (prev == NULL) { break; }
     }
-    // prev & after will be NULL hence
     return;
 }
 
-
+/* 释放院系链所占用的内存空间 */
 void cleanupDepart(Depart *prev) {
     if (prev == NULL) {
         #if defined(DEBUG)
@@ -388,6 +288,7 @@ void cleanupDepart(Depart *prev) {
     Depart *after = prev;
     while (1) {
         after = prev->next;
+        // 这里不光要释放节点本身的内存，还要释放数据域的空间
         free(prev->data); free(prev);
         #if defined(DEBUG)
         printf("[LOG] cleanupDepart(): freed 0x%p\n", prev);
@@ -398,12 +299,10 @@ void cleanupDepart(Depart *prev) {
     return;
 }
 
-
     /**** SELECT ****/
 
+/* 通过负责人姓名查找院系 */
 DepartWrapper *getDepartByManager(Depart *start, Depart *end, const char *manager) {
-    /* NOTE: 这里还是按照有同名的情况来找，以后我就可以复制粘贴了 :doge: */
-
     // 创建搜索结果挂载点
     DepartWrapper *rtn = (DepartWrapper *)malloc(sizeof(DepartWrapper));
     if (rtn == NULL) {
@@ -412,35 +311,34 @@ DepartWrapper *getDepartByManager(Depart *start, Depart *end, const char *manage
         #endif
         return NULL;
     }
-
     DepartWrapper *rtn_head = rtn;  // 保存搜索结果链的头指针
-    rtn_head->depart = NULL; rtn_head->next = NULL;   // 再次初始化
-
-    if (start->data == NULL) {
+    rtn_head->depart = NULL; rtn_head->next = NULL;   // 初始化
+    if (start->data == NULL) {  // 检查院系链是否有数据
         #if defined(DEBUG)
         puts("[LOG] getDepartByManager(): searching an empty chain");
         #endif
+        // 若无数据，返回没有任何数据的挂载点
         return rtn_head;
     }
-
-    for (; start != end; start = start->next) {     // using `break`
-        // NOTE: 只能在有数据的情况下调用该函数
-
+    // 遍历查找
+    for (; start != end; start = start->next) {
         if (!strcmp(start->data->manager, manager)) {  // BINGO!
             #if defined(BUILDING)
             printf("[LOG] getDepartByManager(): found %s @ 0x%p\n", start->data->name, start);
             #endif
-            // 在搜索结果中登记
-            if (rtn_head->depart == NULL) {  // 第一个结果 - 头处理
+            // 将当前记录添加至搜索结果链表
+            // case 1 - 此前没有找到任何满足要求的链表
+            if (rtn_head->depart == NULL) {
+                // 向挂载点写入数据
                 rtn->depart = start;
-            } else {    // 不是第一个结果 - 扩展搜索结果
-                // 申请空间
+            } else {    // case 2 - 已经有结果了
+                // 为新结果申请空间
                 rtn->next = (DepartWrapper *)malloc(sizeof(DepartWrapper));
-                if (rtn->next == NULL) {     // 申请失败
+                if (rtn->next == NULL) {
                     #if defined(DEBUG)
                     puts("[LOG] Error in getDepartByManager():\n\tfailed to malloc for result container");
                     #endif
-                    // 申请空间失败则中断操作，并清空搜索结果
+                    // 申请空间失败则中断操作，并清空搜索结果，返回NULL
                     cleanupDepartWrapper(rtn_head);
                     return NULL;
                 }
@@ -454,9 +352,8 @@ DepartWrapper *getDepartByManager(Depart *start, Depart *end, const char *manage
     return rtn_head;    // 不管有没有找到，都返回搜索结果链表头
 }
 
-
-
-
+/* 通过院系名称查找院系 */
+// 查询函数实现都极为相似，此后只在必要时给出注释
 DepartWrapper *getDepartByName(Depart *start, Depart *end, const char *name) {
     DepartWrapper *rtn = (DepartWrapper *)malloc(sizeof(DepartWrapper));
     if (rtn == NULL) {
@@ -474,7 +371,7 @@ DepartWrapper *getDepartByName(Depart *start, Depart *end, const char *name) {
         return rtn_head;
     }
     for (; start != end; start = start->next) {
-        // NOTE: 和上一个函数唯一的不同
+        // 和上一个函数唯一的不同
         if (strstr(start->data->name, name)) {  // 搜索内容是已保存内容的子串
             #if defined(DEBUG)
             printf("[LOG] getDepartByName(): found %s @ 0x%p\n", start->data->name, start);
@@ -485,7 +382,7 @@ DepartWrapper *getDepartByName(Depart *start, Depart *end, const char *name) {
                 rtn->next = (DepartWrapper *)malloc(sizeof(DepartWrapper));
                 if (rtn->next == NULL) {
                     #if defined(DEBUG)
-                    puts("[LOG] Error in getDepartByName():\n\tfailed to malloc for result container");  // 好吧还有一个。。
+                    puts("[LOG] Error in getDepartByName():\n\tfailed to malloc for result container");
                     #endif
                     cleanupDepartWrapper(rtn_head);
                     return NULL;
@@ -499,46 +396,53 @@ DepartWrapper *getDepartByName(Depart *start, Depart *end, const char *name) {
     return rtn_head;
 }
 
+    /**** Stat ****/
 
+/* 统计所有院系数据 */
 DepartStatWrapper *buildDepartStatChainUnordered(Depart *start, Depart *end, int year) {
+    // 创建统计结果链挂载点
     DepartStatWrapper *unordered = (DepartStatWrapper *)malloc(sizeof(DepartStatWrapper));
     if (unordered == NULL) { return NULL; }
-    if (start->data == NULL) {
+    if (start->data == NULL) {  // 检查传入链表是否有数据
         #if defined(DEBUG)
         puts("[LOG] Error in getDepartOrderedByMasterTeacherRatio(): building with an empty chain");
         #endif
         unordered->depart = NULL; unordered->next = NULL;
         return unordered;
     }
-    // constructing unordered chain
+    // 开始统计
     Depart *start_bak = start; DepartStatWrapper *unordered_bak = unordered;
-    char year_str[10];
-    // do-while
+    char year_str[10];  // 由于项目创建时间以字符串形式存储，在此设立buffer
+    // 创建第一条统计数据
+    // NOTE: <do-while>标识的区域内的内容完全相同
+    // <do-while>
+    // 节点统计数据初始化
     unordered_bak->depart = start_bak; unordered_bak->next = NULL;
     unordered_bak->stat.student_num = 0; unordered_bak->stat.teacher_num = 0;
     unordered_bak->stat.project_total = 0; unordered_bak->stat.project_973 = 0;
     unordered_bak->stat.project_863 = 0; unordered_bak->stat.funding = 0;
-    // Team
+    // 遍历团队
     Team *child_team = start_bak->child_team_head;
-    if (child_team != NULL) {
+    if (child_team != NULL) {   // 检查是否有下属团队，防止跨界访问
         for (; child_team != start_bak->child_team_tail->next;
                child_team = child_team->next) {
+            // 统计学生、教师人数
             unordered_bak->stat.student_num += child_team->data->student_num;
             unordered_bak->stat.teacher_num += child_team->data->teacher_num;
-            // Project
+            // 遍历项目
             Project *child_project = child_team->child_project_head;
-            if (child_project != NULL) {
+            if (child_project != NULL) {    // 同上，防止跨界访问
                 for (; child_project != child_team->child_project_tail->next;
                        child_project = child_project->next) {
-                    if ((strstr(child_project->data->start_date,
-                                itoa(year, year_str, 10)) != NULL)
-                            || year == 0) {
-                        // 由于标识时间的字符串位数不多，所以直接判断输入年份是不是字串就行了
+                    if (year == 0   // 当用户输入的年份为0时，统计所有数据
+                            || strstr(child_project->data->start_date,
+                                      itoa(year, year_str, 10)) != NULL) {
+                        // NOTE: 由于记录时间的字符串位数不多，直接判断输入年份是否为字串即可
                         unordered_bak->stat.project_total += 1;
                         if (child_project->data->type == '1')
-                        { unordered_bak->stat.project_973 += 1; }
+                            { unordered_bak->stat.project_973 += 1; }
                         if (child_project->data->type == '3')
-                        { unordered_bak->stat.project_973 += 1; }
+                            { unordered_bak->stat.project_973 += 1; }
                         unordered_bak->stat.funding += child_project->data->funding;
                     }
                 }
@@ -546,7 +450,7 @@ DepartStatWrapper *buildDepartStatChainUnordered(Depart *start, Depart *end, int
         }
     }
     // 计算学生/教师人数比
-    if (unordered_bak->stat.teacher_num == 0)
+    if (unordered_bak->stat.teacher_num == 0)   // 防止零除数
         { unordered_bak->stat.st_ratio = -1; }
     else {
         unordered_bak->stat.st_ratio = \
@@ -554,51 +458,47 @@ DepartStatWrapper *buildDepartStatChainUnordered(Depart *start, Depart *end, int
             / unordered_bak->stat.teacher_num;
     }
     // 计算项目平均经费
-    if (unordered_bak->stat.project_total == 0)
+    if (unordered_bak->stat.project_total == 0) // 同上，防止零除数
         { unordered_bak->stat.avg_funding = -1; }
     else {
         unordered_bak->stat.avg_funding = \
             unordered_bak->stat.funding \
             / unordered_bak->stat.project_total;
     }
-    // do-while
+    // </do-while>
     for (start_bak = start_bak->next; start_bak != end; start_bak = start_bak->next) {
         unordered_bak->next = (DepartStatWrapper *)malloc(sizeof(DepartStatWrapper));
         if (unordered_bak->next == NULL) { return NULL; }
         unordered_bak = unordered_bak->next;
-        // do-while
+        // <do-while>
         unordered_bak->depart = start_bak; unordered_bak->next = NULL;
         unordered_bak->stat.student_num = 0; unordered_bak->stat.teacher_num = 0;
         unordered_bak->stat.project_total = 0; unordered_bak->stat.project_973 = 0;
         unordered_bak->stat.project_863 = 0; unordered_bak->stat.funding = 0;
-        // Team
         Team *child_team = start_bak->child_team_head;
         if (child_team != NULL) {
             for (; child_team != start_bak->child_team_tail->next;
                    child_team = child_team->next) {
                 unordered_bak->stat.student_num += child_team->data->student_num;
                 unordered_bak->stat.teacher_num += child_team->data->teacher_num;
-                // Project
                 Project *child_project = child_team->child_project_head;
                 if (child_project != NULL) {
                     for (; child_project != child_team->child_project_tail->next;
                            child_project = child_project->next) {
-                        if ((strstr(child_project->data->start_date,
-                                    itoa(year, year_str, 10)) != NULL)
-                                || year == 0) {
-                            // 由于标识时间的字符串位数不多，所以直接判断输入年份是不是字串就行了
+                        if (year == 0
+                                || strstr(child_project->data->start_date,
+                                          itoa(year, year_str, 10)) != NULL) {
                             unordered_bak->stat.project_total += 1;
                             if (child_project->data->type == '1')
-                            { unordered_bak->stat.project_973 += 1; }
+                                { unordered_bak->stat.project_973 += 1; }
                             if (child_project->data->type == '3')
-                            { unordered_bak->stat.project_973 += 1; }
+                                { unordered_bak->stat.project_973 += 1; }
                             unordered_bak->stat.funding += child_project->data->funding;
                         }
                     }
                 }
             }
         }
-        // 计算学生/教师人数比
         if (unordered_bak->stat.teacher_num == 0)
             { unordered_bak->stat.st_ratio = -1; }
         else {
@@ -606,7 +506,6 @@ DepartStatWrapper *buildDepartStatChainUnordered(Depart *start, Depart *end, int
                 (float)unordered_bak->stat.student_num \
                 / unordered_bak->stat.teacher_num;
         }
-        // 计算项目平均经费
         if (unordered_bak->stat.project_total == 0)
             { unordered_bak->stat.avg_funding = -1; }
         else {
@@ -614,9 +513,8 @@ DepartStatWrapper *buildDepartStatChainUnordered(Depart *start, Depart *end, int
                 unordered_bak->stat.funding \
                 / unordered_bak->stat.project_total;
         }
-        // do-while
+        // </do-while>
     }
-    // start_bak = start; unordered_bak = unordered;
     return unordered;
 }
 
