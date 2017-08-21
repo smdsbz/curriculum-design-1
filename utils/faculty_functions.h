@@ -10,7 +10,7 @@
     /**** POST | DELETE | PUT ****/
 
 extern Depart *appendDepart(Depart *head, DepartData new_one);
-/*  录入院系
+/*  添加院系数据
  *  ARGS:   链表头，院系数据模板
  *  RETN:   新增节点的地址
  */
@@ -29,9 +29,9 @@ extern int removeDepart(Depart **phead, Depart *target);
  */
 
 extern DepartData initDepartData(void);
-/*  创建一个院系数据的原型
+/*  创建院系数据模板
  *  ARGS:   void
- *  RETN:   根据在该函数执行过程中输入的数据所创建出来的原型
+ *  RETN:   根据在该函数执行过程中输入的数据所创建出来的模板
  *  NOTE:   包含用户输入前端
  */
 
@@ -39,6 +39,7 @@ extern Depart *createDepartHead(void);
 /*  创建并初始化头节点
  *  ARGS:   void
  *  RETN:   头节点地址 || NULL
+ *  NOTE:   头节点此时没有数据域
  */
 
     /**** SELECT ****/
