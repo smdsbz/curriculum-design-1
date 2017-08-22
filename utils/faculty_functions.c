@@ -218,7 +218,8 @@ int removeDepart(Depart **phead, Depart *target) {
         return 0;
     }
     // 使链表绕开要删除的节点
-    if (*phead == target) {     // 要删除的节点是头节点
+    if (*phead == target && target->next) { // 要删除的节点是头节点
+        // NOTE: 若target是唯一的节点，phead不能指向NULL
         *phead = target->next;  // 头节点重新赋值
     } else {    // 要删除的节点不是头节点
         Depart *phead_safe = *phead;
@@ -228,7 +229,7 @@ int removeDepart(Depart **phead, Depart *target) {
     }
     // 删除节点
     free(target->data); // 释放数据域
-    free(target);       // 释放节点本身占用的空间
+    if (target->next) { free(target); } // 释放节点本身占用的空间
     return 1;
 }
 
@@ -302,7 +303,8 @@ void cleanupDepart(Depart *prev) {
     /**** SELECT ****/
 
 /* 通过负责人姓名查找院系 */
-DepartWrapper *getDepartByManager(Depart *start, Depart *end, const char *manager) {
+DepartWrapper *
+getDepartByManager(Depart *start, Depart *end, const char *manager) {
     // 创建搜索结果挂载点
     DepartWrapper *rtn = (DepartWrapper *)malloc(sizeof(DepartWrapper));
     if (rtn == NULL) {
@@ -354,7 +356,8 @@ DepartWrapper *getDepartByManager(Depart *start, Depart *end, const char *manage
 
 /* 通过院系名称查找院系 */
 // 查询函数实现都极为相似，此后只在必要时给出注释
-DepartWrapper *getDepartByName(Depart *start, Depart *end, const char *name) {
+DepartWrapper *
+getDepartByName(Depart *start, Depart *end, const char *name) {
     DepartWrapper *rtn = (DepartWrapper *)malloc(sizeof(DepartWrapper));
     if (rtn == NULL) {
         #if defined(DEBUG)
@@ -399,9 +402,11 @@ DepartWrapper *getDepartByName(Depart *start, Depart *end, const char *name) {
     /**** Stat ****/
 
 /* 统计所有院系数据 */
-DepartStatWrapper *buildDepartStatChainUnordered(Depart *start, Depart *end, int year) {
+DepartStatWrapper *
+buildDepartStatChainUnordered(Depart *start, Depart *end, int year) {
     // 创建统计结果链挂载点
-    DepartStatWrapper *unordered = (DepartStatWrapper *)malloc(sizeof(DepartStatWrapper));
+    DepartStatWrapper *unordered = \
+        (DepartStatWrapper *)malloc(sizeof(DepartStatWrapper));
     if (unordered == NULL) { return NULL; }
     if (start->data == NULL) {  // 检查传入链表是否有数据
         #if defined(DEBUG)
@@ -518,20 +523,23 @@ DepartStatWrapper *buildDepartStatChainUnordered(Depart *start, Depart *end, int
     return unordered;
 }
 
-DepartStatWrapper *orderDepartStatWrapperBySTRatio(DepartStatWrapper *start) {
-    if (start == NULL) { return NULL; }
+/* 将统计结果按学生/教师人数比排序 */
+DepartStatWrapper *
+orderDepartStatWrapperBySTRatio(DepartStatWrapper *start) {
+    if (start == NULL) { return NULL; } // 输入检查
     DepartStatWrapper *start_bak = start;
     DepartStatWrapper *cur = start;
     Depart *Depart_tmp; DepartStatData DepartStatData_tmp;
+    // 冒泡排序
     for (; start_bak->next; start_bak = start_bak->next) {
         for (cur = start; cur->next; cur = cur->next) {
-            // 少写点代码，这里就牺牲点效率了
+            // ☝ 图个方便，这里就牺牲点效率了
             if (cur->stat.st_ratio < cur->next->stat.st_ratio) {
-                // swap depart
+                // 交换院系
                 Depart_tmp = cur->next->depart;
                 cur->next->depart = cur->depart;
                 cur->depart = Depart_tmp;
-                // swap stat
+                // 交换统计信息
                 DepartStatData_tmp = cur->next->stat;
                 cur->next->stat = cur->stat;
                 cur->stat = DepartStatData_tmp;
@@ -541,7 +549,9 @@ DepartStatWrapper *orderDepartStatWrapperBySTRatio(DepartStatWrapper *start) {
     return start;
 }
 
-DepartStatWrapper *orderDepartStatWrapperByProjectTotal(DepartStatWrapper *start) {
+/* 将统计结果按项目总数降序排序 */
+DepartStatWrapper *
+orderDepartStatWrapperByProjectTotal(DepartStatWrapper *start) {
     if (start == NULL) { return NULL; }
     DepartStatWrapper *start_bak = start;
     DepartStatWrapper *cur = start;
@@ -563,7 +573,9 @@ DepartStatWrapper *orderDepartStatWrapperByProjectTotal(DepartStatWrapper *start
     return start;
 }
 
-DepartStatWrapper *orderDepartStatWrapperByAvgFunding(DepartStatWrapper *start) {
+/* 将统计结果按项目平均经费降序排序 */
+DepartStatWrapper *
+orderDepartStatWrapperByAvgFunding(DepartStatWrapper *start) {
     if (start == NULL) { return NULL; }
     DepartStatWrapper *start_bak = start;
     DepartStatWrapper *cur = start;
@@ -585,19 +597,12 @@ DepartStatWrapper *orderDepartStatWrapperByAvgFunding(DepartStatWrapper *start) 
     return start;
 }
 
-
+/* 获得当前院系节点的前一个节点 - 未调用*/
 Depart *getPrevDepart(Depart *cur, Depart *head) {
-    for (;
-         head->next != cur
-            && head != NULL;
-         head = head->next) ;
-    //  head->next == cur || head == NULL
+    for (; head->next != cur && head != NULL;
+           head = head->next) ;
     return head;
 }
-
-
-
-
 
 #ifdef BUILDING
 #undef BUILDING

@@ -46,13 +46,15 @@ extern Depart *createDepartHead(void);
 
 // NOTE: 会申请DepartWrapper空间，记得调用cleanupDepartWrapper()释放内存
 
-extern DepartWrapper *getDepartByManager(Depart *, Depart *, const char *);
+extern DepartWrapper *
+getDepartByManager(Depart *, Depart *, const char *);
 /*  通过负责人姓名查找院系
  *  ARGS:   院系链表，搜索结束点，院系负责人 char[12]
  *  RETN:   搜索结果挂载点 || NULL （没有结果时也返回挂载点地址）
  */
 
-extern DepartWrapper *getDepartByName(Depart *, Depart *, const char *);
+extern DepartWrapper *
+getDepartByName(Depart *, Depart *, const char *);
 /*  通过院系名称查找院系
  *  ARGS:   院系链表，搜索结束点，名称线索（不一定是全称）
  *  RETN:   搜索结果挂载点 || NULL
@@ -60,23 +62,27 @@ extern DepartWrapper *getDepartByName(Depart *, Depart *, const char *);
 
     /**** STAT ****/
 
-extern DepartStatWrapper *buildDepartStatChainUnordered(Depart *, Depart *, int);
+extern DepartStatWrapper *
+buildDepartStatChainUnordered(Depart *, Depart *, int);
 /*  统计所有院系数据
  *  ARGS:   院系链表头，遍历区域边界，查询目标年度
  *  RETN:   统计结果挂载点 || NULL
  */
 
-extern DepartStatWrapper *orderDepartStatWrapperBySTRatio(DepartStatWrapper *);
+extern DepartStatWrapper *
+orderDepartStatWrapperBySTRatio(DepartStatWrapper *);
 /*  将统计结果按学生/教师人数比排序
  *  ARGS:   统计结果挂载点
  *  RETN:   排序后统计结果链的挂载点
  */
 
-extern DepartStatWrapper *orderDepartStatWrapperByProjectTotal(DepartStatWrapper *);
+extern DepartStatWrapper *
+orderDepartStatWrapperByProjectTotal(DepartStatWrapper *);
 /*  将统计结果按项目总数降序排序
  */
 
-extern DepartStatWrapper *orderDepartStatWrapperByAvgFunding(DepartStatWrapper *);
+extern DepartStatWrapper *
+orderDepartStatWrapperByAvgFunding(DepartStatWrapper *);
 /*  将统计结果按项目平均经费降序排序
  */
 
@@ -84,6 +90,7 @@ extern Depart *getPrevDepart(Depart *cur, Depart *head);
 /*  获得当前院系节点的前一个节点
  *  ARGS:   当前节点，院系链表头
  *  RETN:   前一个节点 || NULL
+ *  NOTE:   未调用！
  */
 
     /**** CLEANUPs ****/
