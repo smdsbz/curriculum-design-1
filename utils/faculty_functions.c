@@ -205,31 +205,32 @@ int modifyDepart(Depart *target, DepartData new_one) {
 }
 
 /* 删除院系节点 */
-int removeDepart(Depart **phead, Depart *target) {
-    if (target == NULL) {   // 输入检查
+int removeDepart(Depart **phead, Depart *tgt) {
+    if (tgt == NULL) {   // 输入检查
         #if defined(DEBUG)
-        puts("[LOG] Error in removeDepart():\n\ttarget is NULL");
+        puts("[LOG] Error in removeDepart():\n\ttgt is NULL");
         #endif
         return 0;
     }
     // 检查院系是否有团队，防止团队信息丢失
-    if (target->child_team_head) {
+    if (tgt->child_team_head) {
         puts("The department you are deleting has affiliated teams!");
         return 0;
     }
     // 使链表绕开要删除的节点
-    if (*phead == target && target->next) { // 要删除的节点是头节点
-        // NOTE: 若target是唯一的节点，phead不能指向NULL
-        *phead = target->next;  // 头节点重新赋值
-    } else {    // 要删除的节点不是头节点
+    if (*phead == tgt && tgt->next) { // 要删除的节点是头节点
+        *phead = tgt->next;  // 头节点重新赋值
+    } else if (tgt->next) {    // 要删除的节点不是头节点
+        // NOTE: 若tgt是唯一的节点，phead不能指向NULL
         Depart *phead_safe = *phead;
         // 遍历找到目标节点之前的节点
-        for (; phead_safe->next != target; phead_safe = phead_safe->next) ;
+        for (; phead_safe->next != tgt; phead_safe = phead_safe->next) ;
         phead_safe->next = phead_safe->next->next;
     }
     // 删除节点
-    free(target->data); // 释放数据域
-    if (target->next) { free(target); } // 释放节点本身占用的空间
+    free(tgt->data); // 释放数据域
+    if (tgt->next == NULL) { tgt->data = NULL; }    // 防止跨界访问
+    if (tgt->next) { free(tgt); }    // 释放节点本身占用的空间
     return 1;
 }
 

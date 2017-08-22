@@ -836,7 +836,7 @@ int main(int argc, char const *argv[]) {
         cleanupTeam(mp.team_head);
         cleanupProject(mp.project_head);
         // 询问用户是否在当前文件夹创建数据文件
-        printf("Create data file in program root? [Y/N]: ");
+        printf("Create data file in %s ? [Y/N]: ", TGT_PATH);
         char option = 0;
         scanf("%c", &option);
         switch (option) {
@@ -846,7 +846,7 @@ int main(int argc, char const *argv[]) {
                 mp.depart_head = createDepartHead();
                 mp.team_head = createTeamHead();
                 mp.project_head = createProjectHead();
-                puts("Data will be saved to program root!");
+                printf("Data will be saved to %s !\n", TGT_PATH);
                 break;
             }
             case 'N':   case 'n':   default: {
@@ -879,12 +879,31 @@ int main(int argc, char const *argv[]) {
                     case 4: { selectAddObjectType(); break; }
                     case 0: {
                         // 退出程序时自动保存数据
+                        // 数据有效性检查
+                        if (!(mp.depart_head->data
+                              && mp.team_head->data
+                              && mp.project_head->data)) {
+                            puts("Basic info not complete!");
+                            printf("Quit without saving? [Y/N] ");
+                            char option;
+                            do {    // 循环吸收之前残余的'\n'
+                                scanf("%c", &option);
+                                switch (option) {
+                                    case 'y':   case 'Y': {
+                                        puts("exit"); return 0;
+                                    }
+                                    default: { break; }
+                                }
+                            } while (option != 'n' && option != 'N');
+                            break;
+                        }
                         // NOTE: 没有单独的数据保存选项
                         if (saveData(mp, TGT_PATH) == 0) {  // 存盘操作失败
                             puts("Error while saving...");
+                            printf("Does the directory %s ever exist?\n",
+                                   TGT_PATH);
                             puts("GG! MY FRIEND! (￣y▽,￣)╭ ");
-                            // HACK: 不知道什么情况会导致这种情况的发生
-                            //       因此目前没想到什么解决方案
+                            exit(-1);
                         }
                         // 释放内存
                         cleanupDepart(mp.depart_head);
