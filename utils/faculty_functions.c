@@ -440,9 +440,10 @@ buildDepartStatChainUnordered(Depart *start, Depart *end, int year) {
             if (child_project != NULL) {    // 同上，防止跨界访问
                 for (; child_project != child_team->child_project_tail->next;
                        child_project = child_project->next) {
+                    sprintf(year_str, "%d", year);
                     if (year == 0   // 当用户输入的年份为0时，统计所有数据
                             || strstr(child_project->data->start_date,
-                                      itoa(year, year_str, 10)) != NULL) {
+                                      year_str) != NULL) {
                         // NOTE: 由于记录时间的字符串位数不多，直接判断输入年份是否为字串即可
                         unordered_bak->stat.project_total += 1;
                         if (child_project->data->type == '1')
@@ -491,9 +492,10 @@ buildDepartStatChainUnordered(Depart *start, Depart *end, int year) {
                 if (child_project != NULL) {
                     for (; child_project != child_team->child_project_tail->next;
                            child_project = child_project->next) {
-                        if (year == 0
+                        sprintf(year_str, "%d", year);
+                        if (year == 0   // 当用户输入的年份为0时，统计所有数据
                                 || strstr(child_project->data->start_date,
-                                          itoa(year, year_str, 10)) != NULL) {
+                                          year_str) != NULL) {
                             unordered_bak->stat.project_total += 1;
                             if (child_project->data->type == '1')
                                 { unordered_bak->stat.project_973 += 1; }
