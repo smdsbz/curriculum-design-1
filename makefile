@@ -10,8 +10,7 @@ main:
 
 # `chcp 65001`为Win命令，调整控制台活动页为UTF-8
 run:
-	chcp 65001
-	./a.exe .\\utils\\data
+	./a.exe ./utils/data
 
 clean:
 	rm a.exe

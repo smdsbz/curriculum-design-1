@@ -425,7 +425,7 @@ void queryTeamByName(void) {
 void queryTeamByTeacherNum(void) {
     Where cond;
     printf("query/team::condition > "); scanf("%s %d",
-           &(cond.direction), &(cond.value));
+           cond.direction, &(cond.value));
     // NOTE: 查询方向 direction 的错误输入处理交给查询函数处理
     TeamWrapper *team_wrapper = \
         getTeamByTeacherNum(mp.team_head, NULL, cond);
