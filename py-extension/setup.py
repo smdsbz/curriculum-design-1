@@ -8,6 +8,7 @@ module = Extension('curr',
                             '../utils/faculty_functions.c',
                             '../utils/team_functions.c',
                             '../utils/project_functions.c'
+                            # '../main.c'   # cause "multiple definition"
                            ])
 
 setup(name='curr',

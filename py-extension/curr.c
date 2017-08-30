@@ -188,6 +188,8 @@ curr_getProjectAttr(PyObject *self, PyObject *args) {
     return Manhatan;
 }
 
+/**** get list of records ****/
+
 /**** Mellxos ****/
 
 static PyObject *
@@ -222,6 +224,9 @@ static PyMethodDef CurrMethods[] = {
         "as above, get team data this time" },
     { "getProjectByIndex", curr_getProjectAttr, METH_VARARGS,
         "..." },
+    ///////////////////////////////
+    { "getAllRecords", curr_getAllRecords, METH_VARARGS,
+        "return a list containing all records" },
     // M
     { "parseTypeCodeToString", curr_parseTypeCodeToString, METH_VARARGS,
         "convert project type code to according type string" },
