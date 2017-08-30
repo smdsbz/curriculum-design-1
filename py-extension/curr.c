@@ -4,17 +4,16 @@
 #include "/usr/include/python3.5/Python.h"
 
 MountPoint mp;              // 头节点挂载点组
-char TGT_PATH[BUFSIZ];  // 数据文件夹路径buffer
+char *TGT_PATH;      // 数据文件夹路径buffer
 Cursor cursor = {0, NULL};  // 用户指针
 
 /**** File Functions ****/
 
 static PyObject *
 curr_loadData(PyObject *self, PyObject *args) {
-    const char *TGT_PATH;
     if (!PyArg_ParseTuple(args, "s", &TGT_PATH)) { return NULL; }
     // Reading data
-    // MountPoint mp = loadData(TGT_PATH);
+    puts(TGT_PATH);
     mp = loadData(TGT_PATH);
     if (mp.depart_head == NULL
             || mp.team_head == NULL
@@ -92,6 +91,8 @@ curr_getDepartAttr(PyObject *self, PyObject *args) {
                          Py_BuildValue("s", ((Depart *)cursor.val)->data->name));
     PyDict_SetItemString(Computer, "manager",
                          Py_BuildValue("s", ((Depart *)cursor.val)->data->manager));
+    PyDict_SetItemString(Computer, "mobile",
+                         Py_BuildValue("s", ((Depart *)cursor.val)->data->mobile));
     return Computer;
 }
 
@@ -225,8 +226,8 @@ static PyMethodDef CurrMethods[] = {
     { "getProjectByIndex", curr_getProjectAttr, METH_VARARGS,
         "..." },
     ///////////////////////////////
-    { "getAllRecords", curr_getAllRecords, METH_VARARGS,
-        "return a list containing all records" },
+    // { "getAllRecords", curr_getAllRecords, METH_VARARGS,
+    //     "return a list containing all records" },
     // M
     { "parseTypeCodeToString", curr_parseTypeCodeToString, METH_VARARGS,
         "convert project type code to according type string" },

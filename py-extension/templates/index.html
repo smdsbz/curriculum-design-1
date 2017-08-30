@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+<!-- set tab title -->
+{% block title %}Choose Path{% endblock %}
+
+<!-- <main> content -->
+{% block main_content %}
+
+<div class="container">
+  <div class="row">
+    <ul class="collapsible popout col s12 l8 offset-l2" data-collapsible="accordion">
+      <li>
+        <div class="collapsible-header">Overview</div>
+        <div class="collapsible-body" style="padding:0">
+          <div class="collection">
+            <a href="{{url_for('overview', object_type='depart')}}" class="collection-item">Department</a>
+            <a href="#" class="collection-item">Team</a>
+            <a href="#" class="collection-item">Project</a>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="collapsible-header"><i class="material-icons">search</i>Query</div>
+        <div class="collapsible-body" style="padding:0">
+          <div class="collection">
+            <a href="#" class="collection-item">Department</a>
+            <a href="#" class="collection-item">Team</a>
+            <a href="#" class="collection-item">Project</a>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="collapsible-header">Statistics</div>
+        <div class="collapsible-body" style="padding:0">
+          <div class="collection">
+            <a href="#" class="collection-item">1</a>
+            <a href="#" class="collection-item">2</a>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+
+{% endblock %}

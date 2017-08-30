@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!-- Core CSSes -->
+	<link href="{{ url_for('static', filename='css/google_material_icons.css') }}" rel="stylesheet">
+	<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/materialize.css') }}"  media="screen,projection"/>
+
+	<!-- Metadata -->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<meta name="theme-color" content="#424242">
+
+	<title>SPMS - {% block title %}{% endblock %}</title>
+
+	<!-- Should localize necessary Javascript libraries -->
+	<script type="text/javascript" src="{{ url_for('static', filename='js/jquery-2.1.1.min.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='js/materialize.min.js') }}"></script>
+
+	<!-- Free time checker's own CSS -->
+	<link href="{{ url_for('static', filename='css/freetimechecker.css') }}" rel="stylesheet">
+
+	<!-- Inpage Toast Manage -- For the sake of just giving toast in frontend, not background -->
+	<script type="text/javascript" src="{{ url_for('static', filename='js/inpage_toast_manager.js') }}"></script>
+
+	<!-- Footer hack -->
+	<link href="{{ url_for('static',filename='css/footer_hack.css') }}" rel="stylesheet">
+
+</head>
+
+<body>
+	<input type="hidden" value="0" id="refresh-flag">
+
+	<!-- PAGE HEADER -->
+	<header>
+		<div class="navbar-fixed">
+			<nav>
+				<div class="nav-wrapper teal">
+					<!-- Header title will redirect you to the home page -->
+					<a href="{{ url_for('index') }}" class="brand-logo hide-on-med-and-down" title="click to return" style="margin-left:2.5em;">SPMS</a>
+					<a href="{{ url_for('index') }}" class="brand-logo hide-on-large-only" title="click to return">SPMS</a>
+					{% if DATA_FOLDER %}
+					<ul id="quit" class="dropdown-content">
+						<li><a href="#!">Ooops</a></li>
+						<li><a href="{{ url_for('quit') }}">Save and Exit</a></li>
+					</ul>
+
+					<ul class="right">
+						<li>
+							<a class="dropdown-button" href="#!" data-activates="quit" title="exit">Exit</a>
+						</li>
+					</ul>
+					{% endif %}
+
+				</div>
+			</nav>
+		</div>
+
+	</header>
+
+
+	<!-- Page Body -->
+	<main style="margin-top:2em;">
+		{% block main_content %}
+		{% endblock %}
+	</main>
+
+
+	<!-- Footer -->
+	<!-- NO! -->
+
+	<!-- Flash Notification Controller based on Materialize Toaster -->
+	<!-- Use the theme from Toastr -->
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/toastr.css') }}">
+	<script id="Flash-notification-controller">
+		$(document).ready(function() {
+			// #quit
+			$(".dropdown-button").dropdown();
+
+			// Toastr!
+			var showFlashToast = function () {
+
+				var refresh_flag = document.getElementById("refresh-flag");
+				if (refresh_flag.value == "0") {
+					refresh_flag.value = "1";
+
+					{% for msg in get_flashed_messages(with_categories=true) %}
+					var message = {
+						// TODO: |safe 标签不管用
+						text: "{{ msg[1] }}".replace("&lt;", "<").replace("&gt;", ">"),
+						category: "{{ msg[0] }}"
+					};
+					var $messageHTML = $("<div>" + message.text + "</div>");
+					switch (message.category) {
+						case "error":
+						Materialize.toast($messageHTML, 4000, "toast-error");
+						break;
+						case "success":
+						Materialize.toast($messageHTML, 3000, "toast-success");
+						break;
+						case "warning":
+						Materialize.toast($messageHTML, 3000, "toast-warning");
+						break;
+						default:
+						Materialize.toast($messageHTML, 3000, "toast-info");
+					}
+
+					{% endfor %}
+				}
+				else{
+					location.reload();
+				}
+			};
+
+			$("body").bind("onload", showFlashToast())
+		})
+
+	</script>
+
+
+</body>
+
+</html>
