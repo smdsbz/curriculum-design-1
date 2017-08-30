@@ -12,7 +12,7 @@
       <table class="striped">
         <thead>
           <th>
-            Department of {{data['Name']}}
+            Team {{data['Name']}}
           </th>
         </thead>
 
@@ -27,8 +27,16 @@
             <td>{{data['Manager']}}</td>
           </tr>
           <tr>
-            <td>Telephone</td>
-            <td>{{data['Telephone']}}</td>
+            <td>Department</td>
+            <td>{{data['Department']}}</td>
+          </tr>
+          <tr>
+            <td>Teacher Num.</td>
+            <td>{{data['Teacher Num.']}}</td>
+          </tr>
+          <tr>
+            <td>Student Num.</td>
+            <td>{{data['Student Num.']}}</td>
           </tr>
           {% endif %}
         </tbody>
@@ -39,7 +47,8 @@
       <div class="collection">
         <a href="#" class="collection-item">Modify</a>
         <a href="#" class="collection-item">Delete</a>
-        <a href="#" class="collection-item">List teams</a>
+        <a href="#" class="collection-item">List Projects</a>
+        <!-- <a href="#" class="collection-item">Parent department</a> -->
       </div>
 
 

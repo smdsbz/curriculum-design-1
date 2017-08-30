@@ -15,9 +15,13 @@
       </h5>
       <div class="divider"></div>
       <div class="collection">
+        {% if not data %}
+        <a href="#" class="collection-item">No data!</a>
+        {% else %}
         {% for each in data %}
-        <a href="{{'/'+object_type+'/'+data.index(each)}}" class="collection-item">{{ each }}</a>
+        <a href="{{'/'+object_type+'/'}}{{data.index(each)}}" class="collection-item">{{ each }}</a>
         {% endfor %}
+        {% endif %}
       </div>
 
     </div>

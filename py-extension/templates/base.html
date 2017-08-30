@@ -37,10 +37,10 @@
 					<!-- Header title will redirect you to the home page -->
 					<a href="{{ url_for('index') }}" class="brand-logo hide-on-med-and-down" title="click to return" style="margin-left:2.5em;">SPMS</a>
 					<a href="{{ url_for('index') }}" class="brand-logo hide-on-large-only" title="click to return">SPMS</a>
-					{% if DATA_FOLDER %}
+					{% if 'DATA_FOLDER' in session %}
 					<ul id="quit" class="dropdown-content">
 						<li><a href="#!">Ooops</a></li>
-						<li><a href="{{ url_for('quit') }}">Save and Exit</a></li>
+						<li><a href="{{ url_for('quit') }}">Exit</a></li>
 					</ul>
 
 					<ul class="right">

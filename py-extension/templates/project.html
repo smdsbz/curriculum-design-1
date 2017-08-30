@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{data['Name']}}{% endblock %}
+{% block title %}{{data['ID']}}{% endblock %}
 
 {% block main_content %}
 
@@ -12,23 +12,35 @@
       <table class="striped">
         <thead>
           <th>
-            Department of {{data['Name']}}
+            Project #{{data['ID']}}
           </th>
         </thead>
 
         <tbody>
           {% if data %}
           <tr>
-            <td>Name</td>
-            <td>{{data['Name']}}</td>
+            <td>ID</td>
+            <td>{{data['ID']}}</td>
           </tr>
           <tr>
             <td>Manager</td>
             <td>{{data['Manager']}}</td>
           </tr>
           <tr>
-            <td>Telephone</td>
-            <td>{{data['Telephone']}}</td>
+            <td>Type</td>
+            <td>{{data['Type']}}</td>
+          </tr>
+          <tr>
+            <td>Start Date</td>
+            <td>{{data['Start Date']}}</td>
+          </tr>
+          <tr>
+            <td>Funding</td>
+            <td>{{'%.2f' % data['Funding']}} (*10000 CNY)</td>
+          </tr>
+          <tr>
+            <td>Team</td>
+            <td>{{data['Team']}}</td>
           </tr>
           {% endif %}
         </tbody>
@@ -39,7 +51,7 @@
       <div class="collection">
         <a href="#" class="collection-item">Modify</a>
         <a href="#" class="collection-item">Delete</a>
-        <a href="#" class="collection-item">List teams</a>
+        <!-- <a href="#" class="collection-item">Parent team</a> -->
       </div>
 
 

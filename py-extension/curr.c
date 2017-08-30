@@ -68,7 +68,7 @@ curr_getDepartAttr(PyObject *self, PyObject *args) {
     if (!mp.depart_head) { puts("Please load data before you query!"); return NULL; }
     // getting object
     cursor.type = 1; cursor.val = mp.depart_head;
-    for (int cur = 1;
+    for (int cur = 0;
          cursor.val && cur < idx;
          cur++, cursor.val = ((Depart *)cursor.val)->next) ;
     if (!cursor.val) { puts("Out of Range!"); return NULL; }
@@ -87,11 +87,11 @@ curr_getDepartAttr(PyObject *self, PyObject *args) {
     // end listDepartAttr();
     // now return a dict!
     PyObject *Computer = PyDict_New();
-    PyDict_SetItemString(Computer, "name",
+    PyDict_SetItemString(Computer, "Name",
                          Py_BuildValue("s", ((Depart *)cursor.val)->data->name));
-    PyDict_SetItemString(Computer, "manager",
+    PyDict_SetItemString(Computer, "Manager",
                          Py_BuildValue("s", ((Depart *)cursor.val)->data->manager));
-    PyDict_SetItemString(Computer, "mobile",
+    PyDict_SetItemString(Computer, "Telephone",
                          Py_BuildValue("s", ((Depart *)cursor.val)->data->mobile));
     return Computer;
 }
@@ -104,7 +104,7 @@ curr_getTeamtAttr(PyObject *self, PyObject *args) {
     if (!mp.team_head) { puts("Please load data before you query!"); return NULL; }
     // getting object
     cursor.type = 2; cursor.val = mp.team_head;
-    for (int cur = 1;
+    for (int cur = 0;
          cursor.val && cur < idx;
          cur++, cursor.val = ((Team *)cursor.val)->next) ;
     if (!cursor.val) { puts("Out of Range!"); return NULL; }
@@ -127,15 +127,15 @@ curr_getTeamtAttr(PyObject *self, PyObject *args) {
     // end listTeamAttr();
     // now return a dict!
     PyObject *Rocket = PyDict_New();
-    PyDict_SetItemString(Rocket, "name",
+    PyDict_SetItemString(Rocket, "Name",
                          Py_BuildValue("s", ((Team *)cursor.val)->data->name));
-    PyDict_SetItemString(Rocket, "manager",
+    PyDict_SetItemString(Rocket, "Manager",
                          Py_BuildValue("s", ((Team *)cursor.val)->data->manager));
-    PyDict_SetItemString(Rocket, "faculty",
+    PyDict_SetItemString(Rocket, "Department",
                          Py_BuildValue("s", ((Team *)cursor.val)->data->faculty));
-    PyDict_SetItemString(Rocket, "teacher_num",
+    PyDict_SetItemString(Rocket, "Teacher Num.",
                          Py_BuildValue("i", ((Team *)cursor.val)->data->teacher_num));
-    PyDict_SetItemString(Rocket, "student_num",
+    PyDict_SetItemString(Rocket, "Student Num.",
                          Py_BuildValue("i", ((Team *)cursor.val)->data->student_num));
     return Rocket;
 }
@@ -148,7 +148,7 @@ curr_getProjectAttr(PyObject *self, PyObject *args) {
     if (!mp.project_head) { puts("Please load data before you query!"); return NULL; }
     // getting object
     cursor.type = 2; cursor.val = mp.project_head;
-    for (int cur = 1;
+    for (int cur = 0;
          cursor.val && cur < idx;
          cur++, cursor.val = ((Project *)cursor.val)->next) ;
     if (!cursor.val) { puts("Out of Range!"); return NULL; }
@@ -173,23 +173,53 @@ curr_getProjectAttr(PyObject *self, PyObject *args) {
     // end listProjectAttr();
     // now return a dict!
     PyObject *Manhatan = PyDict_New();
-    PyDict_SetItemString(Manhatan, "id",
+    PyDict_SetItemString(Manhatan, "ID",
                          Py_BuildValue("s", ((Project *)cursor.val)->data->id));
-    PyDict_SetItemString(Manhatan, "type",
-                         Py_BuildValue("c", ((Project *)cursor.val)->data->type));
-    PyDict_SetItemString(Manhatan, "start_date",
-                         Py_BuildValue("s", ((Project *)cursor.val)->data->start_date));
-    PyDict_SetItemString(Manhatan, "funding",
-                         Py_BuildValue("f", ((Project *)cursor.val)->data->funding));
-    PyDict_SetItemString(Manhatan, "team",
-                         Py_BuildValue("s", ((Project *)cursor.val)->data->team));
-    PyDict_SetItemString(Manhatan, "manager",
+    PyDict_SetItemString(Manhatan, "Manager",
                          Py_BuildValue("s", ((Project *)cursor.val)->data->manager));
+    PyDict_SetItemString(Manhatan, "Type",
+                         Py_BuildValue("c", ((Project *)cursor.val)->data->type));
+    PyDict_SetItemString(Manhatan, "Start Date",
+                         Py_BuildValue("s", ((Project *)cursor.val)->data->start_date));
+    PyDict_SetItemString(Manhatan, "Funding",
+                         Py_BuildValue("f", ((Project *)cursor.val)->data->funding));
+    PyDict_SetItemString(Manhatan, "Team",
+                         Py_BuildValue("s", ((Project *)cursor.val)->data->team));
 
     return Manhatan;
 }
 
 /**** get list of records ****/
+
+static PyObject *
+curr_getAllDepart(PyObject *self) {
+    PyObject *departs = PyList_New(0);
+    if (!mp.depart_head) { puts("no data!"); return departs; }
+    for (Depart *cur = mp.depart_head; cur; cur = cur->next) {
+        PyList_Append(departs, Py_BuildValue("s", cur->data->name));
+    }
+    return departs;
+}
+
+static PyObject *
+curr_getAllTeam(PyObject *self) {
+    PyObject *teams = PyList_New(0);
+    if (!mp.team_head) { puts("no data!"); return teams; }
+    for (Team *cur = mp.team_head; cur; cur = cur->next) {
+        PyList_Append(teams, Py_BuildValue("s", cur->data->name));
+    }
+    return teams;
+}
+
+static PyObject *
+curr_getAllProject(PyObject *self) {
+    PyObject *projects = PyList_New(0);
+    if (!mp.project_head) { puts("no data!"); return projects; }
+    for (Project *cur = mp.project_head; cur; cur = cur->next) {
+        PyList_Append(projects, Py_BuildValue("s", cur->data->id));
+    }
+    return projects;
+}
 
 /**** Mellxos ****/
 
@@ -209,6 +239,8 @@ curr_parseTypeCodeToString(PyObject *self, PyObject *args) {
     return NULL;
 }
 
+// void *
+
 
 /**** Py Packaging ****/
 
@@ -226,8 +258,13 @@ static PyMethodDef CurrMethods[] = {
     { "getProjectByIndex", curr_getProjectAttr, METH_VARARGS,
         "..." },
     ///////////////////////////////
-    // { "getAllRecords", curr_getAllRecords, METH_VARARGS,
-    //     "return a list containing all records" },
+    { "getAllDepart", curr_getAllDepart, METH_VARARGS,
+        "get a list of depart names" },
+    { "getAllTeam", curr_getAllTeam, METH_VARARGS,
+        "get a list of team names" },
+    { "getAllProject", curr_getAllProject, METH_VARARGS,
+        "get a list of project IDs" },
+
     // M
     { "parseTypeCodeToString", curr_parseTypeCodeToString, METH_VARARGS,
         "convert project type code to according type string" },
