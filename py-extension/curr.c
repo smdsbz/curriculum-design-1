@@ -316,13 +316,52 @@ curr_removeFocusedProject(PyObject *self) {
     } else { return PyLong_FromLong(0); }
 }
 
+/**** query ****/
+
+static PyObject *
+_getDepartIdxPyString(Depart *tgt) {
+    int idx = 0; Depart *cur = mp.depart_head;
+    for (; cur && cur != tgt; cur=cur->next, idx++) ;
+    if (cur == NULL) { return NULL; } // no match - to NULL
+    else {
+        return Py_BuildValue("i", idx);
+    }
+}
+
+static PyObject *
+_convertDepartWrapperToPyDict(DepartWrapper *wpr_head) {
+    if (wpr_head == NULL) { return NULL; }
+    PyObject *rtn = PyDict_New();
+    for (; wpr_head; wpr_head = wpr_head->next) {
+        PyDict_SetItemString(rtn, wpr_head->depart->data->name,
+                             _getDepartIdxPyString(wpr_head->depart));
+    }
+    return rtn;
+}
+
+static PyObject *
+curr_queryDepart(PyObject *self, PyObject *args) {
+    const char *pto; const char *buf_str;
+    DepartWrapper *C_rst; PyObject *Py_rst;
+    if (!PyArg_ParseTuple(args, "ss", &pto, &buf_str)) { return NULL; }
+    if (strcmp("name", pto) == 0) {
+        puts("querying depart by name");
+        C_rst = getDepartByName(mp.depart_head, NULL, buf_str);
+    }
+    else if (strcmp("manager", pto) == 0) {
+        C_rst = getDepartByManager(mp.depart_head, NULL, buf_str);
+    } else { return NULL; }
+    Py_rst = _convertDepartWrapperToPyDict(C_rst);
+    cleanupDepartWrapper(C_rst);
+    return Py_rst;
+}
+
 /**** Mellxos ****/
 
 static PyObject *
 curr_parseTypeCodeToString(PyObject *self, PyObject *args) {
     const char from;
     if (!PyArg_ParseTuple(args, "c", &from)) { return NULL; }
-    char to[50];
     switch (from) {
         case '1': { return Py_BuildValue("s", "973 Program"); }
         case '2': { return Py_BuildValue("s", "NSFC"); }
@@ -333,7 +372,6 @@ curr_parseTypeCodeToString(PyObject *self, PyObject *args) {
     }
 }
 
-// void *
 
 
 /**** Py Packaging ****/
@@ -358,6 +396,9 @@ static PyMethodDef CurrMethods[] = {
         "get a list of team names" },
     { "getAllProject", curr_getAllProject, METH_VARARGS,
         "get a list of project IDs" },
+    // QUERYING
+    { "queryDepart", curr_queryDepart, METH_VARARGS,
+        "query department" },
     // MODIFYING
     { "modifyFocusedDepart", curr_modifyFocusedDepart, METH_VARARGS,
         "modify depart info" },

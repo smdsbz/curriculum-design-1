@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Overview for Departments{% endblock %}
+{% block title %}Overview of
+{% if object_type == 'depart' %} Departments
+{% elif object_type == 'team' %} Teams
+{% elif object_type == 'project' %} Projects
+{% endif %}
+{% endblock %}
 
 {% block main_content %}
 

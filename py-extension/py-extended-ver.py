@@ -93,6 +93,18 @@ def overview(object_type):
                            object_type=object_type, data=data)
 
 
+    ## Query ##
+
+@app.route('/query/<object_type>', methods = ['GET', 'POST'])
+@check
+def query(object_type):
+    if request.method == 'GET':
+        data = curr.queryDepart('name', 'C')    # get Computer and Chemistry
+        print(data)
+        return render_template('query.html', object_type=object_type, data=data)
+
+
+
     ## Focused ##
 
 @app.route('/depart/<int:idx>', methods=['GET', 'PUT', 'DELETE'])   # REST not supported
