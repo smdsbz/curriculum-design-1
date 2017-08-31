@@ -74,6 +74,7 @@ def saving():
         flash('Error while saving!', category='error')
     return redirect(url_for('index'))
 
+
     ## Overview ##
 
 @app.route('/overview/<object_type>')
@@ -99,11 +100,99 @@ def overview(object_type):
 @check
 def query(object_type):
     if request.method == 'GET':
-        data = curr.queryDepart('name', 'C')    # get Computer and Chemistry
-        print(data)
+        if object_type == 'depart':
+            data = curr.queryDepart('name', '$ VV ^ 6') # get u nothing
+            print(data)
+        elif object_type == 'team':
+            data = curr.queryTeam('name', '$ VV ^ 6')
+        elif object_type == 'project':
+            data = curr.queryProject('id', '$VV^6')
         return render_template('query.html', object_type=object_type, data=data)
 
 
+    if request.method == 'POST':
+
+        if object_type == 'depart':
+            partial = request.form.get('query-partial', None)
+            content = request.form.get('query-content-2', None)
+            if partial and content:
+                data = curr.queryDepart(partial, content)
+                return render_template('query.html',
+                                       object_type=object_type, data=data)
+            else:
+                flash('Error while querying!', category='warning')
+                return redirect(url_for('query'))
+
+        if object_type == 'team':
+            partial = request.form.get('query-partial', None)
+            content = request.form.get('query-content-2', None)
+
+            if partial == 'teacher_num':
+                content_1 = request.form.get('query-content-1', None)
+                content_2 = content
+                # validation
+                if content_1 is not ('<' or '>' or '='):
+                    flash('Try fvck my code :-)', category='error')
+                    return redirect(url_for('quit'))
+                try:
+                    int(content_2)
+                except ValueError:
+                    flash('Try fvck my code :-)', category='error')
+                    return redirect(url_for('quit'))
+                # OK
+                content = content_1 + ' ' + str(content_2)
+                # print(content)
+
+            if partial and content:
+                data = curr.queryTeam(partial, content)
+                return render_template('query.html',
+                                       object_type=object_type, data=data)
+
+            # HACK: ask hackers to leave
+            flash('Try fvck my code :-)', category='error')
+            return redirect(url_for('quit'))
+
+
+        if object_type == 'project':
+            partial = 'id' or request.form.get('query-partial', None) # always 'id'
+            content = request.form.get('query-content-2', None)
+            if partial and content:
+                data = curr.queryProject(partial, content)
+                return render_template('query.html',
+                                       object_type=object_type, data=data)
+            else:
+                flash('Error while querying!', category='warning')
+                return redirect(url_for('query'))
+
+
+@app.route('/query/<object_type>/<int:idx>/subnodes/')
+@check
+def subnodes(object_type, idx):
+    if object_type == 'depart':
+        Computer = curr.getDepartByIndex(idx)
+        data = curr.getTeamByDepart()
+        return render_template('subnodes.html', object_type='team', data=data)
+    if object_type == 'team':
+        Rocket = curr.getTeamByIndex(idx)
+        data = curr.getProjectByTeam()
+        return render_template('subnodes.html', object_type='project', data=data)
+    else:
+        flash('Undefined behaviour!', category='warning')
+        return redirect(url_for('index'))
+
+
+@app.route('/redirecting/<object_type>/parent')
+@check
+def redirecting(object_type):
+    if object_type == 'team':
+        return redirect(url_for('depart_view',
+                                idx=curr.getDepartByTeam()))
+    if object_type == 'project':
+        return redirect(url_for('team_view',
+                                idx=curr.getTeamByProject()))
+    else:
+        flash('Undefined behaviour!', category='warning')
+        return redirect(url_for('index'))
 
     ## Focused ##
 
@@ -187,6 +276,14 @@ def project_view(idx):
         partial = request.args.get('modify-partial', None)
         content = request.args.get('modify-content', None)
         if partial and content:
+            # input check
+            if partial is 'funding':
+                try:
+                    float(content)
+                except ValueError:
+                    flash('Try fvck my code :-)', category='error')
+                    return redirect(url_for('quit'))
+            # OK
             if curr.modifyFocusedProject(partial, content):
                 flash('Changed successfully!', category='success')
             else:

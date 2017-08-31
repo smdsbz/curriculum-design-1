@@ -23,9 +23,9 @@
         <div class="collapsible-header"><i class="material-icons">search</i>Query</div>
         <div class="collapsible-body" style="padding:0">
           <div class="collection">
-            <a href="#" class="collection-item">Department</a>
-            <a href="#" class="collection-item">Team</a>
-            <a href="#" class="collection-item">Project</a>
+            <a href="{{url_for('query', object_type='depart')}}" class="collection-item">Department</a>
+            <a href="{{url_for('query', object_type='team')}}" class="collection-item">Team</a>
+            <a href="{{url_for('query', object_type='project')}}" class="collection-item">Project</a>
           </div>
         </div>
       </li>

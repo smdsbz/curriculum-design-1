@@ -20,7 +20,7 @@
             {% if object_type == 'team' %}
             onchange="changeInputField(this);"
             {% endif %}
-        >
+        required>
           {% if object_type == 'depart' %}
           <option value="" disabled selected>Options</option>
           <option value="name">by Name</option>
@@ -36,8 +36,13 @@
       </div>
 
       <div class="input-field col s8">
-        <input type="text" name="query-content" id="query-content">
-        <label for="query-content">Value</label>
+        <div class="row" style="margin-bottom:0;">
+          <input class="col s10" type="text" name="query-content-2" id="query-content-2" required>
+          <label for="query-content-2">Value</label>
+          <button type="submit" class="btn-flat waves-effect waves-grey col s2">
+            <i class="material-icons">search</i>
+          </button>
+        </div>
       </div>
     </div>
   </form>
@@ -62,25 +67,30 @@
 
   {% if object_type == 'team' %}
   function changeInputField(e) {
-    parent = $("#query-content").parent();
+    parent = $("#query-content-2").parent();
+    console.log(parent);
     parent.empty();
     if (e.value === "name") {
       parent.append(`
-        <input type="text" name="query-content" id="query-content">
-        <label for="query-content">Value</label>
+        <input class="col s10" type="text" name="query-content-2" id="query-content-2" required>
+        <label for="query-content-2">Value</label>
+        <button type="submit" class="btn-flat waves-effect waves-grey col s2">
+          <i class="material-icons">search</i>
+        </button>
       `);
     }
     else if (e.value === "teacher_num") {
       parent.append(`
-        <div class="row">
-        <select class="col s6" name="query-content-1" id="query-content-1">
+        <select class="col s4" name="query-content-1" id="query-content-1" required>
           <option value="" disabled selected>Choose...</option>
           <option value="&lt;">Less than</option>
           <option value="&gt;">More than</option>
           <option value="&#61;">Equal to</option>
         </select>
-        <input class="col s6" type="number" name="query-content-2" id="query-content-2" placeholder="Value">
-        </div>
+        <input class="col s6" type="number" name="query-content-2" id="query-content-2" placeholder="Value" required>
+        <button class="btn-flat waves-effect waves-grey col s2" type="submit">
+          <i class="material-icons">search</i>
+        </button>
       `);
       $('select').material_select();
     }

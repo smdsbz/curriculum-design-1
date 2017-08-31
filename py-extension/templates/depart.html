@@ -40,7 +40,7 @@
         <a href="#modify" class="collection-item modal-trigger">Modify</a>
         <!-- TODO: modal to confirm delete action -->
         <a href="#delete" class="collection-item" onclick="deleteThisNode();">Delete</a>
-        <a href="#" class="collection-item">List teams</a>
+        <a href="#subnodes" class="collection-item" onclick="redirectToSubTeams();">List teams</a>
       </div>
 
       <!-- modify modal -->
@@ -80,9 +80,19 @@
   $('select').material_select();
 
   function deleteThisNode() {
-    cur_URI = location.href.substring(0, location.href.indexOf('?'));
+    cur_URI = location.href.substring(0, location.href.indexOf('#'));
+    if (cur_URI === "") { cur_URI = location.href; }
     dst_URI = cur_URI + "?action=delete";   // HACK: NOT BEAUTIFUL!
     location.href = dst_URI;
+  }
+
+  function redirectToSubTeams() {
+    cur_URI = location.href.substring(0, location.href.indexOf('#'));
+    if (cur_URI === "") { cur_URI = location.href; }
+    depart_idx = cur_URI.split('/').reverse()[0];
+    console.log(depart_idx);
+    location.href = location.href.substring(0, location.href.indexOf('depart')) +
+                    'query/depart/' + depart_idx + '/subnodes/';
   }
 
 </script>

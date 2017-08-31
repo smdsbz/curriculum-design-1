@@ -323,18 +323,57 @@ _getDepartIdxPyString(Depart *tgt) {
     int idx = 0; Depart *cur = mp.depart_head;
     for (; cur && cur != tgt; cur=cur->next, idx++) ;
     if (cur == NULL) { return NULL; } // no match - to NULL
-    else {
-        return Py_BuildValue("i", idx);
-    }
+    else { return Py_BuildValue("i", idx); }
+}
+
+static PyObject *
+_getTeamIdxPyString(Team *tgt) {
+    int idx = 0; Team *cur = mp.team_head;
+    for (; cur && cur != tgt; cur=cur->next, idx++) ;
+    if (cur == NULL) { return NULL; }
+    else { return Py_BuildValue("i", idx); }
+}
+
+static PyObject *
+_getProjectIdxPyString(Project *tgt) {
+    int idx = 0; Project *cur = mp.project_head;
+    for (; cur && cur != tgt; cur=cur->next, idx++) ;
+    if (cur == NULL) { return NULL; }
+    else { return Py_BuildValue("i", idx); }
 }
 
 static PyObject *
 _convertDepartWrapperToPyDict(DepartWrapper *wpr_head) {
     if (wpr_head == NULL) { return NULL; }
     PyObject *rtn = PyDict_New();
+    if (wpr_head->depart == NULL) { return rtn; }
     for (; wpr_head; wpr_head = wpr_head->next) {
         PyDict_SetItemString(rtn, wpr_head->depart->data->name,
                              _getDepartIdxPyString(wpr_head->depart));
+    }
+    return rtn;
+}
+
+static PyObject *
+_convertTeamWrapperToPyDict(TeamWrapper *wpr_head) {
+    if (wpr_head == NULL) { return NULL; }
+    PyObject *rtn = PyDict_New();
+    if (wpr_head->team == NULL) { return rtn; }
+    for (; wpr_head; wpr_head = wpr_head->next) {
+        PyDict_SetItemString(rtn, wpr_head->team->data->name,
+                             _getTeamIdxPyString(wpr_head->team));
+    }
+    return rtn;
+}
+
+static PyObject *
+_convertProjectWrapperToPyDict(ProjectWrapper *wpr_head) {
+    if (wpr_head == NULL) { return NULL; }
+    PyObject *rtn = PyDict_New();
+    if (wpr_head->project == NULL) { return rtn; }
+    for (; wpr_head; wpr_head = wpr_head->next) {
+        PyDict_SetItemString(rtn, wpr_head->project->data->id,
+                             _getProjectIdxPyString(wpr_head->project));
     }
     return rtn;
 }
@@ -354,6 +393,80 @@ curr_queryDepart(PyObject *self, PyObject *args) {
     Py_rst = _convertDepartWrapperToPyDict(C_rst);
     cleanupDepartWrapper(C_rst);
     return Py_rst;
+}
+
+static PyObject *
+curr_queryTeam(PyObject *self, PyObject *args) {
+    const char *pto; const char *buf_str;
+    TeamWrapper *C_rst; PyObject *Py_rst;
+    if (!PyArg_ParseTuple(args, "ss", &pto, &buf_str)) { return NULL; }
+    if (strcmp("name", pto) == 0) {
+        C_rst = getTeamByName(mp.team_head, NULL, buf_str);
+    }
+    else if (strcmp("teacher_num", pto) == 0) {
+        Where cond;
+        sscanf(buf_str, "%s %d", &cond.direction, &cond.value);
+        // puts(buf_str);
+        C_rst = getTeamByTeacherNum(mp.team_head, NULL, cond);
+    } else { return NULL; }
+    Py_rst = _convertTeamWrapperToPyDict(C_rst);
+    cleanupTeamWrapper(C_rst);
+    return Py_rst;
+}
+
+static PyObject *
+curr_queryProject(PyObject *self, PyObject *args) {
+    const char *pto; const char *buf_str;
+    ProjectWrapper *C_rst; PyObject *Py_rst;
+    if (!PyArg_ParseTuple(args, "ss", &pto, &buf_str)) { return NULL; }
+    if (strcmp("id", pto) == 0) {
+        C_rst = getProjectById(mp.project_head, NULL, buf_str);
+    } else { return NULL; }
+    Py_rst = _convertProjectWrapperToPyDict(C_rst);
+    cleanupProjectWrapper(C_rst);
+    return Py_rst;
+}
+
+/**** navigate ****/
+
+static PyObject *
+curr_getTeamByDepart(PyObject *self) {
+    if (cursor.type != 2) { return NULL; }
+    PyObject *rtn = PyDict_New();
+    Team *team = ((Depart *)cursor.val)->child_team_head;
+    if (team == NULL) { return rtn; }
+    for (; team != ((Depart *)cursor.val)->child_team_tail; team=team->next) {
+        PyDict_SetItemString(rtn, team->data->name,
+                             _getTeamIdxPyString(team));
+    }
+    return rtn;
+}
+
+static PyObject *
+curr_getProjectByTeam(PyObject *self) {
+    if (cursor.type != 2) { return NULL; }
+    PyObject *rtn = PyDict_New();
+    Project *project = ((Team *)cursor.val)->child_project_head;
+    if (project == NULL) { return rtn; }
+    for (; project != ((Team *)cursor.val)->child_project_tail; project=project->next) {
+        PyDict_SetItemString(rtn, project->data->id,
+                             _getProjectIdxPyString(project));
+    }
+    return rtn;
+}
+
+static PyObject *
+curr_getDepartByTeam(PyObject *self) {
+    // if (cursor.type != 2) { puts("cursor.type unmet"); return NULL; }
+    cursor.type = 1; cursor.val = ((Team *)cursor.val)->parent_depart;
+    return _getDepartIdxPyString((Depart *)cursor.val);
+}
+
+static PyObject *
+curr_getTeamByProject(PyObject *self) {
+    // if (cursor.type != 3) { return NULL; }
+    cursor.type = 2; cursor.val = ((Project *)cursor.val)->parent_team;
+    return _getTeamIdxPyString((Team *)cursor.val);
 }
 
 /**** Mellxos ****/
@@ -399,6 +512,19 @@ static PyMethodDef CurrMethods[] = {
     // QUERYING
     { "queryDepart", curr_queryDepart, METH_VARARGS,
         "query department" },
+    { "queryTeam", curr_queryTeam, METH_VARARGS,
+        "query team" },
+    { "queryProject", curr_queryProject, METH_VARARGS,
+        "query project" },
+    // NAVIGATING
+    { "getTeamByDepart", curr_getTeamByDepart, METH_VARARGS,
+        "get a dict of sub-team name-idx" },
+    { "getProjectByTeam", curr_getProjectByTeam, METH_VARARGS,
+        "get a dict of sub-project id-idx" },
+    { "getDepartByTeam", curr_getDepartByTeam, METH_VARARGS,
+        "return parent depart idx" },
+    { "getTeamByProject", curr_getTeamByProject, METH_VARARGS,
+        "return parent team idx" },
     // MODIFYING
     { "modifyFocusedDepart", curr_modifyFocusedDepart, METH_VARARGS,
         "modify depart info" },

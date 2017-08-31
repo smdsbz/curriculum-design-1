@@ -28,7 +28,9 @@
           </tr>
           <tr>
             <td>Department</td>
-            <td>{{data['Department']}}</td>
+            <td>
+              <a href="{{url_for('redirecting', object_type='team')}}" id="parent-depart">{{data['Department']}}</a>
+            </td>
           </tr>
           <tr>
             <td>Teacher Num.</td>
@@ -47,8 +49,8 @@
       <div class="collection">
         <a href="#modify" class="collection-item">Modify</a>
         <a href="#delete" class="collection-item" onclick="deleteThisNode();">Delete</a>
-        <a href="#" class="collection-item">List Projects</a>
-        <a href="#" class="collection-item">Parent department</a>
+        <a href="#subnodes" class="collection-item" onclick="redirectToSubProjects();">List Projects</a>
+        <!-- <a href="#parent" class="collection-item" onclick="redirectToParentDepart();">Parent department</a> -->
       </div>
 
       <!-- modify modal -->
@@ -107,6 +109,15 @@
     else if (e.value === 'student_num') {
       $("#modify-content").attr('type', 'number');
     }
+  }
+
+  function redirectToSubProjects() {
+    cur_URI = location.href.substring(0, location.href.indexOf('#'));
+    if (cur_URI === "") { cur_URI = location.href; }
+    team_idx = cur_URI.split('/').reverse()[0];
+    console.log(team_idx);
+    location.href = location.href.substring(0, location.href.indexOf('team')) +
+                    'query/team/' + team_idx + '/subnodes/';
   }
 
 </script>
