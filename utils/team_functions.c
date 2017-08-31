@@ -264,7 +264,7 @@ int removeTeam(Team **phead, Team *tgt) {
     // 删除节点
     if (*phead == tgt && tgt->next) {
         *phead = tgt->next;
-    } else if (tgt->next) {
+    } else {
         prev->next = tgt->next;
     }
     // 在母结点数据域注册删除操作
@@ -286,8 +286,8 @@ int removeTeam(Team **phead, Team *tgt) {
            tgt->data->name, tgt);
     #endif
     free(tgt->data);
-    if (tgt->next == NULL) { tgt->data = NULL; }
-    if (tgt->next) { free(tgt); }
+    if (tgt->next == NULL && *phead == tgt) { tgt->data = NULL; }
+    else { free(tgt); }
     return 1;
 }
 

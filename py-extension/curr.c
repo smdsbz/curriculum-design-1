@@ -18,12 +18,12 @@ curr_loadData(PyObject *self, PyObject *args) {
     if (mp.depart_head == NULL
             || mp.team_head == NULL
             || mp.project_head == NULL) {
-        return NULL;
+        return PyLong_FromLong(0);
     }
     // list out for debugging
     if (mp.depart_head == NULL) {
         puts("No data!");
-        return PyLong_FromLong(1);
+        return PyLong_FromLong(0);
     }
     Depart *d; Team *t; Project *p;
     for (d = mp.depart_head; d != NULL; d = d->next) {
@@ -46,6 +46,14 @@ curr_loadData(PyObject *self, PyObject *args) {
     putchar('\n');
     // list finished
 
+    return PyLong_FromLong(1);
+}
+
+static PyObject *
+curr_saveData(PyObject *self) {
+    if (saveData(mp, TGT_PATH)) {
+        return PyLong_FromLong(1);
+    }
     return PyLong_FromLong(0);
 }
 
@@ -55,7 +63,7 @@ curr_cleanupAll(PyObject *self, PyObject *args) {
     cleanupDepart(mp.depart_head);
     cleanupTeam(mp.team_head);
     cleanupProject(mp.project_head);
-    return PyLong_FromLong(0);
+    return PyLong_FromLong(1);
 }
 
 /**** Focus on specific object ****/
@@ -147,7 +155,7 @@ curr_getProjectAttr(PyObject *self, PyObject *args) {
     printf("idx == %d\n", idx);
     if (!mp.project_head) { puts("Please load data before you query!"); return NULL; }
     // getting object
-    cursor.type = 2; cursor.val = mp.project_head;
+    cursor.type = 3; cursor.val = mp.project_head;
     for (int cur = 0;
          cursor.val && cur < idx;
          cur++, cursor.val = ((Project *)cursor.val)->next) ;
@@ -221,6 +229,38 @@ curr_getAllProject(PyObject *self) {
     return projects;
 }
 
+/**** modify ****/
+
+static PyObject *
+curr_modifyFocusedDepart(PyObject *self, PyObject *args) {
+    if (cursor.type != 1) { return NULL; }  // type mis-match
+    const char *buf_str; const char *pto;
+    if (!PyArg_ParseTuple(args, "ss", &pto, &buf_str)) { return NULL; }
+    printf("%s::'%s'-->'%s'\n", ((Depart *)cursor.val)->data->name,
+           pto, buf_str);
+    if (strcmp("manager", pto) == 0) {
+        strcpy(((Depart *)cursor.val)->data->manager, buf_str);
+    }
+    else if (strcmp("mobile", pto) == 0) {
+        strcpy(((Depart *)cursor.val)->data->mobile, buf_str);
+    } else { return PyLong_FromLong(0); }
+    return PyLong_FromLong(1);
+}
+
+/**** delete ****/
+
+static PyObject *
+curr_removeFocusedDepart(PyObject *self) {
+    printf("[C] entered curr_removeFocusedDepart(), cursor.type is %d\n", cursor.type);
+    if (cursor.type != 1) { puts("[C] type mis-match"); return NULL; }
+    printf("deleting depart/%s\n", ((Depart *)cursor.val)->data->name);
+    if (removeDepart(&(mp.depart_head), (Depart *)cursor.val)) {
+        cursor.type = 0; cursor.val = NULL;
+        return PyLong_FromLong(1);
+    } else { return PyLong_FromLong(0); }
+}
+
+
 /**** Mellxos ****/
 
 static PyObject *
@@ -236,7 +276,6 @@ curr_parseTypeCodeToString(PyObject *self, PyObject *args) {
         case '5': { return Py_BuildValue("s", "Transverse"); }
         default: { return Py_BuildValue("s", "---"); }
     }
-    return NULL;
 }
 
 // void *
@@ -250,24 +289,31 @@ static PyMethodDef CurrMethods[] = {
         "load and print all data" },
     { "cleanupAll", curr_cleanupAll, METH_VARARGS,
         "cleanup everything"},
-    // TEST
+    // FOCUSING
     { "getDepartByIndex", curr_getDepartAttr, METH_VARARGS,
         "get department attribute, and store them in a python dict!" },
     { "getTeamByIndex", curr_getTeamtAttr, METH_VARARGS,
         "as above, get team data this time" },
     { "getProjectByIndex", curr_getProjectAttr, METH_VARARGS,
         "..." },
-    ///////////////////////////////
+    // LISTING
     { "getAllDepart", curr_getAllDepart, METH_VARARGS,
         "get a list of depart names" },
     { "getAllTeam", curr_getAllTeam, METH_VARARGS,
         "get a list of team names" },
     { "getAllProject", curr_getAllProject, METH_VARARGS,
         "get a list of project IDs" },
-
+    // MODIFYING
+    { "modifyFocusedDepart", curr_modifyFocusedDepart, METH_VARARGS,
+        "modify depart info" },
+    // DELETING
+    { "removeFocusedDepart", curr_removeFocusedDepart, METH_VARARGS,
+        "delete depart record" },
     // M
     { "parseTypeCodeToString", curr_parseTypeCodeToString, METH_VARARGS,
         "convert project type code to according type string" },
+    { "saveData", curr_saveData, METH_VARARGS,
+        "save(cover) original data" },
     { NULL, NULL, 0, NULL }
 };
 

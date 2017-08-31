@@ -219,7 +219,7 @@ int removeProject(Project **phead, Project *tgt) {
     for (; prev->next != NULL && prev->next != tgt; prev = prev->next) ;
     if (*phead == tgt && tgt->next) {
         *phead = tgt->next;
-    } else if (tgt->next) {
+    } else {
         prev->next = tgt->next;
     }
     if (tgt->parent_team->child_project_head == tgt->parent_team->child_project_tail) {
@@ -235,8 +235,8 @@ int removeProject(Project **phead, Project *tgt) {
            tgt->data->id, tgt);
     #endif
     free(tgt->data);
-    if (tgt->next == NULL) { tgt->data = NULL; }
-    if (tgt->next) { free(tgt); }
+    if (tgt->next == NULL && *phead == tgt) { tgt->data = NULL; }
+    else { free(tgt); }
     return 1;
 }
 
