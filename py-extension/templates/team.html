@@ -45,10 +45,40 @@
 
       <!-- operations -->
       <div class="collection">
-        <a href="#" class="collection-item">Modify</a>
-        <a href="#" class="collection-item">Delete</a>
+        <a href="#modify" class="collection-item">Modify</a>
+        <a href="#delete" class="collection-item" onclick="deleteThisNode();">Delete</a>
         <a href="#" class="collection-item">List Projects</a>
-        <!-- <a href="#" class="collection-item">Parent department</a> -->
+        <a href="#" class="collection-item">Parent department</a>
+      </div>
+
+      <!-- modify modal -->
+      <div id="modify" class="modal">
+        <div class="modal-content">
+          <h4>Modify</h4>
+          <div class="container row" style="margin-left:0; margin-right:0;">
+            <form class="col s12" action="" method="put">
+              <div class="row">
+                <div class="input-field col s4">
+                  <select class="" name="modify-partial" onchange="changeInputField(this);">
+                    <option value="" disabled selected>Options</option>
+                    <option value="manager">Manager</option>
+                    <!-- TODO: check str/num before submitting -->
+                    <option value="teacher_num">Teacher Num.</option>
+                    <option value="student_num">Student Num.</option>
+                  </select>
+                  <!-- <label>Options</label> -->
+                </div>
+                <div class="input-field col s8">
+                  <input type="text" name="modify-content" id="modify-content">
+                  <label for="modify-content">Value</label>
+                </div>
+              </div>
+              <button class="btn waves-effect waves-light right" type="submit" name="action" value="modify">
+                Submit <i class="material-icons right">send</i>
+              </button>
+            </form>
+          </div>
+        </div>
       </div>
 
 
@@ -56,5 +86,29 @@
     </div>
   </div>
 </div>
+
+<script>
+  $(".modal").modal();
+  $('select').material_select();
+
+  function deleteThisNode() {
+    cur_URI = location.href.substring(0, location.href.indexOf('?'));
+    dst_URI = cur_URI + "?action=delete";   // HACK: NOT BEAUTIFUL!
+    location.href = dst_URI;
+  }
+
+  function changeInputField(e) {
+    if (e.value === 'manager') {
+      $("#modify-content").attr('type', 'text');
+    }
+    else if (e.value === 'teacher_num') {
+      $("#modify-content").attr('type', 'number');
+    }
+    else if (e.value === 'student_num') {
+      $("#modify-content").attr('type', 'number');
+    }
+  }
+
+</script>
 
 {% endblock %}

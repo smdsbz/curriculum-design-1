@@ -49,15 +49,90 @@
 
       <!-- operations -->
       <div class="collection">
-        <a href="#" class="collection-item">Modify</a>
-        <a href="#" class="collection-item">Delete</a>
+        <a href="#modify" class="collection-item">Modify</a>
+        <a href="#delete" class="collection-item" onclick="deleteThisNode();">Delete</a>
         <!-- <a href="#" class="collection-item">Parent team</a> -->
       </div>
 
+      <!-- modify modal -->
+      <div id="modify" class="modal">
+        <div class="modal-content">
+          <h4>Modify</h4>
+          <div class="container row" style="margin-left:0; margin-right:0;">
+            <form class="col s12" action="" method="put">
+              <div class="row">
+                <div class="input-field col s4">
+                  <select class="" name="modify-partial" onchange="changeInputField(this);">
+                    <option value="" disabled selected>Options</option>
+                    <option value="manager">Manager</option>
+                    <!-- TODO: change <input> to <select> -->
+                    <option value="type">Type</option>
+                    <option value="funding">Funding</option>
+                  </select>
+                  <!-- <label>Options</label> -->
+                </div>
+                <div class="input-field col s8">
+                  <input type="text" name="modify-content" id="modify-content">
+                  <label for="modify-content">Value</label>
+                </div>
+              </div>
+              <button class="btn waves-effect waves-light right" type="submit" name="action" value="modify">
+                Submit <i class="material-icons right">send</i>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
 
 
     </div>
   </div>
 </div>
+
+<script>
+  $(".modal").modal();
+  $('select').material_select();
+
+  function deleteThisNode() {
+    cur_URI = location.href.substring(0, location.href.indexOf('?'));
+    dst_URI = cur_URI + "?action=delete";   // HACK: NOT BEAUTIFUL!
+    location.href = dst_URI;
+  }
+
+  function changeInputField(e) {
+    parent = $("#modify-content").parent();
+    parent.empty(); // parent - jQ object
+    if (e.value === 'manager') {
+      $(parent).append(`
+        <input type="text" name="modify-content" id="modify-content">
+        <label for="modify-content">Value</label>
+      `);
+    }
+    else if (e.value === 'type') {
+      // TODO: change it to <select>
+      parent.append(`
+      <select class="" name="modify-content" id="modify-content">
+        <option value="" disabled selected>Choose a type...</option>
+        <option value="1">1. 973 Program</option>
+        <option value="2">2. NSFC</option>
+        <option value="3">3. 863 Program</option>
+        <option value="4">4. International</option>
+        <option value="5">5. Transeverse</option>
+      </select>
+      `);
+      // init <select> again
+      $("select").material_select();
+    }
+    else if (e.value === 'funding') {
+      // $("#modify-content").attr('type', 'number')
+      // $("#modify-content").attr('step', 'any');
+      parent.append(`
+        <input type="number" name="modify-content" id="modify-content" step="any">
+        <label for="modify-content">Value</label>
+      `);
+    }
+  }
+
+</script>
 
 {% endblock %}

@@ -247,11 +247,49 @@ curr_modifyFocusedDepart(PyObject *self, PyObject *args) {
     return PyLong_FromLong(1);
 }
 
+static PyObject *
+curr_modifyFocusedTeam(PyObject *self, PyObject *args) {
+    if (cursor.type != 2) { return NULL; }
+    const char *buf_str; const char *pto;
+    if (!PyArg_ParseTuple(args, "ss", &pto, &buf_str)) { return NULL; }
+    printf("%s::'%s'-->%s\n", ((Team *)cursor.val)->data->name,
+           pto, buf_str);
+    if (strcmp("manager", pto) == 0) {
+        strcpy(((Team *)cursor.val)->data->manager, buf_str);
+    }
+    else if (strcmp("teacher_num", pto) == 0) {
+        ((Team *)cursor.val)->data->teacher_num = atoi(buf_str);
+    }
+    else if (strcmp("student_num", pto) == 0) {
+        ((Team *)cursor.val)->data->student_num = atoi(buf_str);
+    } else { return PyLong_FromLong(0); }
+    return PyLong_FromLong(1);
+}
+
+static PyObject *
+curr_modifyFocusedProject(PyObject *self, PyObject *args) {
+    if (cursor.type != 3) { return NULL; }
+    const char *buf_str; const char *pto;
+    if (!PyArg_ParseTuple(args, "ss", &pto, &buf_str)) { return NULL; }
+    printf("%s::'%s'-->%s\n", ((Project *)cursor.val)->data->id,
+           pto, buf_str);
+    if (strcmp("type", pto) == 0) {
+        ((Project *)cursor.val)->data->type = *buf_str;
+    }
+    else if (strcmp("funding", pto) == 0) {
+        ((Project *)cursor.val)->data->funding = (float)atof(buf_str);
+    }
+    else if (strcmp("manager", pto) == 0) {
+        strcpy(((Project *)cursor.val)->data->manager, buf_str);
+    } else { return NULL; }
+    return PyLong_FromLong(1);
+}
+
 /**** delete ****/
 
 static PyObject *
 curr_removeFocusedDepart(PyObject *self) {
-    printf("[C] entered curr_removeFocusedDepart(), cursor.type is %d\n", cursor.type);
+    // printf("[C] entered curr_removeFocusedDepart(), cursor.type is %d\n", cursor.type);
     if (cursor.type != 1) { puts("[C] type mis-match"); return NULL; }
     printf("deleting depart/%s\n", ((Depart *)cursor.val)->data->name);
     if (removeDepart(&(mp.depart_head), (Depart *)cursor.val)) {
@@ -260,6 +298,23 @@ curr_removeFocusedDepart(PyObject *self) {
     } else { return PyLong_FromLong(0); }
 }
 
+static PyObject *
+curr_removeFocusedTeam(PyObject *self) {
+    if (cursor.type != 2) { return NULL; }
+    if (removeTeam(&(mp.team_head), (Team *)cursor.val)) {
+        cursor.type = 0; cursor.val = NULL;
+        return PyLong_FromLong(1);
+    } else { return PyLong_FromLong(0); }
+}
+
+static PyObject *
+curr_removeFocusedProject(PyObject *self) {
+    if (cursor.type != 3) { return NULL; }
+    if (removeProject(&(mp.project_head), (Project *)cursor.val)) {
+        cursor.type = 0; cursor.val = NULL;
+        return PyLong_FromLong(1);
+    } else { return PyLong_FromLong(0); }
+}
 
 /**** Mellxos ****/
 
@@ -306,9 +361,17 @@ static PyMethodDef CurrMethods[] = {
     // MODIFYING
     { "modifyFocusedDepart", curr_modifyFocusedDepart, METH_VARARGS,
         "modify depart info" },
+    { "modifyFocusedTeam", curr_modifyFocusedTeam, METH_VARARGS,
+        "modify team info" },
+    { "modifyFocusedProject", curr_modifyFocusedProject, METH_VARARGS,
+        "modify project info" },
     // DELETING
     { "removeFocusedDepart", curr_removeFocusedDepart, METH_VARARGS,
         "delete depart record" },
+    { "removeFocusedTeam", curr_removeFocusedTeam, METH_VARARGS,
+        "delete team record" },
+    { "removeFocusedProject", curr_removeFocusedProject, METH_VARARGS,
+        "delete project record" },
     // M
     { "parseTypeCodeToString", curr_parseTypeCodeToString, METH_VARARGS,
         "convert project type code to according type string" },

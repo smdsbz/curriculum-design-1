@@ -98,6 +98,8 @@ def overview(object_type):
 @app.route('/depart/<int:idx>', methods=['GET', 'PUT', 'DELETE'])   # REST not supported
 @check
 def depart_view(idx):
+    Computer = curr.getDepartByIndex(idx)   # set cursor.val (in C ext. - curr)
+
     if request.method == 'PUT' or request.args.get('action', None) == 'modify':
         # get modify info
         partial = request.args.get('modify-partial', None)
@@ -107,13 +109,12 @@ def depart_view(idx):
             if curr.modifyFocusedDepart(partial, content):
                 flash('Changed successfully!', category='success')
             else:
-                flash('Error in modifying', category='error')
+                flash('Error while modifying!', category='error')
             # Computer = curr.getDepartByIndex(idx)   # refresh data
         return redirect(url_for('depart_view', idx=idx))
 
-    elif request.method == 'DELETE' or request.args.get('action', None) == 'delete':
-        Computer = curr.getDepartByIndex(idx)   # set cursor.val in curr module C env
-        print(Computer)
+    if request.method == 'DELETE' or request.args.get('action', None) == 'delete':
+        # print(Computer)
         ret_code = curr.removeFocusedDepart()
         if ret_code == 1:
             flash("Department successfully deleted!", category='success')
@@ -123,8 +124,7 @@ def depart_view(idx):
             flash("Error while removing '%s'" % Computer['Name'], category='error')
         return redirect(url_for('overview', object_type='depart'))
 
-    elif request.method == 'GET':
-        Computer = curr.getDepartByIndex(idx)
+    if request.method == 'GET':
         return render_template('depart.html', data=Computer)
 
 
@@ -132,16 +132,65 @@ def depart_view(idx):
 @check
 def team_view(idx):
     Rocket = curr.getTeamByIndex(idx)
-    return render_template('team.html', data=Rocket)
+
+    if request.method == 'PUT' or request.args.get('action', None) == 'modify':
+        partial = request.args.get('modify-partial', None)
+        content = request.args.get('modify-content', None)
+        if partial and content:
+            # input check
+            if partial is 'teacher_num' or 'student_num':
+                try:
+                    int(content)    # content should be a integer
+                except ValueError:
+                    flash('Try fvck my code :-)', category='error')
+                    return redirect(url_for('quit'))    # ask hackers to leave
+            # everything's fine
+            if curr.modifyFocusedTeam(partial, content):
+                flash('Changed successfully!', category='success')
+            else:
+                flash('Error while modifying!', category='error')
+        return redirect(url_for('team_view', idx=idx))
+
+    if request.method == 'DELETE' or request.args.get('action', None) == 'delete':
+        ret_code = curr.removeFocusedTeam()
+        if ret_code == 1:
+            flash("Team successfully deleted!", category='success')
+        elif ret_code == 0:
+            flash("The team you are deleting has affiliated projects!", category='warning')
+        else:
+            flash("Error while removing '%s'" % Rocket['Name'], category='error')
+        return redirect(url_for('overview', object_type='team'))
+
+    if request.method == 'GET':
+        return render_template('team.html', data=Rocket)
 
 
 @app.route('/project/<int:idx>', methods=['GET', 'PUT', 'DELETE'])
 @check
 def project_view(idx):
     Manhatan = curr.getProjectByIndex(idx)
-    Manhatan['Type'] = curr.parseTypeCodeToString(Manhatan['Type'])
-    return render_template('project.html', data=Manhatan)
+    Manhatan['Type'] = curr.parseTypeCodeToString(Manhatan['Type']) # little trick
 
+    if request.method == 'PUT' or request.args.get('action', None) == 'modify':
+        partial = request.args.get('modify-partial', None)
+        content = request.args.get('modify-content', None)
+        if partial and content:
+            if curr.modifyFocusedProject(partial, content):
+                flash('Changed successfully!', category='success')
+            else:
+                flash('Error while modifying!', category='error')
+        return redirect(url_for('project_view', idx=idx))
+
+    if request.method == 'DELETE' or request.args.get('action', None) == 'delete':
+        ret_code = curr.removeFocusedProject()
+        if ret_code == 1:
+            flash('Project successfully deleted!', category='success')
+        else:
+            flash("Error while removing '%s'" % Manhatan['ID'], category='error')
+        return redirect(url_for('overview', object_type='project'))
+
+    if request.method == 'GET':
+        return render_template('project.html', data=Manhatan)
 
 #### MAIN ####
 

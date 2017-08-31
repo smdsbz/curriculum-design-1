@@ -38,7 +38,8 @@
       <!-- operations -->
       <div class="collection">
         <a href="#modify" class="collection-item modal-trigger">Modify</a>
-        <a href="#" class="collection-item" onclick="deleteThisNode();">Delete</a>
+        <!-- TODO: modal to confirm delete action -->
+        <a href="#delete" class="collection-item" onclick="deleteThisNode();">Delete</a>
         <a href="#" class="collection-item">List teams</a>
       </div>
 
@@ -55,7 +56,7 @@
                     <option value="manager">Manager</option>
                     <option value="mobile">Telephone</option>
                   </select>
-                  <label>Options</label>
+                  <!-- <label>Options</label> -->
                 </div>
                 <div class="input-field col s8">
                   <input type="text" name="modify-content" id="modify-content">
@@ -68,9 +69,6 @@
             </form>
           </div>
         </div>
-        <!-- <div class="modal-footer">
-          <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
-        </div> -->
       </div>
 
     </div>
