@@ -326,6 +326,71 @@ def stat_view(nu):
 
     return render_template('stat.html', nu=nu, data=data)
 
+
+    ## ADD ##
+
+@app.route('/add/<object_type>', methods=['GET', 'POST'])
+@check
+def add(object_type):
+    if request.method == 'GET':
+        return render_template('add.html', object_type=object_type)
+
+    if request.method == 'POST':
+        if object_type == 'depart':
+            data = [request.form.get('name', None),
+                    request.form.get('manager', None),
+                    request.form.get('mobile', None)
+            ]
+            if None in data:
+                flash('Try fvck my code :-)', category='error')
+                return redirect(url_for('quit'))
+            result = curr.addDepart(data)
+
+        if object_type == 'team':
+            try:
+                data = [request.form.get('name', None),
+                        request.form.get('manager', None),
+                        int(request.form.get('teacher_num', None)),
+                        int(request.form.get('student_num', None)),
+                        request.form.get('faculty', None)
+                ]
+            except ValueError:
+                flash('Try fvck my code :-)', category='error')
+                return redirect(url_for('quit'))
+            if (data[2] < 0) or (data[3] < 0) or (None in data):
+                flash('Try fvck my code :-)', category='error')
+                return redirect(url_for('quit'))
+            result = curr.addTeam(data)
+
+        if object_type == 'project':
+            try:
+                data = [request.form.get('id', None),
+                        int(request.form.get('type', None)[0]),
+                        int(request.form.get('start_date-year', None)), # year first
+                        float(request.form.get('funding', None)),
+                        request.form.get('manager', None),
+                        request.form.get('team', None)
+                ]
+                start_date_month = int(request.form.get('start_date-month', None))
+            except ValueError or TypeError:
+                flash('Try fvck my code :-)', category='error')
+                return redirect(url_for('quit'))
+            if (data[2] < 1234 or data[2] > 2999) \
+                    or (start_date_month < 1 or start_date_month > 12) \
+                    or (None in data) \
+                    or (str(data[1]) not in '12345'):
+                flash('Try fvck my code :-)', category='error')
+                return redirect(url_for('quit'))
+            data[2] = '%4d/%02d' % (data[2], start_date_month)
+            result = curr.addProject(data)
+
+        # after add*() is called
+        if result != 0:
+            flash(result, category='warning')
+            return redirect(url_for('index'))
+        flash('%s successfully added!' % data[0], category='success')
+        return redirect(url_for('overview', object_type=object_type))
+
 #### MAIN ####
 
 if __name__ == '__main__':

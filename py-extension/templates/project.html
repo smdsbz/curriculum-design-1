@@ -40,7 +40,7 @@
           </tr>
           <tr>
             <td>Team</td>
-            <td>{{data['Team']}}</td>
+            <td><a href="{{url_for('redirecting', object_type='project')}}">{{data['Team']}}</a></td>
           </tr>
           {% endif %}
         </tbody>

@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Add Record{% endblock %}
+
+{% block main_content %}
+
+<div class="container">
+  <h4 class="center">
+    {% if object_type == 'depart' %}
+    Adding Department
+    {% elif object_type == 'team' %}
+    Adding Team
+    {% elif object_type == 'project' %}
+    Adding Project
+    {% endif %}
+  </h4>
+
+  <div class="progress">
+    <div class="indeterminate"></div>
+  </div>
+
+  <div class="row">
+    <form class="col s12 l10 offset-l1" action="" method="post">
+
+      {% if object_type == 'depart' %}
+      <div class="row">
+        <div class="input-field col s12">
+          <input type="text" name="name" id="add-depart-name" required>
+          <label for="add-depart-name">Name</label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="input-field col s12">
+          <input type="text" name="manager" id="add-depart-manager" required>
+          <label for="add-depart-manager">Manager</label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="input-field col s12">
+          <input type="text" name="mobile" id="add-depart-mobile" required>
+          <label for="add-depart-mobile">Telephone</label>
+        </div>
+      </div>
+
+      {% elif object_type == 'team' %}
+      <div class="row">
+        <div class="input-field col s12">
+          <input type="text" name="name" id="add-team-name" required>
+          <label for="add-team-name">Name</label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="input-field col s12">
+          <input type="text" name="manager" id="add-team-manager" required>
+          <label for="add-team-manager">Manager</label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="input-field col s12">
+          <input type="number" name="teacher_num" id="add-team-teacher-num" min="0" required>
+          <label for="add-team-teacher-num">Teacher Num.</label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="input-field col s12">
+          <input type="number" name="student_num" id="add-team-student-num" min="0" required>
+          <label for="add-team-student-num">Student Num.</label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="input-field col s12">
+          <input type="text" name="faculty" id="add-team-faculty" required>
+          <label for="add-team-faculty">Department</label>
+        </div>
+      </div>
+
+      {% elif object_type == 'project' %}
+      <div class="row">
+        <div class="input-field col s12">
+          <input type="text" name="id" id="add-project-id" required>
+          <label for="add-project-id">ID</label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="input-field col s12">
+          <select name="type" required>
+            <option value="" disabled selected>Choose...</option>
+            <option value="1">973 Program</option>
+            <option value="2">NSFC</option>
+            <option value="3">863 Program</option>
+            <option value="4">International</option>
+            <option value="5">Transeverse</option>
+          </select>
+          <label>Type</label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="input-field col s6">
+          <input type="number" name="start_date-year" id="add-project-start-date-year" min="1234" max="2999" required>
+          <label for="add-project-start-date-year">Year</label>
+        </div>
+        <div class="input-field col s6">
+          <input type="number" name="start_date-month" id="add-project-start-date-month" min="1" max="12" required>
+          <label for="add-project-start-date-month">Month</label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="input-field col s12">
+          <input type="number" name="funding" id="add-project-funding" step="any" required>
+          <label for="add-project-funding">Funding</label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="input-field col s12">
+          <input type="text" name="manager" id="add-project-manager" required>
+          <label for="add-project-manager">Manager</label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="input-field col s12">
+          <input type="text" name="team" id="add-project-team" required>
+          <label for="add-project-team">Team</label>
+        </div>
+      </div>
+
+
+      {% endif %}
+      <button class="btn waves-effect waves-light right" type="submit">
+        Submit<i class="material-icons right">send</i>
+      </button>
+    </form>
+  </div>
+
+
+</div>
+
+
+{% if object_type == 'project' %}
+<script>
+  $(document).ready(function() {
+    $('select').material_select();
+  });
+</script>
+{% endif %}
+
+
+{% endblock %}

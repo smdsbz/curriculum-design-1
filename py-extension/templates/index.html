@@ -52,7 +52,19 @@
           </div>
         </div>
       </li>
+      <li>
+        <div class="collapsible-header"><i class="material-icons">playlist_add</i>Add</div>
+        <div class="collapsible-body" style="padding:0">
+          <div class="collection">
+            <a href="{{url_for('add', object_type='depart')}}" class="collection-item">Department</a>
+            <a href="{{url_for('add', object_type='team')}}" class="collection-item">Team</a>
+            <a href="{{url_for('add', object_type='project')}}" class="collection-item">Project</a>
+          </div>
+        </div>
+      </li>
+
     </ul>
+
 
     <div class="modal" id="stat-2-input">
       <div class="modal-content">

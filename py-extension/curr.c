@@ -228,6 +228,7 @@ curr_getAllDepart(PyObject *self) {
     PyObject *departs = PyList_New(0);
     if (!mp.depart_head) { puts("no data!"); return departs; }
     for (Depart *cur = mp.depart_head; cur; cur = cur->next) {
+        puts(cur->data->name);
         PyList_Append(departs, Py_BuildValue("s", cur->data->name));
     }
     return departs;
@@ -337,6 +338,61 @@ curr_removeFocusedProject(PyObject *self) {
     if (removeProject(&(mp.project_head), (Project *)cursor.val)) {
         cursor.type = 0; cursor.val = NULL;
         return PyLong_FromLong(1);
+    } else { return PyLong_FromLong(0); }
+}
+
+/**** add ****/
+
+static PyObject *
+curr_addDepart(PyObject *self, PyObject *args) {
+    DepartData data;
+    const char *data_name, *data_manager, *data_mobile;
+    if (!PyArg_ParseTuple(args, "(sss)", &data_name,
+                         &data_manager, &data_mobile)) { return NULL; }
+    strcpy(data.name, data_name);
+    strcpy(data.manager, data_manager);
+    strcpy(data.mobile, data_mobile);
+    // puts(data_name); puts(data.name);
+    if (!appendDepart(mp.depart_head, data)) {
+        return Py_BuildValue("s", "Record already exists!");
+    } else { return PyLong_FromLong(0); }
+}
+
+static PyObject *
+curr_addTeam(PyObject *self, PyObject *args) {
+    TeamData data;
+    const char *data_name, *data_manager, *data_faculty;
+    if (!PyArg_ParseTuple(args, "(ssiis)", &data_name, &data_manager,
+                          &data.teacher_num, &data.student_num,
+                          &data_faculty)) { return NULL; }
+    strcpy(data.name, data_name);
+    strcpy(data.manager, data_manager);
+    strcpy(data.faculty, data_faculty);
+    if (!appendTeam(mp.team_head, data, mp.depart_head)) {
+        // HACK: unable to offer more acurate info
+        return Py_BuildValue("s", "Failed! Please check your input data!");
+    } else { return PyLong_FromLong(0); }
+}
+
+static PyObject *
+curr_addProject(PyObject *self, PyObject *args) {
+    ProjectData data;
+    const char *data_id, *data_start_date, *data_manager, *data_team;
+    int data_type;
+    if (!PyArg_ParseTuple(args, "(sisfss)",
+                          &data_id, &data_type, &data_start_date,
+                          &data.funding, &data_manager, &data_team)) {
+        return NULL;
+    }
+    data.type = data_type + '0';
+    putchar(data.type); putchar('\n');
+    strcpy(data.id, data_id);
+    puts(data_start_date);
+    strcpy(data.start_date, data_start_date);
+    strcpy(data.manager, data_manager);
+    strcpy(data.team, data_team);
+    if (!appendProject(mp.project_head, data, mp.team_head)) {
+        return Py_BuildValue("s", "Failed! Please chack your input data!");
     } else { return PyLong_FromLong(0); }
 }
 
@@ -455,7 +511,7 @@ curr_queryProject(PyObject *self, PyObject *args) {
 
 static PyObject *
 curr_getTeamByDepart(PyObject *self) {
-    if (cursor.type != 2) { return NULL; }
+    // if (cursor.type != 2) { return NULL; }
     PyObject *rtn = PyDict_New();
     Team *team = ((Depart *)cursor.val)->child_team_head;
     if (team == NULL) { return rtn; }
@@ -468,7 +524,7 @@ curr_getTeamByDepart(PyObject *self) {
 
 static PyObject *
 curr_getProjectByTeam(PyObject *self) {
-    if (cursor.type != 2) { return NULL; }
+    // if (cursor.type != 2) { return NULL; }
     PyObject *rtn = PyDict_New();
     Project *project = ((Team *)cursor.val)->child_project_head;
     if (project == NULL) { return rtn; }
@@ -726,6 +782,10 @@ static PyMethodDef CurrMethods[] = {
         "delete team record" },
     { "removeFocusedProject", curr_removeFocusedProject, METH_VARARGS,
         "delete project record" },
+    // ADDING
+    { "addDepart", curr_addDepart, METH_VARARGS, "add depart data" },
+    { "addTeam", curr_addTeam, METH_VARARGS, "add team data" },
+    { "addProject", curr_addProject, METH_VARARGS, "add project data" },
     // STATISTIC
     { "stat_1", curr_stat_1, METH_VARARGS, "get list of stat No.1" },
     { "stat_2", curr_stat_2, METH_VARARGS, "get list of stat No.2" },
