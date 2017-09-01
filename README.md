@@ -46,7 +46,11 @@
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 ## User Manual (for CLI ver.)
+### Compiling it
+- *nix: do `$PROG $ make && make run`
+- Win: do `PS> mingw32-make` or do as suggested in the `./makefile` :upside_down_face:
 
+### Using it
 ```
 ${PROGRAM_ROOT} → ./the_programme.exe ${DATA_FOLDER}
 ========================================================
