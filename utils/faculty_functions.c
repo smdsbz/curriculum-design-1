@@ -218,19 +218,21 @@ int removeDepart(Depart **phead, Depart *tgt) {
         return 0;
     }
     // 使链表绕开要删除的节点
-    if (*phead == tgt && tgt->next) { // 要删除的节点是头节点
-        *phead = tgt->next;  // 头节点重新赋值
-    } else if (tgt->next) {    // 要删除的节点不是头节点
+    // case 1 - 要删除的节点是头节点且不是唯一结点
+    if (*phead == tgt && tgt->next) {
+        *phead = tgt->next; // 头节点重新赋值
+    } else { // case 2 - 要删除的节点不是头节点（故不可能为唯一节点）
         // NOTE: 若tgt是唯一的节点，phead不能指向NULL
         Depart *phead_safe = *phead;
         // 遍历找到目标节点之前的节点
         for (; phead_safe->next != tgt; phead_safe = phead_safe->next) ;
-        phead_safe->next = phead_safe->next->next;
+        phead_safe->next = tgt->next;
     }
     // 删除节点
     free(tgt->data); // 释放数据域
-    if (tgt->next == NULL) { tgt->data = NULL; }    // 防止跨界访问
-    if (tgt->next) { free(tgt); }    // 释放节点本身占用的空间
+    // case 3 - 唯一结点，需要保留链表挂载点
+    if (tgt->next == NULL && *phead == tgt) { tgt->data = NULL; }
+    else { free(tgt); }    // 释放节点本身占用的空间
     return 1;
 }
 

@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Stat Overview{% endblock %}
+
+{% block main_content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col s12 l8 offset-l2">
+
+      <h5>
+        {% if nu == 1 %}
+        1. Human Resource
+        {% elif nu == 2 %}
+        2. Project Overview - {{year or 'All'}}
+        {% elif nu == 3 %}
+        3. Top 10 NSFC Teams
+        {% elif nu == 4 %}
+        4. Top 5 Project/Teacher Ratio Teams
+        {% elif nu == 5 %}
+        5. Top 5 Average Project Funding Departments
+        {% endif %}
+      </h5>
+
+      <!-- <br> -->
+
+      <table class="striped">
+        <thead>
+          {% if nu == 1 %}
+          <th>Name</th>
+          <th>Teachers</th>
+          <th>Students</th>
+          <th>S/T Ratio</th>
+
+          {% elif nu == 2 %}
+          <th>Name</th>
+          <th>Projects</th>
+          <th>973 Proj.</th>
+          <th>863 Proj.</th>
+          <th>Funding</th>
+
+          {% elif nu == 3 %}
+          <th>Name</th>
+          <th>NSFC Proj.</th>
+          <th>Funding</th>
+
+          {% elif nu == 4 %}
+          <th>Name</th>
+          <th>Teachers</th>
+          <th>Projects</th>
+          <th>P/T Ratio</th>
+
+          {% elif nu == 5 %}
+          <th>Name</th>
+          <th>Projects</th>
+          <th>Funding</th>
+          <th>Fund/Proj.</th>
+
+          {% endif %}
+        </thead>
+
+        <tbody>
+          {% if not data %}
+          <tr>
+            <td>No data!</td>
+          </tr>
+          {% else %}
+
+            {% if nu == 1 %}
+            {% for each in data %}
+            <tr>
+              <td><a href="{{url_for('depart_view', idx=each[1])}}">{{each[0]}}</a></td>
+              <td>{{each[2][1]}}</td>
+              <td>{{each[2][2]}}</td>
+              {% if each[2][1] == 0 %}
+              <td>---</td>
+              {% else %}
+              <td>{{'%.2f' % each[2][0]}}</td>
+              {% endif %}
+            </tr>
+            {% endfor %}
+
+            {% elif nu == 2 %}
+            {% for each in data %}
+            <tr>
+              <td><a href="{{url_for('depart_view', idx=each[1])}}">{{each[0]}}</a></td>
+              <td>{{each[2][0]}}</td>
+              <td>{{each[2][1]}}</td>
+              <td>{{each[2][2]}}</td>
+              <td>{{'%.2f' % each[2][3]}}</td>
+            </tr>
+            {% endfor %}
+
+            {% elif nu == 3 %}
+            {% for each in data %}
+            <tr>
+              <td><a href="{{url_for('team_view', idx=each[1])}}">{{each[0]}}</a></td>
+              <td>{{each[2][0]}}</td>
+              <td>{{'%.2f' % each[2][1]}}</td>
+            </tr>
+            {% endfor %}
+
+            {% elif nu == 4 %}
+            {% for each in data %}
+            <tr>
+              <td><a href="{{url_for('team_view', idx=each[1])}}">{{each[0]}}</a></td>
+              <td>{{each[2][0]}}</td>
+              <td>{{each[2][1]}}</td>
+              <td>{{'%.2f' % each[2][2]}}</td>
+            </tr>
+            {% endfor %}
+
+            {% elif nu == 5 %}
+            {% for each in data %}
+            <tr>
+              <td><a href="{{url_for('depart_view', idx=each[1])}}">{{each[0]}}</a></td>
+              <td>{{each[2][0]}}</td>
+              <td>{{'%.2f' % each[2][1]}}</td>
+              {% if each[2][0] == 0 %}
+              <td>---</td>
+              {% else %}
+              <td>{{'%.2f' % each[2][2]}}</td>
+              {% endif %}
+            </tr>
+            {% endfor %}
+
+
+            {% endif %}
+
+          {% endif %}
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

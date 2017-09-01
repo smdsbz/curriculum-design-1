@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Querying
+{% if object_type == 'depart' %} Departments
+{% elif object_type == 'team' %} Teams
+{% elif object_type == 'project' %} Projects
+{% endif %}
+{% endblock %}
+
+{% block main_content %}
+
+<div class="container row" style="">
+  <h4>Querying on Departments</h4>
+  <form class="col s12" action="" method="post">
+    <div class="row">
+
+
+      <div class="input-field col s4">
+        <select class="" name="query-partial" id="query-partial"
+            {% if object_type == 'team' %}
+            onchange="changeInputField(this);"
+            {% endif %}
+        required>
+          {% if object_type == 'depart' %}
+          <option value="" disabled selected>Options</option>
+          <option value="name">by Name</option>
+          <option value="manager">by Manager</option>
+          {% elif object_type == 'team' %}
+          <option value="" disabled selected>Options</option>
+          <option value="name">by Name</option>
+          <option value="teacher_num">by Teacher Num.</option>
+          {% elif object_type == 'project' %}
+          <option value="id" selected>by ID</option>
+          {% endif %}
+        </select>
+      </div>
+
+      <div class="input-field col s8">
+        <div class="row" style="margin-bottom:0;">
+          <input class="col s10" type="text" name="query-content-2" id="query-content-2" required>
+          <label for="query-content-2">Value</label>
+          <button type="submit" class="btn-flat waves-effect waves-grey col s2">
+            <i class="material-icons">search</i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- <div class="divider"></div> -->
+
+<div class="container row">
+  <div class="collection s12 l8 offset-l2">
+    {% if not data %}
+    <a href="#" class="collection-item">No data!</a>
+    {% else %}
+    {% for each in data %}
+    <a href="{{'/'+object_type+'/'}}{{data[each]}}" class="collection-item">{{each}}</a>
+    {% endfor %}
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  $('select').material_select();
+
+  {% if object_type == 'team' %}
+  function changeInputField(e) {
+    parent = $("#query-content-2").parent();
+    console.log(parent);
+    parent.empty();
+    if (e.value === "name") {
+      parent.append(`
+        <input class="col s10" type="text" name="query-content-2" id="query-content-2" required>
+        <label for="query-content-2">Value</label>
+        <button type="submit" class="btn-flat waves-effect waves-grey col s2">
+          <i class="material-icons">search</i>
+        </button>
+      `);
+    }
+    else if (e.value === "teacher_num") {
+      parent.append(`
+        <select class="col s4" name="query-content-1" id="query-content-1" required>
+          <option value="" disabled selected>Choose...</option>
+          <option value="&lt;">Less than</option>
+          <option value="&gt;">More than</option>
+          <option value="&#61;">Equal to</option>
+        </select>
+        <input class="col s6" type="number" name="query-content-2" id="query-content-2" placeholder="Value" required>
+        <button class="btn-flat waves-effect waves-grey col s2" type="submit">
+          <i class="material-icons">search</i>
+        </button>
+      `);
+      $('select').material_select();
+    }
+  }
+  {% endif %}
+
+</script>
+
+{% endblock %}

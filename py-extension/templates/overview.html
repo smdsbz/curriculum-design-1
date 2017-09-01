@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Overview of
+{% if object_type == 'depart' %} Departments
+{% elif object_type == 'team' %} Teams
+{% elif object_type == 'project' %} Projects
+{% endif %}
+{% endblock %}
+
+{% block main_content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col s12 l8 offset-l2">
+      <h5>Overview of
+        {% if object_type == 'depart' %} Departments
+        {% elif object_type == 'team' %} Teams
+        {% elif object_type == 'project' %} Projects
+        {% endif %}
+      </h5>
+      <!-- <div class="divider"></div> -->
+      <br>
+      <div class="collection">
+        {% if not data %}
+        <a href="#" class="collection-item">No data!</a>
+        {% else %}
+        {% for each in data %}
+        <a href="{{'/'+object_type+'/'}}{{data.index(each)}}" class="collection-item">{{ each }}</a>
+        {% endfor %}
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
