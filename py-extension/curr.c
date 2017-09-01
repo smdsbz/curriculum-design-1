@@ -485,7 +485,81 @@ curr_parseTypeCodeToString(PyObject *self, PyObject *args) {
     }
 }
 
+/**** Statistic ****/
 
+static PyObject *
+curr_stat_1(PyObject *self) {
+    DepartStatWrapper *rst = \
+        buildDepartStatChainUnordered(mp.depart_head, NULL, 0);
+    if (rst == NULL) { puts("RUNTIME ERROR!"); return NULL; }
+    orderDepartStatWrapperBySTRatio(rst);
+
+    PyObject *rtn = PyList_New(0);
+    DepartStatWrapper *rst_bak = rst;
+    for (; rst; rst=rst->next) {
+        PyObject *Comp_StatWrapper = PyList_New(3);
+        // set name
+        PyList_SetItem(Comp_StatWrapper, 0,
+                       Py_BuildValue("s", rst->depart->data->name));
+        // set idx
+        PyList_SetItem(Comp_StatWrapper, 1,
+                       _getDepartIdxPyString(rst->depart));
+        // set stat data
+            // create stat data wrapper
+        PyObject *Comp_StatDataWrapper = PyList_New(3);
+        PyList_SetItem(Comp_StatDataWrapper, 0,
+                       Py_BuildValue("f",rst->stat.st_ratio));
+        PyList_SetItem(Comp_StatDataWrapper, 1,
+                       Py_BuildValue("i", rst->stat.student_num));
+        PyList_SetItem(Comp_StatDataWrapper, 2,
+                       Py_BuildValue("i", rst->stat.teacher_num));
+            // zero-division
+        if (rst->stat.teacher_num == 0) {
+            PyList_SetItem(Comp_StatDataWrapper, 0,
+                           Py_BuildValue("s", "---"));
+        }
+            // write to stat wrapper
+        PyList_SetItem(Comp_StatWrapper, 2, Comp_StatDataWrapper);
+        // append to return list
+        PyList_Append(rtn, Comp_StatWrapper);
+    }
+
+    cleanupDepartStatWrapper(rst);
+    return rtn;
+}
+
+static PyObject *
+curr_stat_2(PyObject *self, PyObject *args) {
+    int year;
+    if (!PyArg_ParseTuple(args, "i", &year)) { return NULL; }
+    DepartStatWrapper *rst = \
+        buildDepartStatChainUnordered(mp.depart_head, NULL, year);
+    if (rst == NULL) { puts("RUNTIME ERROR!"); return NULL; }
+    orderDepartStatWrapperByProjectTotal(rst);
+    // puts("So far so good!");
+    PyObject *rtn = PyList_New(0);
+    DepartStatWrapper *rst_bak = rst;
+    for (; rst; rst=rst->next) {
+        PyObject *Comp_StatWrapper = PyList_New(3);
+        PyList_SetItem(Comp_StatWrapper, 0,
+                       Py_BuildValue("s", rst->depart->data->name));
+        PyList_SetItem(Comp_StatWrapper, 1,
+                       _getDepartIdxPyString(rst->depart));
+        PyObject *Comp_StatDataWrapper = PyList_New(4);
+        PyList_SetItem(Comp_StatDataWrapper, 0,
+                       Py_BuildValue("i", rst->stat.project_total));
+        PyList_SetItem(Comp_StatDataWrapper, 1,
+                       Py_BuildValue("i", rst->stat.project_973));
+        PyList_SetItem(Comp_StatDataWrapper, 2,
+                       Py_BuildValue("i", rst->stat.project_863));
+        PyList_SetItem(Comp_StatDataWrapper, 3,
+                       Py_BuildValue("f", rst->stat.funding));
+        PyList_SetItem(Comp_StatWrapper, 2, Comp_StatDataWrapper);
+        PyList_Append(rtn, Comp_StatWrapper);
+    }
+    cleanupDepartStatWrapper(rst);
+    return rtn;
+}
 
 /**** Py Packaging ****/
 
@@ -539,6 +613,9 @@ static PyMethodDef CurrMethods[] = {
         "delete team record" },
     { "removeFocusedProject", curr_removeFocusedProject, METH_VARARGS,
         "delete project record" },
+    // STATISTIC
+    { "stat_1", curr_stat_1, METH_VARARGS, "get list of stat No.1" },
+    { "stat_2", curr_stat_2, METH_VARARGS, "get list of stat No.2" },
     // M
     { "parseTypeCodeToString", curr_parseTypeCodeToString, METH_VARARGS,
         "convert project type code to according type string" },

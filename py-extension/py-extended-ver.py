@@ -301,6 +301,25 @@ def project_view(idx):
     if request.method == 'GET':
         return render_template('project.html', data=Manhatan)
 
+
+    ## STAT ##
+
+@app.route('/stat/<int:nu>')
+@check
+def stat_view(nu):
+    if nu == 1:
+        data = curr.stat_1()
+    elif nu == 2:
+        year = request.args.get('year', '0')
+        try:
+            year = int(year)
+        except ValueError:
+            year = 0
+        data = curr.stat_2(year)
+        return render_template('stat.html', nu=nu, year=year, data=data)
+
+    return render_template('stat.html', nu=nu, data=data)
+
 #### MAIN ####
 
 if __name__ == '__main__':
