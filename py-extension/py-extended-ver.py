@@ -309,7 +309,7 @@ def project_view(idx):
 def stat_view(nu):
     if nu == 1:
         data = curr.stat_1()
-    elif nu == 2:
+    elif nu == 2:   # individual view return
         year = request.args.get('year', '0')
         try:
             year = int(year)
@@ -317,6 +317,12 @@ def stat_view(nu):
             year = 0
         data = curr.stat_2(year)
         return render_template('stat.html', nu=nu, year=year, data=data)
+    elif nu == 3:
+        data = curr.stat_3()
+    elif nu == 4:
+        data = curr.stat_4()
+    elif nu == 5:
+        data = curr.stat_5()
 
     return render_template('stat.html', nu=nu, data=data)
 

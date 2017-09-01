@@ -523,8 +523,7 @@ curr_stat_1(PyObject *self) {
         // append to return list
         PyList_Append(rtn, Comp_StatWrapper);
     }
-
-    cleanupDepartStatWrapper(rst);
+    cleanupDepartStatWrapper(rst_bak);
     return rtn;
 }
 
@@ -557,7 +556,97 @@ curr_stat_2(PyObject *self, PyObject *args) {
         PyList_SetItem(Comp_StatWrapper, 2, Comp_StatDataWrapper);
         PyList_Append(rtn, Comp_StatWrapper);
     }
-    cleanupDepartStatWrapper(rst);
+    cleanupDepartStatWrapper(rst_bak);
+    return rtn;
+}
+
+static PyObject *
+curr_stat_3(PyObject *self) {
+    TeamStatWrapper *rst = \
+        buildTeamStatChainUnordered(mp.team_head, NULL, 1);
+    if (rst == NULL) { puts("RUNTIME ERROR!"); return NULL; }
+    orderTeamStatWrapperByNSFCProject(rst);
+
+    PyObject *rtn = PyList_New(0);
+    TeamStatWrapper *rst_bak = rst;
+          // cnt - number control
+    for (int cnt = 0; rst && cnt < 10; rst=rst->next, cnt++) {
+        PyObject *Rock_StatWrapper = PyList_New(3);
+        PyList_SetItem(Rock_StatWrapper, 0,
+                       Py_BuildValue("s", rst->team->data->name));
+        PyList_SetItem(Rock_StatWrapper, 1,
+                       _getTeamIdxPyString(rst->team));
+        PyObject *Rock_StatDataWrapper = PyList_New(2);
+        PyList_SetItem(Rock_StatDataWrapper, 0,
+                       Py_BuildValue("i", rst->stat.project_NSFC));
+        PyList_SetItem(Rock_StatDataWrapper, 1,
+                       Py_BuildValue("f", rst->stat.funding));
+        PyList_SetItem(Rock_StatWrapper, 2, Rock_StatDataWrapper);
+        PyList_Append(rtn, Rock_StatWrapper);
+    }
+    cleanupTeamStatWrapper(rst_bak);
+    return rtn;
+}
+
+static PyObject *
+curr_stat_4(PyObject *self) {
+    TeamStatWrapper *rst = \
+        buildTeamStatChainUnordered(mp.team_head, NULL, 0);
+    if (rst == NULL) { puts("RUNTIME ERROR!"); return NULL; }
+    orderTeamStatWrapperByPTRatio(rst);
+
+    PyObject *rtn = PyList_New(0);
+    TeamStatWrapper *rst_bak = rst;
+    for (int cnt = 0; rst && cnt < 5; rst=rst->next, cnt++) {
+        PyObject *Rock_StatWrapper = PyList_New(3);
+        PyList_SetItem(Rock_StatWrapper, 0,
+                       Py_BuildValue("s", rst->team->data->name));
+        PyList_SetItem(Rock_StatWrapper, 1,
+                       _getTeamIdxPyString(rst->team));
+        PyObject *Rock_StatDataWrapper = PyList_New(3);
+        PyList_SetItem(Rock_StatDataWrapper, 0,
+                       Py_BuildValue("i", rst->team->data->teacher_num));
+        PyList_SetItem(Rock_StatDataWrapper, 1,
+                       Py_BuildValue("i", rst->stat.project_total));
+        PyList_SetItem(Rock_StatDataWrapper, 2,
+                       Py_BuildValue("f", rst->stat.pt_ratio));
+        PyList_SetItem(Rock_StatWrapper, 2, Rock_StatDataWrapper);
+        PyList_Append(rtn, Rock_StatWrapper);
+    }
+    cleanupTeamStatWrapper(rst_bak);
+    return rtn;
+}
+
+static PyObject *
+curr_stat_5(PyObject *self) {
+    DepartStatWrapper *rst = \
+        buildDepartStatChainUnordered(mp.depart_head, NULL, 0);
+    if (rst == NULL) { puts("RUNTIME ERROR!"); return NULL; }
+    orderDepartStatWrapperByAvgFunding(rst);
+
+    PyObject *rtn = PyList_New(0);
+    DepartStatWrapper *rst_bak = rst;
+    for (int cnt = 0; rst && cnt < 5; rst=rst->next) {
+        PyObject *Comp_StatWrapper = PyList_New(3);
+        PyList_SetItem(Comp_StatWrapper, 0,
+                       Py_BuildValue("s", rst->depart->data->name));
+        PyList_SetItem(Comp_StatWrapper, 1,
+                       _getDepartIdxPyString(rst->depart));
+        PyObject *Comp_StatDataWrapper = PyList_New(3);
+        PyList_SetItem(Comp_StatDataWrapper, 0,
+                       Py_BuildValue("i", rst->stat.project_total));
+        PyList_SetItem(Comp_StatDataWrapper, 1,
+                       Py_BuildValue("f", rst->stat.funding));
+        PyList_SetItem(Comp_StatDataWrapper, 2,
+                       Py_BuildValue("f", rst->stat.avg_funding));
+        if (rst->stat.project_total == 0) {
+            PyList_SetItem(Comp_StatDataWrapper, 2,
+                           Py_BuildValue("s", "---"));
+        }
+        PyList_SetItem(Comp_StatWrapper, 2, Comp_StatDataWrapper);
+        PyList_Append(rtn, Comp_StatWrapper);
+    }
+    cleanupDepartStatWrapper(rst_bak);
     return rtn;
 }
 
@@ -616,6 +705,9 @@ static PyMethodDef CurrMethods[] = {
     // STATISTIC
     { "stat_1", curr_stat_1, METH_VARARGS, "get list of stat No.1" },
     { "stat_2", curr_stat_2, METH_VARARGS, "get list of stat No.2" },
+    { "stat_3", curr_stat_3, METH_VARARGS, "get list of stat No.3" },
+    { "stat_4", curr_stat_4, METH_VARARGS, "get list of stat No.4" },
+    { "stat_5", curr_stat_5, METH_VARARGS, "get list of stat No.5" },
     // M
     { "parseTypeCodeToString", curr_parseTypeCodeToString, METH_VARARGS,
         "convert project type code to according type string" },

@@ -8,9 +8,10 @@
 
 <div class="container">
   <div class="row">
+
     <ul class="collapsible popout col s12 l8 offset-l2" data-collapsible="accordion">
       <li>
-        <div class="collapsible-header">Overview</div>
+        <div class="collapsible-header"><i class="material-icons">list</i>Overview</div>
         <div class="collapsible-body" style="padding:0">
           <div class="collection">
             <a href="{{url_for('overview', object_type='depart')}}" class="collection-item">Department</a>
@@ -30,16 +31,66 @@
         </div>
       </li>
       <li>
-        <div class="collapsible-header">Statistics</div>
+        <div class="collapsible-header"><i class="material-icons">trending_up</i>Statistics</div>
         <div class="collapsible-body" style="padding:0">
           <div class="collection">
-            <a href="{{url_for('stat_view', nu=1)}}" class="collection-item">1</a>
-            <a href="#stat-2-input" class="collection-item">2</a>
+            <a href="{{url_for('stat_view', nu=1)}}" class="collection-item">
+              1. Human Resource
+            </a>
+            <a href="#stat-2-input" class="collection-item">
+              2. Project Overview
+            </a>
+            <a href="{{url_for('stat_view', nu=3)}}" class="collection-item">
+              3. Top 10 NSFC Teams
+            </a>
+            <a href="{{url_for('stat_view', nu=4)}}" class="collection-item">
+              4. Top 5 Project/Teacher Ratio Teams
+            </a>
+            <a href="{{url_for('stat_view', nu=4)}}" class="collection-item">
+              5. Top 5 Average Project Funding Departments
+            </a>
           </div>
         </div>
       </li>
     </ul>
+
+    <div class="modal" id="stat-2-input">
+      <div class="modal-content">
+        <div class="container row">
+          <div class="input-field col s12">
+            <!-- TODO: Enter key press -->
+            <input type="number" name="year" id="stat-2-input-year">
+            <label for="stat-2-input-year">Query on year...</label>
+          </div>
+          <button class="btn waves-effect waves-light right col s4" onclick="goStat2();">
+            Query<i class="material-icons right">search</i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+
+
   </div>
 </div>
+
+
+<script>
+  $(".modal").modal();
+
+  function goStat2() {
+    href_prefix = location.href;
+    dst_href = href_prefix + 'stat/2';
+    if ($("#stat-2-input-year").value) {
+      dst_href += '?year=' + $("#stat-2-input-year").value;
+    }
+    location.href = dst_href;
+  }
+</script>
+
+
+
+
 
 {% endblock %}
