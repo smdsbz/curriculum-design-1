@@ -11,20 +11,44 @@ Cursor cursor = {0, NULL};  // 用户指针
 
 static PyObject *
 curr_loadData(PyObject *self, PyObject *args) {
+    puts(START);    // WORK OF ART :-)
     if (!PyArg_ParseTuple(args, "s", &TGT_PATH)) { return NULL; }
     // Reading data
-    puts(TGT_PATH);
+    // puts(TGT_PATH);
     mp = loadData(TGT_PATH);
     if (mp.depart_head == NULL
             || mp.team_head == NULL
             || mp.project_head == NULL) {
+        puts("Data file not found!");
+        cleanupDepart(mp.depart_head);
+        cleanupTeam(mp.team_head);
+        cleanupProject(mp.project_head);
+        // ask if create?
+        printf("Create data file in %s ? [Y/N]: ", TGT_PATH);
+        char option = 0;
+        scanf("%c", &option);
+        switch (option) {
+            case 'Y':   case 'y': {
+                // NOTE: 此时数据文件并不会立即创建
+                //       由于fwrite()函数的特性，数据文件在保存时自动创建
+                mp.depart_head = createDepartHead();
+                mp.team_head = createTeamHead();
+                mp.project_head = createProjectHead();
+                printf("Data will be saved to %s !\n", TGT_PATH);
+                break;
+            }
+            case 'N':   case 'n':   default: {
+                // 没有数据文件，退出程序
+                puts("No data available!");
+                puts("exit");
+                return PyLong_FromLong(0);
+            }
+        }
         return PyLong_FromLong(0);
     }
+
+
     // list out for debugging
-    if (mp.depart_head == NULL) {
-        puts("No data!");
-        return PyLong_FromLong(0);
-    }
     Depart *d; Team *t; Project *p;
     for (d = mp.depart_head; d != NULL; d = d->next) {
         printf("%s\n", d->data->name);
