@@ -131,7 +131,7 @@ def query(object_type):
                 content_1 = request.form.get('query-content-1', None)
                 content_2 = content
                 # validation
-                if content_1 is not ('<' or '>' or '='):
+                if content_1 not in {'<', '>', '='}:
                     flash('Try fvck my code :-)', category='error')
                     return redirect(url_for('quit'))
                 try:
