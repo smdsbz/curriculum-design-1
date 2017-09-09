@@ -24,11 +24,12 @@ Enjoy your ride!\n\
 
 // 顶层
 char *DOC_ROOT = "Operations Available:\n\
-     0) Quit\n\
+     0) Save and quit\n\
      1) List out all records\n\
      2) Query utilities\n\
      3) Statistics utilities\n\
      4) Add a new record\n\
+     5) Back-up data\n\
 ";
 
 // 查询对象选择

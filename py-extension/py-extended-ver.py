@@ -74,6 +74,14 @@ def saving():
         flash('Error while saving!', category='error')
     return redirect(url_for('index'))
 
+@app.route('/backing-up')
+def backup():
+    if curr.backupData():
+    # if True:
+        flash('Successfully backed-up!', category='success')
+    else:
+        flash('Error while backing-up!', category='error')
+    return redirect(url_for('index'))
 
     ## Overview ##
 

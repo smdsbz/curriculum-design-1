@@ -82,6 +82,14 @@ curr_saveData(PyObject *self) {
 }
 
 static PyObject *
+curr_backupData(PyObject *self) {
+    if (backupData(mp, TGT_PATH)) {
+        return PyLong_FromLong(1);
+    }
+    return PyLong_FromLong(0);
+}
+
+static PyObject *
 curr_cleanupAll(PyObject *self, PyObject *args) {
     // cleanups
     cleanupDepart(mp.depart_head);
@@ -797,6 +805,8 @@ static PyMethodDef CurrMethods[] = {
         "convert project type code to according type string" },
     { "saveData", curr_saveData, METH_VARARGS,
         "save(cover) original data" },
+    { "backupData", curr_backupData, METH_VARARGS,
+        "backup current data to $CUR_WORKING_DIR/bak" },
     { NULL, NULL, 0, NULL }
 };
 
