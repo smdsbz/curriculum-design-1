@@ -19,6 +19,13 @@ ${PROGRAMME_ROOT}
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+struct stat st = {0};
 
 #include "data_structure.h"
 #include "faculty_functions.h"
@@ -47,6 +54,7 @@ int _saveProjectData(Project *, const char *);
  *  RETN:   success code
  */
 int saveData(MountPoint , const char *);
+int backupData(MountPoint, const char *);
 MountPoint loadData(const char *);
 
 /********** Function Realization **********/
@@ -162,6 +170,20 @@ int saveData(MountPoint mp, const char *TGT_PATH) {
     #if defined(DEBUG)
     puts("[LOG] Error in saveData():\n\tfailed to save");
     #endif
+    return 0;
+}
+
+/* HACK: bakup data */
+int backupData(MountPoint mp, const char *TGT_PATH) {
+    // generate target path for backup data
+    char BAK_PATH[100];
+    sprintf(BAK_PATH, "%s/%s", TGT_PATH, "bak");
+    // check if target backup directory already exsists
+    // (NOTE: and create one if necessary)
+    if (stat(BAK_PATH, &st) == -1) {
+        mkdir(BAK_PATH, 0755);
+    }
+    if (saveData(mp, BAK_PATH)) { return 1; }
     return 0;
 }
 

@@ -877,6 +877,18 @@ int main(int argc, char const *argv[]) {
                     case 3: { selectStatItem(); break; }
                     // 新增记录
                     case 4: { selectAddObjectType(); break; }
+                    case 5: {
+                        if (!(mp.depart_head->data
+                              && mp.team_head->data
+                              && mp.project_head)) {
+                            puts("Basic info not complete!");
+                            break;
+                        }
+                        if (backupData(mp, TGT_PATH)) {
+                            puts("Successfully backed-up!");
+                        } else { exit(-1); }
+                        break;
+                    }
                     case 0: {
                         // 退出程序时自动保存数据
                         // 数据有效性检查
