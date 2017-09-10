@@ -10,7 +10,12 @@
 {% block main_content %}
 
 <div class="container row" style="">
-  <h4>Querying on Departments</h4>
+  <h4>Querying on
+  {% if object_type == 'depart' %} Departments
+  {% elif object_type == 'team' %} Teams
+  {% elif object_type == 'project' %} Projects
+  {% endif %}
+  </h4>
   <form class="col s12" action="" method="post">
     <div class="row">
 
@@ -68,7 +73,7 @@
   {% if object_type == 'team' %}
   function changeInputField(e) {
     parent = $("#query-content-2").parent();
-    console.log(parent);
+    // console.log(parent);
     parent.empty();
     if (e.value === "name") {
       parent.append(`
