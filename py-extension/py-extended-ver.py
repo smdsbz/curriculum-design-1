@@ -67,8 +67,8 @@ def quit():
 
 @app.route('/saving')
 def saving():
-    # if curr.saveData():     # NOTE: use this one for production
-    if True:    # NOTE: use this for BUILDING stage
+    if curr.saveData():     # NOTE: use this one for production
+    # if True:    # NOTE: use this for BUILDING stage
         flash('Changes saved!', category='success')
     else:
         flash('Error while saving!', category='error')
