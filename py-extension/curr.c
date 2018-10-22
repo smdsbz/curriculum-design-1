@@ -47,7 +47,6 @@ curr_loadData(PyObject *self, PyObject *args) {
         return PyLong_FromLong(0);
     }
 
-
     // list out for debugging
     Depart *d; Team *t; Project *p;
     for (d = mp.depart_head; d != NULL; d = d->next) {
@@ -523,7 +522,7 @@ curr_getTeamByDepart(PyObject *self) {
     PyObject *rtn = PyDict_New();
     Team *team = ((Depart *)cursor.val)->child_team_head;
     if (team == NULL) { return rtn; }
-    for (; team != ((Depart *)cursor.val)->child_team_tail; team=team->next) {
+    for (; team != ((Depart *)cursor.val)->child_team_tail->next; team=team->next) {
         PyDict_SetItemString(rtn, team->data->name,
                              _getTeamIdxPyString(team));
     }
@@ -536,7 +535,7 @@ curr_getProjectByTeam(PyObject *self) {
     PyObject *rtn = PyDict_New();
     Project *project = ((Team *)cursor.val)->child_project_head;
     if (project == NULL) { return rtn; }
-    for (; project != ((Team *)cursor.val)->child_project_tail; project=project->next) {
+    for (; project != ((Team *)cursor.val)->child_project_tail->next; project=project->next) {
         PyDict_SetItemString(rtn, project->data->id,
                              _getProjectIdxPyString(project));
     }
